@@ -45,7 +45,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
  </div>
 </header>
 <main class="max-w-[1920px] w-full mx-auto px-4 sm:px-6 py-6 flex-1">
- <div class="border-b border-emerald-200 mb-5 flex items-end overflow-x-auto"><button class="tab tab-active"><i class="fa-solid fa-seedling mr-2"></i>01. Dados de Transplantio</button><button class="tab"><i class="fa-solid fa-chart-column mr-2"></i>02. Rendimento</button></div>
+ <div id="sheetTabs" class="border-b border-emerald-200 mb-5 flex items-end overflow-x-auto gap-1"></div>
  <section id="content-transplantio" class="space-y-5">
   <div class="glass p-4 print-hide"><div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="font-extrabold text-emerald-900">Filtros de visualização</h2><p class="text-xs text-slate-500">Filtre os dados por bloco, variedade e data sem alterar a planilha.</p></div><div class="flex gap-2"><button onclick="clearFilters()" class="bg-white hover:bg-slate-50 border border-slate-300 px-3 py-2 rounded-lg text-xs font-bold text-slate-700"><i class="fa-solid fa-filter-circle-xmark mr-1"></i>Limpar filtros</button><button onclick="loadData()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button><button onclick="window.print()" class="bg-white border border-slate-300 px-3 py-2 rounded-lg text-xs font-bold text-slate-700"><i class="fa-solid fa-print mr-1"></i>Printar tela</button></div></div><div class="filters-grid"><div><label class="filter-label">Ciclo</label><select id="filterCycle" class="filter-select" onchange="render()"><option value="">Todos os ciclos</option></select></div><div><label class="filter-label">Bloco</label><select id="filterBlock" class="filter-select" onchange="render()"><option value="">Todos os blocos</option></select></div><div><label class="filter-label">Variedade</label><select id="filterVariety" class="filter-select" onchange="render()"><option value="">Todas as variedades</option><option value="BRO">BRO</option><option value="Master">Master</option></select></div><div><label class="filter-label">Data</label><input id="filterDate" type="date" class="filter-date" onchange="render()"></div></div></div>
   <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
@@ -62,16 +62,18 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
   </div>
   <div class="glass p-4"><div class="flex items-center justify-between gap-3 mb-3"><div><h3 class="font-extrabold text-slate-800">Dados consolidados</h3><p id="tableCount" class="text-xs text-slate-500">--</p></div></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs text-center data-table"><thead><tr><th>Bloco</th><th>Ciclo</th><th>Variedade</th><th>Bandejas</th><th>Mudas</th><th>Transplantado</th><th>Perdas</th><th>Dias germinação</th><th>Data</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
  </section>
+ <section id="genericSheets" class="space-y-5 hidden"></section>
 </main>
 </div>
 <script>
 const SHEET_BASE='https://docs.google.com/spreadsheets/d/e/2PACX-1vQBafGpPjdS96k2e5uJbMLZpUAC_lxayvEx3tFkKObwyUAt3Ex1ruG4mWNM4V-eIbn5t6w9gUFH5H5d/pub';
 const SHEET_CSV=SHEET_BASE+'?output=csv';
 const SHEET_XLSX=SHEET_BASE+'?output=xlsx';
-let chart=null, rendimentoChart=null, rows=[];
+let chart=null, rows=[], workbookSheets={};
 function handleLogin(){const u=document.getElementById('username').value,p=document.getElementById('password').value;if(u==='adm123'&&p==='lucas@2026'){document.getElementById('loginError').classList.add('hidden');document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.remove('hidden');document.getElementById('app').classList.add('flex');loadData()}else document.getElementById('loginError').classList.remove('hidden')}
 function logout(){location.reload()}
-document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.tab').forEach((t,i)=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('tab-active'));t.classList.add('tab-active');document.getElementById('content-transplantio').classList.toggle('hidden',i!==0);document.getElementById('content-rendimento').classList.toggle('hidden',i!==1);if(i===1)renderRendimento();})})
+function activateSheetTab(name){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('tab-active'));const t=[...document.querySelectorAll('.tab')].find(x=>x.dataset.sheet===name);if(t)t.classList.add('tab-active');document.getElementById('content-transplantio').classList.toggle('hidden',name!=='Transplantio');document.getElementById('genericSheets').classList.toggle('hidden',name==='Transplantio');if(name!=='Transplantio')renderGenericSheet(name)}
+function buildSheetTabs(names){const tabs=document.getElementById('sheetTabs');tabs.innerHTML='';names.forEach((name,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' tab-active':'');b.dataset.sheet=name;b.innerHTML=`<i class="fa-solid ${norm(name)==='transplantio'?'fa-seedling':'fa-table'} mr-2"></i>${escapeHtml(name)}`;b.onclick=()=>activateSheetTab(name);tabs.appendChild(b)})}
 function norm(s){return String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()}
 function num(v){if(typeof v==='number')return v;let s=String(v??'').trim().replace(/\s/g,'');if(!s)return 0;if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');else if(s.includes(','))s=s.replace(',','.');let n=Number(s.replace(/[^0-9.-]/g,''));return Number.isFinite(n)?n:0}
 function findKey(keys, terms){return keys.find(k=>terms.some(t=>norm(k).includes(norm(t))))}
@@ -81,36 +83,18 @@ function formatDate(v){if(!v)return '--';const [y,m,d]=v.split('-');return d&&m&
 function normalizeData(data){const keys=Object.keys(data[0]||{});const blockK=findKey(keys,['bloco','block']);const varK=findKey(keys,['variedade','cultivar']);const bandK=findKey(keys,['bandeja','bandejas']);const transK=findKey(keys,['transplantado','transplantadas','transplante','plantado']);const lossK=findKey(keys,['perdas','perda']);const germK=findKey(keys,['dias de germinacao','dias germinacao','germinacao','dias']);const dateK=findKey(keys,['data de transplantio','data transplantio','data']);const cycleK=findKey(keys,['ciclo']);const startK=findKey(keys,['inicio','hora inicio','inicio transplantio']);const endK=findKey(keys,['fim','final','hora fim','final transplantio']);const timeK=findKey(keys,['tempo total','tempo','duracao']);const collabK=findKey(keys,['colaborador','colaboradores','funcionarios','pessoas']);return data.map(r=>({bloco:String(r[blockK]||'').trim(),variedade:String(r[varK]||'').trim(),bandejas:num(r[bandK]),transplantado:num(r[transK]),perdas:num(r[lossK]),germinacao:num(r[germK]),data:parseDateValue(r[dateK]),ciclo:String(r[cycleK]||'').trim(),inicio:String(r[startK]||'').trim(),fim:String(r[endK]||'').trim(),tempo:String(r[timeK]||'').trim(),colaboradores:num(r[collabK])})).filter(r=>r.bloco&&r.variedade&&(r.bandejas||r.transplantado||r.perdas||r.germinacao))}
 function variedade(v){const n=norm(v);return n.includes('master')?'Master':n.includes('bro')||n.includes('brocol')?'BRO':v||'Outra'}
 async function loadData(){const st=document.getElementById('status');st.textContent='Atualizando...';let erros=[];try{
-  // 1) Preferimos XLSX publicado: permite localizar a aba "Transplantio" pelo nome, sem depender de gid.
-  try{
-    const res=await fetch(SHEET_XLSX+'&cb='+Date.now(),{method:'GET',mode:'cors',cache:'no-store',redirect:'follow'});
-    if(res.ok){
-      const buf=await res.arrayBuffer();
-      const wb=XLSX.read(buf,{type:'array'});
-      const nome=wb.SheetNames.find(n=>norm(n)==='transplantio') || wb.SheetNames[0];
-      if(nome){
-        const ws=wb.Sheets[nome];
-        const data=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
-        const normalized=normalizeData(data);
-        if(normalized.length){rows=normalized;populateFilters();populateRendimentoFilters();render();renderRendimento();st.textContent=`${rows.length} registros carregados — aba ${nome}`;return;}
-        erros.push('A aba publicada não possui registros reconhecíveis');
-      }
-    }else erros.push('XLSX HTTP '+res.status);
-  }catch(e){erros.push('XLSX: '+(e.message||e));}
-  // 2) Fallback para CSV publicado (primeira aba).
-  try{
-    const res=await fetch(SHEET_CSV+'&cb='+Date.now(),{method:'GET',mode:'cors',cache:'no-store',redirect:'follow'});
-    if(res.ok){
-      const txt=await res.text();
-      if(!/<!doctype html|<html[\s>]/i.test(txt)){
-        const normalized=normalizeData(parseCSV(txt));
-        if(normalized.length){rows=normalized;populateFilters();populateRendimentoFilters();render();renderRendimento();st.textContent=`${rows.length} registros carregados`;return;}
-      }
-      erros.push('CSV publicado sem registros reconhecíveis');
-    }else erros.push('CSV HTTP '+res.status);
-  }catch(e){erros.push('CSV: '+(e.message||e));}
-  throw new Error(erros.join(' | ')||'Publicação indisponível');
-}catch(e){console.error(e);st.textContent='Erro ao carregar os dados';alert('Não foi possível carregar os dados da planilha publicada.\n\nO sistema tentou ler a publicação XLSX e o CSV e procurar a aba "Transplantio" automaticamente.\n\nDetalhe: '+(e.message||e));}}
+  const res=await fetch(SHEET_XLSX+'&cb='+Date.now(),{method:'GET',mode:'cors',cache:'no-store',redirect:'follow'});
+  if(!res.ok)throw new Error('XLSX HTTP '+res.status);
+  const buf=await res.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});
+  workbookSheets={};
+  wb.SheetNames.forEach(nome=>{workbookSheets[nome]=XLSX.utils.sheet_to_json(wb.Sheets[nome],{defval:'',raw:false});});
+  const names=[...wb.SheetNames].sort((a,b)=>norm(a)==='transplantio'?-1:norm(b)==='transplantio'?1:0);buildSheetTabs(names);
+  const nome=names.find(n=>norm(n)==='transplantio')||names[0];
+  const normalized=normalizeData(workbookSheets[nome]||[]);
+  if(!normalized.length)throw new Error(`A aba "${nome}" não possui registros reconhecíveis para o painel de transplantio`);
+  rows=normalized;populateFilters();render();st.textContent=`${rows.length} registros carregados — ${names.length} aba(s) da planilha`;
+}catch(e){console.error(e);st.textContent='Erro ao carregar os dados';alert('Não foi possível carregar as abas da planilha publicada.\n\nO sistema tentou ler todas as abas pela publicação XLSX.\n\nDetalhe: '+(e.message||e));}}
+function renderGenericSheet(name){const data=workbookSheets[name]||[];const box=document.getElementById('genericSheets');if(!data.length){box.innerHTML='<div class="glass p-6 text-center text-slate-500">Esta aba não possui dados.</div>';return;}const keys=Object.keys(data[0]);const rowsHtml=data.map(r=>`<tr>${keys.map(k=>`<td>${escapeHtml(r[k]??'')}</td>`).join('')}</tr>`).join('');box.innerHTML=`<div class="glass p-5"><div class="flex items-center justify-between mb-4"><div><h2 class="text-lg font-extrabold text-slate-800">${escapeHtml(name)}</h2><p class="text-xs text-slate-500">${data.length.toLocaleString('pt-BR')} registros · dados atualizados diretamente da planilha publicada</p></div><button onclick="loadData()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs data-table"><thead><tr>${keys.map(k=>`<th>${escapeHtml(k)}</th>`).join('')}</tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`}
 function populateFilters(){const cyc=document.getElementById('filterCycle');const cycles=[...new Set(rows.map(r=>r.ciclo).filter(Boolean))].sort();cyc.innerHTML='<option value="">Todos os ciclos</option>'+cycles.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');const sel=document.getElementById('filterBlock'),current=sel.value;const blocks=[...new Set(rows.map(r=>r.bloco).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));sel.innerHTML='<option value="">Todos os blocos</option>'+blocks.map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(displayBlock(b))}</option>`).join('');if(blocks.includes(current))sel.value=current;}
 function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function displayBlock(v){let s=String(v).trim();if(/^bloco\s*/i.test(s))return s.replace(/^bloco\s*/i,'Bloco ');return `Bloco ${s.replace(/^0+/,'')||'0'}`.replace(/Bloco (\d+)$/,(_,n)=>`Bloco ${String(n).padStart(2,'0')}`)}
