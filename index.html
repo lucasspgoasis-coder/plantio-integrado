@@ -126,10 +126,64 @@ function findKey(keys, terms){return keys.find(k=>terms.some(t=>norm(k).includes
 function parseCSV(text){let lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return[];const parse=l=>{let a=[],c='',q=false;for(let i=0;i<l.length;i++){let ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){c+='"';i++}else q=!q}else if(ch===','&&!q){a.push(c);c=''}else c+=ch}a.push(c);return a};let h=parse(lines[0]);return lines.slice(1).map(l=>{let a=parse(l),o={};h.forEach((k,i)=>o[k.trim()]=a[i]??'');return o})}
 function parseDateValue(v){let s=String(v??'').trim();if(!s)return '';if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;let m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;let d=new Date(s);if(!Number.isNaN(d.getTime()))return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;return ''}
 function formatDate(v){if(!v)return '--';const [y,m,d]=v.split('-');return d&&m&&y?`${d}/${m}/${y}`:v}
-function normalizeData(data){const keys=Object.keys(data[0]||{});const blockK=findKey(keys,['bloco','block']);const varK=findKey(keys,['variedade','cultivar']);const bandK=findKey(keys,['bandeja','bandejas']);const mudasK=findKey(keys,['mudas','muda']);const transK=keys.find(k=>norm(k)==='total transplantado')||keys.find(k=>norm(k)==='plantado')||keys.find(k=>norm(k)==='transplantado')||findKey(keys,['total transplantado','plantado','transplantado','transplantadas','transplante']);const lossK=findKey(keys,['perdas','perda']);const germK=findKey(keys,['dias de germinacao','dias germinacao','germinacao','dias']);const dateK=findKey(keys,['data de transplantio','data transplantio','data']);const cycleK=findKey(keys,['ciclo']);const startK=findKey(keys,['inicio','hora inicio','inicio transplantio']);const endK=findKey(keys,['fim','final','hora fim','final transplantio']);const timeK=findKey(keys,['tempo total','tempo','duracao']);const collabK=findKey(keys,['colaborador','colaboradores','funcionarios','pessoas']);return data.map(r=>({bloco:normalizeBlock(r[blockK]),variedade:String(r[varK]??'').trim(),bandejas:num(r[bandK]),mudas:num(r[mudasK]),transplantado:num(r[transK]),perdas:num(r[lossK]),germinacao:num(r[germK]),data:parseDateValue(r[dateK]),ciclo:String(r[cycleK]??'').trim(),inicio:String(r[startK]??'').trim(),fim:String(r[endK]??'').trim(),tempo:String(r[timeK]??'').trim(),colaboradores:num(r[collabK])})).filter(r=>r.bloco&&r.variedade&&(r.bandejas||r.mudas||r.transplantado||r.perdas||r.germinacao))}
+function normalizeData(data){
+  const keys=Object.keys(data[0]||{});
+  const blockK=findKey(keys,['bloco','block']);
+  const varK=findKey(keys,['variedade','cultivar']);
+  const bandK=findKey(keys,['bandeja','bandejas']);
+  const mudasK=findKey(keys,['mudas','muda']);
+  const transK=keys.find(k=>norm(k)==='total transplantado')||keys.find(k=>norm(k)==='plantado')||keys.find(k=>norm(k)==='transplantado')||findKey(keys,['total transplantado','plantado','transplantado','transplantadas','transplante']);
+  const lossK=findKey(keys,['perdas','perda']);
+  const germK=findKey(keys,['dias de germinacao','dias germinacao','germinacao','dias']);
+  const dateK=findKey(keys,['data de transplantio','data transplantio','data']);
+  const cycleK=findKey(keys,['ciclo']);
+  const startK=findKey(keys,['inicio','hora inicio','inicio transplantio']);
+  const endK=findKey(keys,['fim','final','hora fim','final transplantio']);
+  const timeK=findKey(keys,['tempo total','tempo','duracao']);
+  const collabK=findKey(keys,['colaborador','colaboradores','funcionarios','pessoas']);
+  return data.map(r=>{
+    const resolved=resolveCounts(num(r[mudasK]),num(r[transK]),num(r[lossK]));
+    return {
+      bloco:normalizeBlock(r[blockK]),
+      variedade:String(r[varK]??'').trim(),
+      bandejas:num(r[bandK]),
+      mudas:resolved.mudas,
+      transplantado:resolved.transplantado,
+      perdas:resolved.perdas,
+      germinacao:num(r[germK]),
+      data:parseDateValue(r[dateK]),
+      ciclo:String(r[cycleK]??'').trim(),
+      inicio:String(r[startK]??'').trim(),
+      fim:String(r[endK]??'').trim(),
+      tempo:String(r[timeK]??'').trim(),
+      colaboradores:num(r[collabK])
+    };
+  }).filter(r=>r.bloco&&r.variedade&&(r.bandejas||r.mudas||r.transplantado||r.perdas||r.germinacao))
+}
 function normalizeBlock(v){let s=String(v??'').trim().replace(/^bloco\s*/i,'');if(/^\d+$/.test(s))return String(Number(s));return s}
 function variedade(v){const raw=String(v??'').trim(),n=norm(raw);if(n.includes('master')||n.includes('tsv'))return 'Master TSV';if(n.includes('syngenta')&&n.includes('68'))return 'BRO 68 Syngenta';if(n.includes('pharlap'))return 'Pharlap';if(n.includes('jiraya'))return 'JIRAYA';if(n==='bro'||n.includes('brocol'))return 'BRO';return raw||'Outra'}
+function scaleCandidates(x){const n=Math.max(0,Number(x||0));return [n,n*1000]}
+function resolveCounts(mRaw,tRaw,pRaw){
+  const m0=Math.max(0,Number(mRaw||0)), t0=Math.max(0,Number(tRaw||0)), p0=Math.max(0,Number(pRaw||0));
+  const candidates=[];
+  for(const mf of [1,1000]) for(const tf of [1,1000]) for(const pf of [1,1000]){
+    const m=m0*mf,t=t0*tf,p=p0*pf;
+    const diff=Math.abs(m-(t+p));
+    candidates.push({m,t,p,diff});
+  }
+  candidates.sort((a,b)=>a.diff-b.diff);
+  const best=candidates[0];
+  // Safety: never allow the dashboard to create impossible percentages from a
+  // malformed row. Keep source values but cap the displayed loss to the
+  // available mudas.
+  return {
+    mudas:best.m,
+    transplantado:best.t,
+    perdas:Math.min(best.p,best.m),
+  };
+}
 function rowMudas(r){return Math.max(0,Number(r.mudas||0))}
+
 function rowTrans(r){return Math.max(0,Number(r.transplantado||0))}
 function rowPerdas(r){return Math.max(0,Number(r.perdas||0))}
 function totals(source){
@@ -290,7 +344,7 @@ function renderRendimento(){
 
 function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function displayBlock(v){let s=String(v).trim();if(/^bloco\s*/i.test(s))return s.replace(/^bloco\s*/i,'Bloco ');return `Bloco ${s.replace(/^0+/,'')||'0'}`.replace(/Bloco (\d+)$/,(_,n)=>`Bloco ${String(n).padStart(2,'0')}`)}
-/* Aba 01: usa diretamente os campos Mudas, Transplantado e Perdas da planilha. Os percentuais são calculados sobre o total de Mudas. */
+/* Aba 01: usa diretamente os campos Mudas, Transplantado e Perdas da planilha. Os valores de Mudas, Transplantado e Perdas são reconciliados a partir dos campos da planilha e consolidados por bloco/ciclo antes do cálculo dos percentuais. */
 function aggregate(source=rows){const map={};source.forEach(r=>{const v=variedade(r.variedade),key=r.bloco+'___'+v;if(!map[key])map[key]={bloco:r.bloco,variedade:v,bandejas:0,mudas:0,transplantado:0,perdas:0,germinacao:[]};map[key].bandejas+=Number(r.bandejas||0);map[key].mudas+=rowMudas(r);map[key].transplantado+=rowTrans(r);map[key].perdas+=rowPerdas(r);if(r.germinacao)map[key].germinacao.push(r.germinacao)});return Object.values(map).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})||a.variedade.localeCompare(b.variedade)).map(r=>{
   const perdas=Math.max(0,Number(r.perdas||0));
   return {...r,perdas,pctTransplantado:pct(r.transplantado,r.mudas),pctPerdas:pct(perdas,r.mudas)};
