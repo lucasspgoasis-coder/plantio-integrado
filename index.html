@@ -105,7 +105,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
    <div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Transplantio — BRO</h3><p class="text-xs text-slate-500">Pontos por bloco: total transplantado, % total transplantado e % total perdido.</p></div><div class="h-[430px] relative"><canvas id="germBroChart"></canvas></div></div>
    <div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Transplantio — Master</h3><p class="text-xs text-slate-500">Pontos por bloco: total transplantado, % total transplantado e % total perdido.</p></div><div class="h-[430px] relative"><canvas id="germMasterChart"></canvas></div></div>
   </div>
-  <div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Transplantado em % — gráfico de pizza</h3><p class="text-xs text-slate-500">Cada fatia representa o % total transplantado do bloco: transplantado ÷ total de mudas. As perdas não são somadas ao transplantado.</p></div><div class="h-[430px] relative"><canvas id="germPieChart"></canvas></div></div>
+  <div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Transplantado em % — gráfico de pizza</h3><p class="text-xs text-slate-500">Cada fatia representa o % total transplantado do bloco: transplantado ÷ total de mudas. As mudas vêm diretamente do campo Mudas da planilha. Transplantado e perdas são campos separados; as perdas nunca são somadas ao transplantado.</p></div><div class="h-[430px] relative"><canvas id="germPieChart"></canvas></div></div>
   <div class="glass p-4"><div class="flex items-center justify-between mb-3"><div><h3 class="font-extrabold text-slate-800">Resumo do transplantio</h3><p id="germCount" class="text-xs text-slate-500">--</p></div></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs text-center data-table"><thead><tr><th>Bloco</th><th>Variedade</th><th>Total de mudas</th><th>Transplantado</th><th>Perdas</th><th>% total transplantado</th><th>% de perdas</th></tr></thead><tbody id="germTbody"></tbody></table></div></div>
  </section>
  <section id="genericSheets" class="space-y-5 hidden"></section>
@@ -129,11 +129,21 @@ function formatDate(v){if(!v)return '--';const [y,m,d]=v.split('-');return d&&m&
 function normalizeData(data){const keys=Object.keys(data[0]||{});const blockK=findKey(keys,['bloco','block']);const varK=findKey(keys,['variedade','cultivar']);const bandK=findKey(keys,['bandeja','bandejas']);const mudasK=findKey(keys,['mudas','muda']);const transK=keys.find(k=>norm(k)==='total transplantado')||keys.find(k=>norm(k)==='plantado')||keys.find(k=>norm(k)==='transplantado')||findKey(keys,['total transplantado','plantado','transplantado','transplantadas','transplante']);const lossK=findKey(keys,['perdas','perda']);const germK=findKey(keys,['dias de germinacao','dias germinacao','germinacao','dias']);const dateK=findKey(keys,['data de transplantio','data transplantio','data']);const cycleK=findKey(keys,['ciclo']);const startK=findKey(keys,['inicio','hora inicio','inicio transplantio']);const endK=findKey(keys,['fim','final','hora fim','final transplantio']);const timeK=findKey(keys,['tempo total','tempo','duracao']);const collabK=findKey(keys,['colaborador','colaboradores','funcionarios','pessoas']);return data.map(r=>({bloco:normalizeBlock(r[blockK]),variedade:String(r[varK]??'').trim(),bandejas:num(r[bandK]),mudas:num(r[mudasK]),transplantado:num(r[transK]),perdas:num(r[lossK]),germinacao:num(r[germK]),data:parseDateValue(r[dateK]),ciclo:String(r[cycleK]??'').trim(),inicio:String(r[startK]??'').trim(),fim:String(r[endK]??'').trim(),tempo:String(r[timeK]??'').trim(),colaboradores:num(r[collabK])})).filter(r=>r.bloco&&r.variedade&&(r.bandejas||r.mudas||r.transplantado||r.perdas||r.germinacao))}
 function normalizeBlock(v){let s=String(v??'').trim().replace(/^bloco\s*/i,'');if(/^\d+$/.test(s))return String(Number(s));return s}
 function variedade(v){const raw=String(v??'').trim(),n=norm(raw);if(n.includes('master')||n.includes('tsv'))return 'Master TSV';if(n.includes('syngenta')&&n.includes('68'))return 'BRO 68 Syngenta';if(n.includes('pharlap'))return 'Pharlap';if(n.includes('jiraya'))return 'JIRAYA';if(n==='bro'||n.includes('brocol'))return 'BRO';return raw||'Outra'}
-function rowMudas(r){const b=Number(r.bandejas||0);return b>0?b*200:Number(r.mudas||0)}
+function rowMudas(r){return Number(r.mudas||0)}
 function rowTrans(r){return Number(r.transplantado||0)}
 function rowPerdas(r){return Number(r.perdas||0)}
 function totals(source){return source.reduce((a,r)=>{a.mudas+=rowMudas(r);a.transplantado+=rowTrans(r);a.perdas+=rowPerdas(r);return a},{mudas:0,transplantado:0,perdas:0})}
 function pct(value,total){return total>0?(Number(value||0)/Number(total))*100:0}
+function validateTotals(t){
+  return {
+    mudas:Number(t.mudas||0),
+    transplantado:Number(t.transplantado||0),
+    perdas:Number(t.perdas||0),
+    percentualTransplantado:pct(t.transplantado,t.mudas),
+    percentualPerdas:pct(t.perdas,t.mudas),
+    somaTransplantadoPerdas:Number(t.transplantado||0)+Number(t.perdas||0)
+  };
+}
 
 async function loadData(){const st=document.getElementById('status');st.textContent='Atualizando...';let erros=[];try{
   const res=await fetch(SHEET_XLSX+'&cb='+Date.now(),{method:'GET',mode:'cors',cache:'no-store',redirect:'follow'});
