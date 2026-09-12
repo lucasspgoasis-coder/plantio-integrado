@@ -1097,19 +1097,20 @@
 
             // Regra do Mínimo de 1%
             let calcP = t > 0 ? (p / t * 100) : 0;
-            if (p > 0 && calcP > 0 && calcP < 1) calcP = 1;
+            let roundedP = Math.round(calcP);
+            if (p > 0 && calcP > 0 && roundedP === 0) roundedP = 1;
 
             const fmt = (n) => new Intl.NumberFormat('pt-BR').format(n);
             document.getElementById('kpiPSTrans').textContent = fmt(t);
             document.getElementById('kpiPSPerdasCausa').textContent = fmt(p);
-            document.getElementById('kpiPSPctPerdasCausa').textContent = (calcP % 1 === 0 ? calcP.toFixed(0) : calcP.toFixed(1)) + '%';
+            document.getElementById('kpiPSPctPerdasCausa').textContent = roundedP + '%';
             
-            // Novos KPIs atualizados para exibir os números reais colhidos/não colhidos
+            // Novos KPIs atualizados para exibir os números reais colhidos/não colhidos com % arredondada
             document.getElementById('kpiPSTotalColhido').textContent = fmt(c);
-            document.getElementById('kpiPSPctColhido').textContent = (t>0?(c/t*100).toFixed(1):0) + '% do plantado';
+            document.getElementById('kpiPSPctColhido').textContent = Math.round(t>0?(c/t*100):0) + '% do plantado';
             
             document.getElementById('kpiPSTotalNaoColhido').textContent = fmt(nc);
-            document.getElementById('kpiPSPctNaoColhido').textContent = (t>0?(nc/t*100).toFixed(1):0) + '% do plantado';
+            document.getElementById('kpiPSPctNaoColhido').textContent = Math.round(t>0?(nc/t*100):0) + '% do plantado';
             
             let topC='', maxV=-1; for(let k in causes) { if(causes[k]>maxV){ maxV=causes[k]; topC=k; } }
             document.getElementById('kpiPSTopCausa').textContent = topC !== '' ? `${topC} (${fmt(maxV)})` : 'Sem registros';
@@ -1218,13 +1219,13 @@
             if (psChartBlockNaoColhidoInstance) psChartBlockNaoColhidoInstance.destroy();
             let pTrans = blocks.map(b => filteredProdSheetData.filter(d=>d.setor===b).reduce((s,r)=>s+r.totalTransplantado,0));
             let pNao = blocks.map(b => filteredProdSheetData.filter(d=>d.setor===b).reduce((s,r)=>s+r.totalNaoColhido,0));
-            let pPct = pTrans.map((t,i) => t>0?parseFloat(((pNao[i]/t)*100).toFixed(1)):0);
+            let pPct = pTrans.map((t,i) => Math.round(t>0?((pNao[i]/t)*100):0));
 
             psChartBlockNaoColhidoInstance = new Chart(document.getElementById('psChartBlockNaoColhido'), {
                 type: 'bar', data: { labels: blocks, datasets: [
-                    { label: 'Total Não Colhido', data: pNao, backgroundColor: '#0ea5e9', yAxisID: 'y', datalabels: {anchor:'end', align:'top', color:'#0369a1', font:{weight:'bold'}} },
-                    { label: '% Não Colhido', data: pPct, type: 'line', yAxisID: 'y1', borderColor: '#f43f5e', backgroundColor: '#f43f5e', datalabels: {align:'bottom', color:'#be123c', font:{weight:'bold'}, formatter:v=>v+'%'} }
-                ]}, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { position: 'left' }, y1: { position: 'right', min: 0, grid: { drawOnChartArea: false } } } }
+                    { label: 'Total Não Colhido', data: pNao, backgroundColor: '#0ea5e9', xAxisID: 'x', datalabels: {anchor:'end', align:'right', color:'#0369a1', font:{weight:'bold'}} },
+                    { label: '% Não Colhido', data: pPct, type: 'bar', xAxisID: 'x1', backgroundColor: '#f43f5e', datalabels: {anchor:'end', align:'right', color:'#be123c', font:{weight:'bold'}, formatter:v=>v+'%'} }
+                ]}, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 40 } }, scales: { y: { grid: { display: false } }, x: { position: 'bottom' }, x1: { position: 'top', min: 0, grid: { drawOnChartArea: false } } } }
             });
 
             let cMap = {}, tT = 0;
@@ -1241,8 +1242,9 @@
             // Regra do Mínimo de 1%
             let cPct = sCaus.map(c => {
                 let p = tT > 0 ? (c[1] / tT * 100) : 0;
-                if (c[1] > 0 && p > 0 && p < 1) p = 1;
-                return parseFloat(p.toFixed(1));
+                let roundedP = Math.round(p);
+                if (c[1] > 0 && p > 0 && roundedP === 0) roundedP = 1;
+                return roundedP;
             });
 
             document.getElementById('psTableBody').innerHTML = sCaus.map((c,i) => `
