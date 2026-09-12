@@ -59,7 +59,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
    <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">% total perdido</p><h3 id="kPerdaPct" class="text-2xl font-extrabold text-orange-600">--</h3></div>
   </div>
   <div class="glass p-5">
-   <div class="flex items-start justify-between gap-3 mb-3"><div><h2 class="text-base font-extrabold text-slate-800">Transplantio por Bloco e Variedade — todas as barras horizontais</h2><p class="text-xs text-slate-500">Blocos em ordem alfabética. Cada variedade é exibida separadamente; mudas = bandejas × 200. % transplantado = transplantado ÷ mudas e % perdas = perdas ÷ mudas. Os totais respeitam todos os filtros selecionados.</p></div><div id="status" class="text-xs font-semibold text-emerald-700"></div></div>
+   <div class="flex items-start justify-between gap-3 mb-3"><div><h2 class="text-base font-extrabold text-slate-800">Transplantio por Bloco e Variedade — todas as variedades da planilha</h2><p class="text-xs text-slate-500">Blocos em ordem alfabética. Todas as variedades registradas na planilha são reconhecidas automaticamente e exibidas separadamente; mudas = bandejas × 200. % transplantado = transplantado ÷ mudas e % perdas = perdas ÷ mudas. Os totais respeitam todos os filtros selecionados, inclusive quando o mesmo bloco possui BRO e Master; cada variedade é somada separadamente e o campo geral soma as duas.</p></div><div id="status" class="text-xs font-semibold text-emerald-700"></div></div>
    <div class="h-[560px] relative"><canvas id="transplantioChart"></canvas></div>
   </div>
   <div class="glass p-4"><div class="flex items-center justify-between gap-3 mb-3"><div><h3 class="font-extrabold text-slate-800">Dados consolidados</h3><p id="tableCount" class="text-xs text-slate-500">--</p></div></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs text-center data-table"><thead><tr><th>Bloco</th><th>Ciclo</th><th>Variedade</th><th>Bandejas</th><th>Mudas</th><th>Transplantado</th><th>Perdas</th><th>Total dias de germinação</th><th>Data</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
@@ -142,7 +142,7 @@ function normalizeData(data){
   const timeK=findKey(keys,['tempo total','tempo','duracao']);
   const collabK=findKey(keys,['colaborador','colaboradores','funcionarios','pessoas']);
   return data.map(r=>{
-    const resolved=resolveCounts(num(r[mudasK]),num(r[transK]),num(r[lossK]));
+    const resolved=resolveCounts(num(r[mudasK]),num(r[transK]),num(r[lossK]),num(r[bandK]));
     return {
       bloco:normalizeBlock(r[blockK]),
       variedade:String(r[varK]??'').trim(),
@@ -161,25 +161,48 @@ function normalizeData(data){
   }).filter(r=>r.bloco&&r.variedade&&(r.bandejas||r.mudas||r.transplantado||r.perdas||r.germinacao))
 }
 function normalizeBlock(v){let s=String(v??'').trim().replace(/^bloco\s*/i,'');if(/^\d+$/.test(s))return String(Number(s));return s}
-function variedade(v){const raw=String(v??'').trim(),n=norm(raw);if(n.includes('master')||n.includes('tsv'))return 'Master TSV';if(n.includes('syngenta')&&n.includes('68'))return 'BRO 68 Syngenta';if(n.includes('pharlap'))return 'Pharlap';if(n.includes('jiraya'))return 'JIRAYA';if(n==='bro'||n.includes('brocol'))return 'BRO';return raw||'Outra'}
+function variedade(v){
+  const raw=String(v??'').replace(/\s+/g,' ').trim();
+  const n=norm(raw);
+  if(!raw)return 'Outra';
+
+  // Mantém os nomes principais em uma forma única para evitar duplicidade
+  // causada apenas por maiúsculas/minúsculas, espaços ou pequenas variações.
+  if(n.includes('master')||n.includes('tsv'))return 'Master TSV';
+  if(n.includes('syngenta')&&n.includes('68'))return 'BRO 68 Syngenta';
+
+  // BRO genérico continua separado do BRO 68 Syngenta.
+  if(n==='bro')return 'BRO';
+
+  // Para qualquer outra variedade registrada na planilha, NÃO transformar
+  // em "Outra", Pharlap ou JIRAYA. O próprio nome da planilha é preservado.
+  // Assim novas variedades passam automaticamente a aparecer no filtro,
+  // gráfico e tabela da Aba 01.
+  return raw;
+}
 function scaleCandidates(x){const n=Math.max(0,Number(x||0));return [n,n*1000]}
-function resolveCounts(mRaw,tRaw,pRaw){
-  const m0=Math.max(0,Number(mRaw||0)), t0=Math.max(0,Number(tRaw||0)), p0=Math.max(0,Number(pRaw||0));
-  const candidates=[];
-  for(const mf of [1,1000]) for(const tf of [1,1000]) for(const pf of [1,1000]){
-    const m=m0*mf,t=t0*tf,p=p0*pf;
-    const diff=Math.abs(m-(t+p));
-    candidates.push({m,t,p,diff});
-  }
-  candidates.sort((a,b)=>a.diff-b.diff);
-  const best=candidates[0];
-  // Safety: never allow the dashboard to create impossible percentages from a
-  // malformed row. Keep source values but cap the displayed loss to the
-  // available mudas.
+function resolveCounts(mRaw,tRaw,pRaw,bandRaw){
+  /*
+    Correção da Aba 01:
+    não alterar escala dos valores tentando forçar mudas = transplantado + perdas.
+    Isso podia funcionar para uma variedade isolada, mas gerar valores errados
+    quando BRO e Master eram filtrados juntos no mesmo bloco.
+
+    Regra:
+    1) usar Mudas, Transplantado e Perdas exatamente como vieram da planilha;
+    2) se Mudas estiver vazio/zero, usar Bandejas × 200 como fallback;
+    3) nunca multiplicar/dividir silenciosamente por 1.000;
+    4) limitar apenas valores negativos a zero.
+  */
+  const m0=Math.max(0,Number(mRaw||0));
+  const t0=Math.max(0,Number(tRaw||0));
+  const p0=Math.max(0,Number(pRaw||0));
+  const b0=Math.max(0,Number(bandRaw||0));
+  const mudas=m0>0 ? m0 : b0*200;
   return {
-    mudas:best.m,
-    transplantado:best.t,
-    perdas:Math.min(best.p,best.m),
+    mudas,
+    transplantado:t0,
+    perdas:p0
   };
 }
 function rowMudas(r){return Math.max(0,Number(r.mudas||0))}
@@ -344,8 +367,8 @@ function renderRendimento(){
 
 function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function displayBlock(v){let s=String(v).trim();if(/^bloco\s*/i.test(s))return s.replace(/^bloco\s*/i,'Bloco ');return `Bloco ${s.replace(/^0+/,'')||'0'}`.replace(/Bloco (\d+)$/,(_,n)=>`Bloco ${String(n).padStart(2,'0')}`)}
-/* Aba 01: usa diretamente os campos Mudas, Transplantado e Perdas da planilha. Os valores de Mudas, Transplantado e Perdas são reconciliados a partir dos campos da planilha e consolidados por bloco/ciclo antes do cálculo dos percentuais. */
-function aggregate(source=rows){const map={};source.forEach(r=>{const v=variedade(r.variedade),key=r.bloco+'___'+v;if(!map[key])map[key]={bloco:r.bloco,variedade:v,bandejas:0,mudas:0,transplantado:0,perdas:0,germinacao:[]};map[key].bandejas+=Number(r.bandejas||0);map[key].mudas+=rowMudas(r);map[key].transplantado+=rowTrans(r);map[key].perdas+=rowPerdas(r);if(r.germinacao)map[key].germinacao.push(r.germinacao)});return Object.values(map).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})||a.variedade.localeCompare(b.variedade)).map(r=>{
+/* Aba 01: usa diretamente Mudas, Transplantado e Perdas da planilha. Não faz ajuste automático de escala. A consolidação é por bloco + variedade, e os KPIs gerais somam todas as variedades que passaram pelo filtro. */
+function aggregate(source=rows){const map={};source.forEach(r=>{const v=variedade(r.variedade),key=String(r.bloco)+'___'+v;if(!map[key])map[key]={bloco:r.bloco,variedade:v,bandejas:0,mudas:0,transplantado:0,perdas:0,germinacao:[]};map[key].bandejas+=Number(r.bandejas||0);map[key].mudas+=rowMudas(r);map[key].transplantado+=rowTrans(r);map[key].perdas+=rowPerdas(r);if(r.germinacao)map[key].germinacao.push(r.germinacao)});return Object.values(map).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})||a.variedade.localeCompare(b.variedade)).map(r=>{
   const perdas=Math.max(0,Number(r.perdas||0));
   return {...r,perdas,pctTransplantado:pct(r.transplantado,r.mudas),pctPerdas:pct(perdas,r.mudas)};
 })}
