@@ -59,7 +59,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
    <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">% total perdido</p><h3 id="kPerdaPct" class="text-2xl font-extrabold text-orange-600">--</h3></div>
   </div>
   <div class="glass p-5">
-   <div class="flex items-start justify-between gap-3 mb-3"><div><h2 class="text-base font-extrabold text-slate-800">Transplantio por Bloco — variedades selecionadas somadas</h2><p class="text-xs text-slate-500">Blocos em ordem alfabética. Quando houver mais de uma variedade no ciclo/bloco selecionado, os valores são somados no mesmo bloco. Mudas = bandejas × 200. % transplantado = transplantado ÷ mudas e % perdas = perdas ÷ mudas. Os totais respeitam todos os filtros selecionados.</p></div><div id="status" class="text-xs font-semibold text-emerald-700"></div></div>
+   <div class="flex items-start justify-between gap-3 mb-3"><div><h2 class="text-base font-extrabold text-slate-800">Transplantio por Bloco — variedades selecionadas somadas</h2><p class="text-xs text-slate-500">Blocos em ordem alfabética. Quando houver mais de uma variedade no ciclo/bloco selecionado, os valores são somados no mesmo bloco. Mudas = bandejas × 200. % transplantado = transplantado ÷ mudas e % perdas = perdas ÷ mudas. Os totais respeitam todos os filtros selecionados.</p></div><div class="flex items-center gap-2"><div id="status" class="text-xs font-semibold text-emerald-700"></div><button id="refreshDataBtn" type="button" onclick="loadData(true)" class="px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition" title="Atualizar dados da planilha"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button></div></div>
    <div class="h-[560px] relative"><canvas id="transplantioChart"></canvas></div>
   </div>
   <div class="glass p-4"><div class="flex items-center justify-between gap-3 mb-3"><div><h3 class="font-extrabold text-slate-800">Dados consolidados</h3><p id="tableCount" class="text-xs text-slate-500">--</p></div></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs text-center data-table"><thead><tr><th>Bloco</th><th>Ciclo</th><th>Variedade</th><th>Bandejas</th><th>Mudas</th><th>Transplantado</th><th>Perdas</th><th>Total dias de germinação</th><th>Data</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
@@ -116,7 +116,7 @@ const SHEET_BASE='https://docs.google.com/spreadsheets/d/e/2PACX-1vQBafGpPjdS96k
 const SHEET_CSV=SHEET_BASE+'?output=csv';
 const SHEET_XLSX=SHEET_BASE+'?output=xlsx';
 let chart=null, germBroChart=null, germMasterChart=null, germPctChart=null, germPieChart=null, rendimentoChart=null, rendimentoPctChart=null, rendimentoPieChart=null, rows=[], workbookSheets={};
-function handleLogin(){const u=document.getElementById('username').value,p=document.getElementById('password').value;if(u==='adm123'&&p==='lucas@2026'){document.getElementById('loginError').classList.add('hidden');document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.remove('hidden');document.getElementById('app').classList.add('flex');loadData()}else document.getElementById('loginError').classList.remove('hidden')}
+function handleLogin(){const u=document.getElementById('username').value,p=document.getElementById('password').value;if(u==='adm123'&&p==='lucas@2026'){document.getElementById('loginError').classList.add('hidden');document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.remove('hidden');document.getElementById('app').classList.add('flex');loadData();startAutoSync()}else document.getElementById('loginError').classList.remove('hidden')}
 function logout(){location.reload()}
 function activateSheetTab(name){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('tab-active'));const t=[...document.querySelectorAll('.tab')].find(x=>x.dataset.sheet===name);if(t)t.classList.add('tab-active');document.getElementById('content-transplantio').classList.toggle('hidden',name!=='Transplantio');document.getElementById('content-rendimento').classList.toggle('hidden',name!=='Rendimento');document.getElementById('content-germinacao').classList.toggle('hidden',name!=='Germinação');document.getElementById('genericSheets').classList.toggle('hidden',name==='Transplantio'||name==='Rendimento'||name==='Germinação');if(name==='Rendimento')renderRendimento();else if(name==='Germinação')renderGerminacao();else if(name!=='Transplantio')renderGenericSheet(name)}
 function buildSheetTabs(names){const tabs=document.getElementById('sheetTabs');tabs.innerHTML='';const ordered=[...names.filter(n=>norm(n)==='transplantio'), 'Rendimento', 'Germinação', ...names.filter(n=>norm(n)!=='transplantio')];const unique=[...new Set(ordered)];unique.forEach((name,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' tab-active':'');b.dataset.sheet=name;const icon=norm(name)==='transplantio'?'fa-seedling':norm(name)==='rendimento'?'fa-chart-column':norm(name)==='germinacao'?'fa-chart-scatter':'fa-table';b.innerHTML=`<i class="fa-solid ${icon} mr-2"></i>${escapeHtml(name)}`;b.onclick=()=>activateSheetTab(name);tabs.appendChild(b)})}
@@ -202,9 +202,9 @@ function rowTrans(r){return Math.max(0,Number(r.transplantado||0))}
 /* A perda vem da própria coluna "Perdas" da planilha.
    Só usamos o saldo como fallback quando a célula de perdas estiver vazia. */
 function rowPerdas(r){
-  const source=Number(r.perdas);
-  if(Number.isFinite(source) && source>0)return source;
-  return Math.min(rowMudas(r),Math.max(0,rowMudas(r)-rowTrans(r)));
+  // Usa sempre o valor da coluna "Perdas" da planilha. A normalização já
+  // resolve a escala numérica da fonte e preenche somente células realmente vazias.
+  return Math.max(0,Number(r.perdas||0));
 }
 function totals(source){
   let mudas=0,transplantado=0,perdas=0;
@@ -236,18 +236,88 @@ function validateTotals(t){
   };
 }
 
-async function loadData(){const st=document.getElementById('status');st.textContent='Atualizando...';let erros=[];try{
-  const res=await fetch(SHEET_XLSX+'&cb='+Date.now(),{method:'GET',mode:'cors',cache:'no-store',redirect:'follow'});
-  if(!res.ok)throw new Error('XLSX HTTP '+res.status);
-  const buf=await res.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});
-  workbookSheets={};
-  wb.SheetNames.forEach(nome=>{workbookSheets[nome]=XLSX.utils.sheet_to_json(wb.Sheets[nome],{defval:'',raw:false});});
-  const names=[...wb.SheetNames].sort((a,b)=>norm(a)==='transplantio'?-1:norm(b)==='transplantio'?1:0);buildSheetTabs(names);
-  const nome=names.find(n=>norm(n)==='transplantio')||names[0];
-  const normalized=normalizeData(workbookSheets[nome]||[]);
-  if(!normalized.length)throw new Error(`A aba "${nome}" não possui registros reconhecíveis para o painel de transplantio`);
-  rows=normalized;populateFilters();updateFilterContextStatus();render();st.textContent=`${rows.length} registros carregados — ${names.length} aba(s) da planilha`;
-}catch(e){console.error(e);st.textContent='Erro ao carregar os dados';alert('Não foi possível carregar as abas da planilha publicada.\n\nO sistema tentou ler todas as abas pela publicação XLSX.\n\nDetalhe: '+(e.message||e));}}
+function captureFilterState(){
+  const state={};
+  document.querySelectorAll('[id$="Menu"]').forEach(menu=>{
+    const values=[...menu.querySelectorAll('input[data-value]:checked')].map(x=>x.value);
+    const all=menu.querySelector('[data-all]');
+    state[menu.id]={
+      values,
+      allChecked:!!all?.checked
+    };
+  });
+  return state;
+}
+function restoreFilterState(state){
+  if(!state)return;
+  Object.entries(state).forEach(([menuId,info])=>{
+    const menu=document.getElementById(menuId);
+    if(!menu)return;
+    const boxes=[...menu.querySelectorAll('input[data-value]')];
+    const all=menu.querySelector('[data-all]');
+    const wanted=new Set(info.values||[]);
+    boxes.forEach(b=>b.checked=wanted.has(b.value));
+    if(all)all.checked=info.allChecked && !boxes.length ? true : (boxes.length ? boxes.every(b=>b.checked) : true);
+    const labelId=menuId.replace('Menu','Label');
+    const label=document.getElementById(labelId);
+    if(label){
+      const text=menuId.startsWith('filterCycle')?'Todos os ciclos':
+        menuId.startsWith('filterBlock')||menuId.startsWith('rFilterBlock')||menuId.startsWith('gBroBlock')||menuId.startsWith('gMasterBlock')?'Todos os blocos':
+        menuId.startsWith('filterVariety')||menuId.startsWith('rFilterVariety')?'Todas as variedades':
+        menuId.includes('Month')?'Todos os meses':'Todos';
+      updateMultiLabel(menuId,labelId,text);
+    }
+  });
+}
+async function loadData(manual=false){
+  const st=document.getElementById('status');
+  const btn=document.getElementById('refreshDataBtn');
+  const previousState=captureFilterState();
+  st.textContent='Atualizando dados da planilha...';
+  if(btn)btn.disabled=true;
+  try{
+    // A URL publicada do Google Sheets é a fonte oficial. O parâmetro cb
+    // impede que uma cópia em cache seja reutilizada.
+    const res=await fetch(SHEET_XLSX+'&cb='+Date.now(),{
+      method:'GET',mode:'cors',cache:'no-store',redirect:'follow'
+    });
+    if(!res.ok)throw new Error('XLSX HTTP '+res.status);
+    const buf=await res.arrayBuffer();
+    const wb=XLSX.read(buf,{type:'array'});
+    workbookSheets={};
+    wb.SheetNames.forEach(nome=>{
+      workbookSheets[nome]=XLSX.utils.sheet_to_json(wb.Sheets[nome],{defval:'',raw:false});
+    });
+    const names=[...wb.SheetNames].sort((a,b)=>norm(a)==='transplantio'?-1:norm(b)==='transplantio'?1:0);
+    buildSheetTabs(names);
+    const nome=names.find(n=>norm(n)==='transplantio')||names[0];
+    const normalized=normalizeData(workbookSheets[nome]||[]);
+    if(!normalized.length)throw new Error(`A aba "${nome}" não possui registros reconhecíveis para o painel de transplantio`);
+    rows=normalized;
+    populateFilters();
+    restoreFilterState(previousState);
+    updateFilterContextStatus();
+    render();
+    if(document.querySelector('.tab.tab-active')?.dataset.sheet==='Rendimento')renderRendimento();
+    if(document.querySelector('.tab.tab-active')?.dataset.sheet==='Germinação')renderGerminacao();
+    st.textContent=`Sincronizado com a planilha • ${rows.length} registros • ${new Date().toLocaleTimeString('pt-BR')}`;
+  }catch(e){
+    console.error(e);
+    st.textContent='Erro ao atualizar a planilha';
+    if(manual)alert('Não foi possível atualizar os dados da planilha publicada.\n\nDetalhe: '+(e.message||e));
+  }finally{
+    if(btn)btn.disabled=false;
+  }
+}
+let syncTimer=null;
+function startAutoSync(){
+  clearInterval(syncTimer);
+  // Atualiza automaticamente a cada 60 segundos enquanto o painel estiver aberto.
+  syncTimer=setInterval(()=>{if(!document.hidden)loadData(false)},60000);
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden && rows.length)loadData(false);
+});
 function aggregateGeneral(source){
   let mudas=0,transplantado=0,perdas=0;
   (source||[]).forEach(r=>{
