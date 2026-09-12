@@ -759,12 +759,12 @@
                         </div>
                         Horas Trabalhadas e Transplantado
                     </h3>
-                    <div class="relative w-full" style="height: 450px;">
+                    <div class="relative w-full" style="height: 500px;">
                         <canvas id="prodChartHours"></canvas>
                     </div>
                 </section>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-6">
                     <section class="elegant-card p-6">
                         <h3 class="text-lg font-extrabold text-slate-800 mb-2">Rendimento (Mudas/Colaborador)</h3>
                         <div class="relative w-full" style="height: 400px;">
@@ -882,7 +882,7 @@
                 <section class="elegant-card p-6">
                     <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
                         <div class="bg-rose-50 text-rose-600 p-2 rounded-lg">
-                            <i class="fa-solid fa-chart-column"></i>
+                            <i class="fa-solid fa-chart-line"></i>
                         </div>
                         Total de Perdas por Causa e % de Perda
                     </h3>
@@ -1405,7 +1405,7 @@
                         datalabels: { anchor: 'end', align: 'top', color: vColors[v], font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val>0?new Intl.NumberFormat('pt-BR').format(val):'' }
                     });
                     ds.push({ label: v + ' (% Plantado)', data: blocks.map((b,i) => mudas[i]>0?(trans[i]/mudas[i]*100):null), type: 'line', yAxisID: 'y1',
-                        borderColor: vColors[v], backgroundColor: vColors[v], borderWidth: 2, borderDash: [5, 5], datalabels: { display: false }
+                        borderColor: vColors[v], backgroundColor: vColors[v], borderWidth: 3, borderDash: [], tension: 0.42, cubicInterpolationMode: 'monotone', pointRadius: 4, pointHoverRadius: 6, datalabels: { display: true, align: 'top', anchor: 'end', font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val != null ? Math.round(val) + '%' : '' }
                     });
                 }
             });
@@ -1433,7 +1433,7 @@
                     let r = filteredRendData.filter(x => x.local === b && x.variedade === v);
                     let m = r.reduce((s,x)=>s+x.mudas,0); return m>0?Math.round(r.reduce((s,x)=>s+x.transplantado,0)/m*100):null;
                 });
-                if(d.some(x=>x!==null)) return { label: `% Plantado (${v})`, data: d, borderColor: vColors[v], backgroundColor: vColors[v], fill: false, datalabels:{align:'top', font:{weight:'bold'}, formatter:val=>val?val+'%':''} };
+                if(d.some(x=>x!==null)) return { label: `% Plantado (${v})`, data: d, borderColor: vColors[v], backgroundColor: vColors[v], fill: false, tension: 0.42, cubicInterpolationMode: 'monotone', borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, datalabels:{align:'top', font:{weight:'bold'}, formatter:val=>val?val+'%':''} };
             }).filter(Boolean);
 
             rendChartPctInstance = new Chart(document.getElementById('rendChartPercentage'), {
@@ -1467,7 +1467,7 @@
             prodChartHoursInstance = new Chart(document.getElementById('prodChartHours'), {
                 type: 'bar', data: { labels: blocks, datasets: [
                     { label: 'Transplantado', data: hTrans, backgroundColor: '#6366f1', yAxisID: 'y', datalabels: {anchor:'end', align:'top', formatter:v=>new Intl.NumberFormat('pt-BR').format(v)} },
-                    { label: 'Horas', data: hHours, type: 'line', yAxisID: 'y1', borderColor: '#f59e0b', backgroundColor: '#f59e0b', datalabels: {align:'bottom', formatter:v=>v.toFixed(1)+'h'} }
+                    { label: 'Horas', data: hHours, type: 'bar', yAxisID: 'y1', backgroundColor: '#f59e0b', borderRadius: 8, barThickness: 28, maxBarThickness: 34, datalabels: {anchor:'end', align:'top', formatter:v=>v.toFixed(1)+'h'} }
                 ]}, options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
             });
 
@@ -1575,10 +1575,10 @@
 
             if (psChartCausasBarraInstance) psChartCausasBarraInstance.destroy();
             psChartCausasBarraInstance = new Chart(document.getElementById('psChartCausasBarra'), {
-                type: 'bar', data: { labels: cLbl, datasets: [
-                    { label: 'Total Perdas', data: cPer, backgroundColor: '#f43f5e', yAxisID: 'y', datalabels: {anchor:'end', align:'top', font:{weight:'bold'}} },
-                    { label: '% de Perda', data: cPct, type: 'line', yAxisID: 'y1', borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', datalabels: {align:'bottom', font:{weight:'bold'}, formatter:v=>v+'%'} }
-                ]}, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { position: 'left' }, y1: { position: 'right', min: 0, grid: { drawOnChartArea: false } } } }
+                type: 'line', data: { labels: cLbl, datasets: [
+                    { label: 'Total Perdas', data: cPer, borderColor: '#f43f5e', backgroundColor: '#f43f5e', yAxisID: 'y', borderWidth: 3, tension: 0.42, cubicInterpolationMode: 'monotone', pointRadius: 5, pointHoverRadius: 7, fill: false, datalabels: {display:true, anchor:'end', align:'top', font:{weight:'bold'}, formatter:v=>new Intl.NumberFormat('pt-BR').format(v)} },
+                    { label: '% de Perda', data: cPct, yAxisID: 'y1', borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', borderWidth: 3, tension: 0.42, cubicInterpolationMode: 'monotone', pointRadius: 5, pointHoverRadius: 7, fill: false, datalabels: {display:true, align:'bottom', anchor:'end', font:{weight:'bold'}, formatter:v=>v+'%'} }
+                ]}, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { x: { grid: { display: false } }, y: { position: 'left', beginAtZero: true, title:{display:true,text:'Total de Perdas'} }, y1: { position: 'right', min: 0, grid: { drawOnChartArea: false }, title:{display:true,text:'% de Perda'} } }, plugins: { legend: { display: true, position: 'top', labels: { usePointStyle: true, padding: 18, font:{family:'Poppins',weight:'700'} } } } }
             });
 
             if (psChartCausasPizzaInstance) psChartCausasPizzaInstance.destroy();
