@@ -309,8 +309,8 @@ document.addEventListener('click',e=>{if(!e.target.closest('.multi-select'))docu
 function selectedValues(menuId){return [...document.querySelectorAll('#'+menuId+' input[type=checkbox]:checked:not([data-all])')].map(x=>x.value)}
 function updateMultiLabel(menuId,labelId,allText){const vals=selectedValues(menuId);document.getElementById(labelId).textContent=!vals.length||document.querySelector('#'+menuId+' input[data-all]')?.checked?allText:(vals.length<=2?vals.join(', '):`${vals.length} selecionados`)}
 function makeMulti(menuId,labelId,items,allText,onChange,formatter=x=>x){const menu=document.getElementById(menuId);if(!menu)return;menu.innerHTML=`<label class="multi-option multi-all"><input type="checkbox" data-all checked> Selecionar todos</label>`+items.map((x,i)=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(String(x))}" data-value checked> ${escapeHtml(formatter(x))}</label>`).join('');const all=menu.querySelector('[data-all]');const boxes=[...menu.querySelectorAll('[data-value]')];all.onchange=()=>{boxes.forEach(b=>b.checked=all.checked);updateMultiLabel(menuId,labelId,allText);onChange()};boxes.forEach(b=>b.onchange=()=>{all.checked=boxes.every(x=>x.checked);updateMultiLabel(menuId,labelId,allText);onChange()});updateMultiLabel(menuId,labelId,allText)}
-function populateFilters(){const cycles=[...new Set(rows.map(r=>r.ciclo).filter(Boolean))].sort();const blocks=[...new Set(rows.map(r=>r.bloco).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));const varieties=[...new Set(rows.map(r=>variedade(r.variedade)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));const dates=[...new Set(rows.map(r=>r.data).filter(Boolean))].sort();makeMulti('filterCycleMenu','filterCycleLabel',cycles,'Todos os ciclos',()=>{refreshContextFilterMenus();render()});makeMulti('filterBlockMenu','filterBlockLabel',blocks,'Todos os blocos',()=>{refreshContextFilterMenus();render()},displayBlock);makeMulti('filterVarietyMenu','filterVarietyLabel',varieties,'Todas as variedades',()=>{refreshContextFilterMenus();render()});makeMulti('gBroBlockMenu','gBroBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gBroCycleMenu','gBroCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gBroMonthMenu','gBroMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('gMasterBlockMenu','gMasterBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gMasterCycleMenu','gMasterCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gMasterMonthMenu','gMasterMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('rFilterBlockMenu','rFilterBlockLabel',blocks,'Todos os blocos',renderRendimento,displayBlock);makeMulti('rFilterCycleMenu','rFilterCycleLabel',cycles,'Todos os ciclos',renderRendimento);makeMulti('rFilterVarietyMenu','rFilterVarietyLabel',varieties,'Todas as variedades',renderRendimento)}
-function filteredRows(){const cy=selectedValues('filterCycleMenu'),b=selectedValues('filterBlockMenu'),v=selectedValues('filterVarietyMenu');const start=document.getElementById('filterStartDate')?.value||'',end=document.getElementById('filterEndDate')?.value||'';return rows.filter(r=>(!cy.length||cy.includes(r.ciclo))&&(!b.length||b.includes(r.bloco))&&(!v.length||v.includes(variedade(r.variedade)))&&(!start||!r.data||r.data>=start)&&(!end||!r.data||r.data<=end))}
+function populateFilters(){const cycles=[...new Set(rows.map(r=>String(r.ciclo??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));const blocks=[...new Set(rows.map(r=>String(r.bloco??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));const varieties=[...new Set(rows.map(r=>variedade(r.variedade)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));makeMulti('filterCycleMenu','filterCycleLabel',cycles,'Todos os ciclos',render);makeMulti('filterBlockMenu','filterBlockLabel',blocks,'Todos os blocos',render,displayBlock);makeMulti('filterVarietyMenu','filterVarietyLabel',varieties,'Todas as variedades',render);makeMulti('gBroBlockMenu','gBroBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gBroCycleMenu','gBroCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gBroMonthMenu','gBroMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('gMasterBlockMenu','gMasterBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gMasterCycleMenu','gMasterCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gMasterMonthMenu','gMasterMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('rFilterBlockMenu','rFilterBlockLabel',blocks,'Todos os blocos',renderRendimento,displayBlock);makeMulti('rFilterCycleMenu','rFilterCycleLabel',cycles,'Todos os ciclos',renderRendimento);makeMulti('rFilterVarietyMenu','rFilterVarietyLabel',varieties,'Todas as variedades',renderRendimento)}
+function filteredRows(){const cy=selectedValues('filterCycleMenu').map(x=>String(x).trim()),b=selectedValues('filterBlockMenu').map(x=>String(x).trim()),v=selectedValues('filterVarietyMenu').map(x=>String(x).trim());const start=document.getElementById('filterStartDate')?.value||'',end=document.getElementById('filterEndDate')?.value||'';return rows.filter(r=>{const rc=String(r.ciclo??'').trim(),rb=String(r.bloco??'').trim(),rv=variedade(r.variedade);return (!cy.length||cy.includes(rc))&&(!b.length||b.includes(rb))&&(!v.length||v.includes(rv))&&(!start||!r.data||r.data>=start)&&(!end||!r.data||r.data<=end)})}
 function updateFilterContextStatus(){
   const c=selectedValues('filterCycleMenu'),b=selectedValues('filterBlockMenu'),v=selectedValues('filterVarietyMenu');
   const parts=[];
@@ -508,22 +508,23 @@ function aggregate(source=rows){
   });
 }
 function aggregateBlockCycle(source=rows){
-  // Consolida TODOS os registros que passaram pelos filtros por BLOCO.
-  // Assim, se o usuário selecionar 2+ ciclos e/ou 2+ variedades do mesmo bloco,
-  // os campos gerais recebem a soma conjunta antes do cálculo dos percentuais.
-  // Ex.: Bloco 01 + Ciclo 06 + BRO 68 + Master => 27.000 mudas, não 17.000/10.000 separados.
-  const map={};
+  // Consolida os registros JÁ FILTRADOS por BLOCO. O ciclo e a variedade não
+  // fazem parte da chave de consolidação: eles definem quais registros entram
+  // no conjunto, e depois tudo desse bloco é somado.
+  // Ex.: Bloco 01 + Ciclo 6 + BRO + Master => uma única barra com a soma das duas variedades.
+  const map=new Map();
   (source||[]).forEach(r=>{
-    const key=String(r.bloco??'').trim();
-    if(!key)return;
-    if(!map[key])map[key]={bloco:key,bandejas:0,mudas:0,transplantado:0};
-    map[key].bandejas+=Number(r.bandejas||0);
-    map[key].mudas+=rowMudas(r);
-    map[key].transplantado+=rowTrans(r);
+    const bloco=String(r.bloco??'').trim();
+    if(!bloco)return;
+    if(!map.has(bloco))map.set(bloco,{bloco,bandejas:0,mudas:0,transplantado:0});
+    const g=map.get(bloco);
+    g.bandejas+=Number(r.bandejas||0);
+    g.mudas+=rowMudas(r);
+    g.transplantado+=rowTrans(r);
   });
-  return Object.values(map).map(r=>{
-    const mudas=Math.max(0,Math.round(Number(r.mudas||0)));
-    const transplantado=Math.min(mudas,Math.max(0,Math.round(Number(r.transplantado||0))));
+  return [...map.values()].map(r=>{
+    const mudas=Math.max(0,Math.round(r.mudas));
+    const transplantado=Math.min(mudas,Math.max(0,Math.round(r.transplantado)));
     const perdas=Math.max(0,mudas-transplantado);
     return {...r,mudas,transplantado,perdas,pctTransplantado:pct(transplantado,mudas),pctPerdas:pct(perdas,mudas)};
   }).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'}));
