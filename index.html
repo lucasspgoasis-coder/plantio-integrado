@@ -105,6 +105,272 @@
         .login-bg {
             background: linear-gradient(135deg, #064e3b 0%, #0f766e 100%);
         }
+
+        /* Logo institucional - sem moldura/contorno */
+        .system-logo {
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
+            display: block;
+            border: 0 !important;
+            outline: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            flex-shrink: 0;
+        }
+        .login-logo {
+            width: 112px;
+            height: 112px;
+            object-fit: contain;
+            display: block;
+            border: 0 !important;
+            outline: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            margin-bottom: 14px;
+        }
+        @media (max-width: 640px) {
+            .system-logo { width: 48px; height: 48px; }
+            .login-logo { width: 96px; height: 96px; }
+        }
+
+        /* ===== REFINO VISUAL PREMIUM ===== */
+        :root {
+            --ui-green: #059669;
+            --ui-green-dark: #065f46;
+            --ui-ink: #0f172a;
+            --ui-muted: #64748b;
+            --ui-line: #e2e8f0;
+            --ui-surface: #ffffff;
+            --ui-bg: #f5f8f7;
+        }
+
+        body {
+            background: radial-gradient(circle at 15% 0%, rgba(16,185,129,.06), transparent 28%),
+                        radial-gradient(circle at 100% 20%, rgba(20,184,166,.05), transparent 30%),
+                        var(--ui-bg);
+            color: var(--ui-ink);
+        }
+
+        /* Login */
+        .login-bg {
+            background:
+                radial-gradient(circle at 15% 20%, rgba(52,211,153,.18), transparent 26%),
+                radial-gradient(circle at 85% 80%, rgba(45,212,191,.16), transparent 28%),
+                linear-gradient(135deg, #022c22 0%, #064e3b 48%, #0f766e 100%);
+        }
+        .login-bg::before,
+        .login-bg::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 9999px;
+            pointer-events: none;
+        }
+        .login-bg::before { width: 430px; height: 430px; left: -170px; top: -170px; }
+        .login-bg::after { width: 520px; height: 520px; right: -220px; bottom: -220px; }
+        #loginScreen > div {
+            border: 1px solid rgba(255,255,255,.70);
+            box-shadow: 0 35px 80px rgba(0,0,0,.28), 0 8px 30px rgba(0,0,0,.12);
+            padding: 2.5rem;
+            backdrop-filter: blur(12px);
+        }
+        #loginScreen > div::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 5px;
+            background: linear-gradient(90deg, #059669, #14b8a6, #34d399);
+        }
+        #loginScreen .login-logo {
+            width: 118px;
+            height: 118px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 8px 14px rgba(15,118,110,.14));
+        }
+        #loginScreen h2 { letter-spacing: -.025em; }
+        #loginScreen form > div > label { color: #64748b; }
+        #loginScreen input {
+            min-height: 48px;
+            border-radius: 14px;
+            background: #f8fafc;
+            border-color: #dbe4e1;
+            box-shadow: inset 0 1px 2px rgba(15,23,42,.025);
+        }
+        #loginScreen input:hover { border-color: #b7c9c3; background: #fff; }
+        #loginScreen input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16,185,129,.11), 0 4px 12px rgba(15,23,42,.05);
+        }
+        #loginScreen button[type="submit"] {
+            min-height: 50px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #059669, #0f766e);
+            box-shadow: 0 12px 24px rgba(5,150,105,.24);
+        }
+        #loginScreen button[type="submit"]:hover {
+            background: linear-gradient(135deg, #047857, #115e59);
+            box-shadow: 0 16px 30px rgba(5,150,105,.30);
+        }
+        .login-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 11px;
+            margin-bottom: 12px;
+            border-radius: 999px;
+            background: #ecfdf5;
+            color: #047857;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+        }
+
+        /* Cabeçalho */
+        #dashboardScreen > header {
+            box-shadow: 0 8px 24px rgba(2,44,34,.16);
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        #dashboardScreen > header::after {
+            content: "";
+            position: absolute;
+            right: -80px;
+            top: -130px;
+            width: 300px;
+            height: 300px;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 50%;
+        }
+        #dashboardScreen > header h1 { letter-spacing: -.035em; }
+        #dashboardScreen > header .system-logo { width: 62px; height: 62px; filter: drop-shadow(0 5px 10px rgba(0,0,0,.12)); }
+
+        /* Navegação */
+        #dashboardScreen > nav {
+            min-height: 62px;
+            background: rgba(255,255,255,.96);
+            box-shadow: 0 4px 16px rgba(15,23,42,.04);
+            backdrop-filter: blur(10px);
+        }
+        #dashboardScreen > nav .tab-btn {
+            position: relative;
+            min-height: 62px;
+            border-bottom-width: 3px;
+            transition: color .2s ease, background .2s ease, transform .2s ease;
+        }
+        #dashboardScreen > nav .tab-btn:hover { background: #f0fdf9; }
+
+        /* Área principal */
+        #dashboardScreen main {
+            background: transparent;
+            scroll-behavior: smooth;
+        }
+        .elegant-card {
+            background: rgba(255,255,255,.94);
+            border: 1px solid rgba(226,232,240,.86);
+            border-radius: 18px;
+            box-shadow: 0 8px 28px rgba(15,23,42,.045), 0 2px 6px rgba(15,23,42,.025);
+            transition: box-shadow .22s ease, transform .22s ease, border-color .22s ease;
+        }
+        .elegant-card:hover {
+            border-color: #d7e4df;
+            box-shadow: 0 14px 34px rgba(15,23,42,.065), 0 3px 8px rgba(15,23,42,.03);
+        }
+
+        /* KPIs */
+        .kpi-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(226,232,240,.75);
+            border-radius: 18px;
+            box-shadow: 0 8px 22px rgba(15,23,42,.055);
+        }
+        .kpi-card::after {
+            content: "";
+            position: absolute;
+            width: 92px;
+            height: 92px;
+            right: -38px;
+            top: -42px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.14);
+            pointer-events: none;
+        }
+        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(15,23,42,.09); }
+
+        /* Filtros e campos */
+        .filter-input,
+        select,
+        input[type="text"], input[type="number"], input[type="date"], input[type="time"],
+        input[type="search"], input[type="password"] {
+            border-radius: 11px;
+            transition: border-color .2s ease, box-shadow .2s ease, background .2s ease, transform .2s ease;
+        }
+        .filter-input:hover { border-color: #cbd5e1; }
+        .filter-input:focus, select:focus,
+        input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus,
+        input[type="time"]:focus, input[type="search"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #34d399 !important;
+            box-shadow: 0 0 0 4px rgba(52,211,153,.10) !important;
+        }
+        label { letter-spacing: .01em; }
+
+        /* Botões */
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:not(.tab-btn):not(.custom-checkbox) {
+            transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, border-color .18s ease;
+        }
+        button:not(.tab-btn):not(.custom-checkbox):hover { transform: translateY(-1px); }
+        button:not(.tab-btn):not(.custom-checkbox):active { transform: translateY(0); }
+
+        /* Tabelas */
+        table { border-collapse: separate; border-spacing: 0; overflow: hidden; border-radius: 12px; }
+        table thead th {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .045em;
+            text-transform: uppercase;
+            color: #475569;
+            background: #f1f7f5;
+            border-bottom: 1px solid #dce8e4;
+        }
+        table tbody tr { transition: background-color .15s ease; }
+        table tbody tr:hover { background-color: #f7fbfa !important; }
+        table tbody td { border-bottom-color: #edf2f1 !important; }
+        table tbody tr:last-child td { border-bottom: 0 !important; }
+
+        /* Gráficos */
+        canvas { filter: drop-shadow(0 4px 8px rgba(15,23,42,.025)); }
+        .chartjs-render-monitor { border-radius: 12px; }
+
+        /* Títulos de seções */
+        section > div:first-child h2,
+        section > div:first-child h3 { letter-spacing: -.02em; }
+        section h2 i, section h3 i { filter: drop-shadow(0 2px 3px rgba(15,23,42,.08)); }
+
+        /* Dropdowns */
+        .dropdown-content {
+            border: 1px solid #dfe9e5;
+            border-radius: 14px;
+            box-shadow: 0 18px 40px rgba(15,23,42,.12);
+            padding: 5px;
+        }
+        .dropdown-content > * { border-radius: 9px; }
+
+        /* Alertas */
+        #loginError { border: 1px solid #fecdd3; box-shadow: 0 5px 14px rgba(244,63,94,.06); }
+
+        @media (max-width: 640px) {
+            #loginScreen > div { padding: 1.75rem; border-radius: 22px; }
+            #dashboardScreen > header .system-logo { width: 50px; height: 50px; }
+            #dashboardScreen > nav .tab-btn { min-height: 56px; padding-left: 14px; padding-right: 14px; }
+            .elegant-card { border-radius: 15px; }
+            .kpi-card { border-radius: 15px; }
+        }
+
     </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-emerald-200 selection:text-emerald-900">
@@ -113,6 +379,8 @@
         <div class="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 w-full max-w-md relative overflow-hidden">
             <div class="absolute -top-16 -right-16 w-32 h-32 bg-emerald-50 rounded-full opacity-50"></div>
             <div class="flex flex-col items-center mb-8 relative z-10">
+                <img class="login-logo" src="https://i.imgur.com/oFfFlsV.png" alt="Logo institucional">
+                <div class="login-badge"><i class="fa-solid fa-shield-halved"></i> Acesso seguro</div>
                 <h2 class="text-2xl font-extrabold text-slate-800 text-center">Acesso ao Sistema</h2>
                 <p class="text-sm text-slate-500 mt-2 text-center font-medium">Digite suas credenciais para entrar no sistema.</p>
             </div>
@@ -132,7 +400,10 @@
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                             <i class="fa-solid fa-lock text-slate-400 text-sm"></i>
                         </div>
-                        <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/10 transition-all shadow-sm" placeholder="Sua senha" required>
+                        <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-2.5 pl-10 pr-12 text-sm text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/10 transition-all shadow-sm" placeholder="Sua senha" required>
+                        <button type="button" onclick="togglePassword()" aria-label="Mostrar ou ocultar senha" class="absolute inset-y-0 right-0 px-3.5 text-slate-400 hover:text-emerald-600" style="transform:none!important;">
+                            <i id="passwordToggleIcon" class="fa-solid fa-eye"></i>
+                        </button>
                     </div>
                 </div>
                 
@@ -150,8 +421,9 @@
     <div id="dashboardScreen" class="hidden h-full flex flex-col w-full">
         <header class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 shadow-md z-10 sticky top-0 relative overflow-hidden">
             <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative z-10">
-                <div class="flex items-center gap-4">
-                    <div>
+                <div class="flex items-center gap-4 min-w-0">
+                    <img class="system-logo" src="https://i.imgur.com/oFfFlsV.png" alt="Logo institucional">
+                    <div class="min-w-0">
                         <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-tight">
                             Sistema Integrado
                         </h1>
@@ -1314,6 +1586,17 @@
                 type: 'doughnut', data: { labels: cLbl, datasets: [{ data: cPer, backgroundColor: cLbl.map((_,i)=>colors[(i+4)%colors.length]), datalabels:{color:'#fff', font:{weight:'bold',size:10}, formatter:(v,ctx)=>{ let s=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0); let pct=s>0?(v/s)*100:0; return pct>=5?Math.round(pct)+'%':''; }} }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
             });
+        }
+    </script>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('passwordToggleIcon');
+            if (!input || !icon) return;
+            const visible = input.type === 'text';
+            input.type = visible ? 'password' : 'text';
+            icon.className = visible ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
         }
     </script>
 </body>
