@@ -1200,10 +1200,57 @@
             });
 
             if (prodChartBarTimeInstance) prodChartBarTimeInstance.destroy();
-            let bMudas = blocks.map(b => { let r=filteredProdData.filter(d=>d.local===b), c=r.reduce((s,x)=>s+x.colaboradores,0); return c>0?Math.round(r.reduce((s,x)=>s+x.transplantado,0)/c):0; });
+            
+            let bMudas = blocks.map(b => { 
+                let r=filteredProdData.filter(d=>d.local===b);
+                let c=r.reduce((s,x)=>s+x.colaboradores,0); 
+                return c>0 ? Math.round(r.reduce((s,x)=>s+x.transplantado,0)/c) : 0; 
+            });
+            
+            let bRendimento = blocks.map(b => {
+                let r=filteredProdData.filter(d=>d.local===b);
+                let t=r.reduce((s,x)=>s+x.transplantado,0);
+                let m=r.reduce((s,x)=>s+x.mudas,0);
+                return m>0 ? Math.round((t/m)*100) : 0;
+            });
+
             prodChartBarTimeInstance = new Chart(document.getElementById('prodChartBarTime'), {
-                type: 'bar', data: { labels: blocks, datasets: [{ label: 'Mudas/Colab', data: bMudas, backgroundColor: '#10b981', datalabels: {anchor:'end', align:'top', font:{weight:'bold'}} }] },
-                options: { responsive: true, maintainAspectRatio: false }
+                type: 'line', 
+                data: { 
+                    labels: blocks, 
+                    datasets: [
+                        { 
+                            label: 'Mudas / Colab', 
+                            data: bMudas, 
+                            borderColor: '#10b981', 
+                            backgroundColor: '#10b981', 
+                            borderWidth: 3,
+                            tension: 0.3,
+                            yAxisID: 'y',
+                            datalabels: { anchor: 'bottom', align: 'bottom', font: { weight: 'bold' }, formatter: v => new Intl.NumberFormat('pt-BR').format(v) } 
+                        },
+                        { 
+                            label: '% Rendimento', 
+                            data: bRendimento, 
+                            borderColor: '#0ea5e9', 
+                            backgroundColor: '#0ea5e9', 
+                            borderWidth: 3,
+                            tension: 0.3,
+                            yAxisID: 'y1',
+                            datalabels: { anchor: 'top', align: 'top', font: { weight: 'bold' }, formatter: v => v + '%' } 
+                        }
+                    ] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    layout: { padding: { top: 20, bottom: 20 } },
+                    scales: { 
+                        x: { grid: { display: false } },
+                        y: { type: 'linear', position: 'left', title: { display: true, text: 'Mudas/Colab' }, grid: { color: '#f1f5f9' } },
+                        y1: { type: 'linear', position: 'right', title: { display: true, text: '% Rendimento' }, grid: { drawOnChartArea: false } }
+                    }
+                }
             });
 
             if (prodChartPieInstance) prodChartPieInstance.destroy();
