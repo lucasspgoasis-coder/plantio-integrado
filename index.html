@@ -59,7 +59,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
    <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">% total perdido</p><h3 id="kPerdaPct" class="text-2xl font-extrabold text-orange-600">--</h3></div>
   </div>
   <div class="glass p-5">
-   <div class="flex items-start justify-between gap-3 mb-3"><div><h2 class="text-base font-extrabold text-slate-800">Transplantio por Bloco e Variedade — todas as barras horizontais</h2><p class="text-xs text-slate-500">Blocos em ordem alfabética. Cada variedade é exibida separadamente; mudas = bandejas × 200. % transplantado = transplantado ÷ mudas e % perdas = perdas ÷ mudas. Os totais respeitam todos os filtros selecionados.</p></div><div id="status" class="text-xs font-semibold text-emerald-700"></div></div>
+   <div class="flex items-start justify-between gap-3 mb-3"><div><h2 class="text-base font-extrabold text-slate-800">Transplantio por Bloco — variedades selecionadas somadas</h2><p class="text-xs text-slate-500">Blocos em ordem alfabética. Quando houver mais de uma variedade no ciclo/bloco selecionado, os valores são somados no mesmo bloco. Mudas = bandejas × 200. % transplantado = transplantado ÷ mudas e % perdas = perdas ÷ mudas. Os totais respeitam todos os filtros selecionados.</p></div><div id="status" class="text-xs font-semibold text-emerald-700"></div></div>
    <div class="h-[560px] relative"><canvas id="transplantioChart"></canvas></div>
   </div>
   <div class="glass p-4"><div class="flex items-center justify-between gap-3 mb-3"><div><h3 class="font-extrabold text-slate-800">Dados consolidados</h3><p id="tableCount" class="text-xs text-slate-500">--</p></div></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs text-center data-table"><thead><tr><th>Bloco</th><th>Ciclo</th><th>Variedade</th><th>Bandejas</th><th>Mudas</th><th>Transplantado</th><th>Perdas</th><th>Total dias de germinação</th><th>Data</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
@@ -543,22 +543,18 @@ function render(){
   document.getElementById('kPerdas').textContent=fmtInt(perdas);
   document.getElementById('kGerm').textContent=fmtPct(pct(trans,mudas));
   document.getElementById('kPerdaPct').textContent=fmtPct(pct(perdas,mudas));
-const blocks=[...new Set(d.map(x=>x.bloco))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
-const labels=blocks.map(displayBlock);
-const varieties=[...new Set(d.map(x=>x.variedade).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
-const datasets=varieties.flatMap((v,i)=>{
-  const mudasData=blocks.map(b=>{const r=d.find(x=>x.bloco===b&&x.variedade===v);return r?Number(r.mudas||0):null});
-  const transData=blocks.map(b=>{const r=d.find(x=>x.bloco===b&&x.variedade===v);return r?Number(r.transplantado||0):null});
-  const perdaData=blocks.map(b=>{const r=d.find(x=>x.bloco===b&&x.variedade===v);return r?Number(r.perdas||0):null});
-  const palette=['#15803d','#2563eb','#7c3aed','#0891b2','#ca8a04','#db2777','#475569','#0f766e','#be123c'];
-  return [
-    {label:v+' — Total de mudas',data:mudasData,backgroundColor:palette[i%palette.length],borderColor:palette[i%palette.length],borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>x==null?'':Number(x).toLocaleString('pt-BR')}},
-    {label:v+' — Transplantado',data:transData,backgroundColor:palette[i%palette.length],borderColor:palette[i%palette.length],borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>x==null?'':Number(x).toLocaleString('pt-BR')}},
-    {label:v+' — Perdas',data:perdaData,backgroundColor:'rgba(234,88,12,.78)',borderColor:'#ea580c',borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>x==null?'':Number(x).toLocaleString('pt-BR')}}
-  ]
-});
+// O gráfico da Aba 01 consolida por BLOCO tudo o que passou pelos filtros.
+// Assim, ao selecionar Bloco 01 + Ciclo 6, as duas variedades desse ciclo
+// aparecem somadas em um único conjunto de barras para o bloco.
+const chartData=bc;
+const labels=chartData.map(x=>displayBlock(x.bloco));
+const datasets=[
+  {label:'Total de mudas',data:chartData.map(r=>Number(r.mudas||0)),backgroundColor:'#15803d',borderColor:'#15803d',borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>Number(x).toLocaleString('pt-BR')}},
+  {label:'Transplantado',data:chartData.map(r=>Number(r.transplantado||0)),backgroundColor:'#2563eb',borderColor:'#2563eb',borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>Number(x).toLocaleString('pt-BR')}},
+  {label:'Perdas',data:chartData.map(r=>Number(r.perdas||0)),backgroundColor:'#ea580c',borderColor:'#ea580c',borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>Number(x).toLocaleString('pt-BR')}}
+];
 if(chart)chart.destroy();
-chart=new Chart(document.getElementById('transplantioChart'),{type:'bar',data:{labels,datasets},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{beginAtZero:true,title:{display:true,text:'Quantidade de mudas',font:{weight:'700'}},ticks:{callback:v=>Number(v).toLocaleString('pt-BR')}},y:{title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'},padding:10}},tooltip:{callbacks:{title:c=>labels[c[0].dataIndex],label:c=>`${c.dataset.label}: ${Number(c.parsed.x).toLocaleString('pt-BR')} mudas`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
+chart=new Chart(document.getElementById('transplantioChart'),{type:'bar',data:{labels,datasets},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{beginAtZero:true,title:{display:true,text:'Quantidade de mudas',font:{weight:'700'}},ticks:{callback:v=>Number(v).toLocaleString('pt-BR')}},y:{title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'},padding:12}},tooltip:{callbacks:{title:c=>labels[c[0].dataIndex],label:c=>`${c.dataset.label}: ${Number(c.parsed.x).toLocaleString('pt-BR')} mudas`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
 const tbody=document.getElementById('tbody');const tableRows=[...filtered].sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})||a.data.localeCompare(b.data)||variedade(a.variedade).localeCompare(variedade(b.variedade)));tbody.innerHTML=tableRows.length?tableRows.map(r=>{const v=variedade(r.variedade);return `<tr><td><span class="block-badge">${escapeHtml(displayBlock(r.bloco))}</span></td><td>${escapeHtml(r.ciclo||'--')}</td><td><span class="var-badge"><span class="var-dot" style="background:${v==='BRO'?'#15803d':'#f97316'}"></span>${escapeHtml(v)}</span></td><td class="num-cell">${fmtInt(r.bandejas)}</td><td class="num-cell">${fmtInt(rowMudas(r))}</td><td class="num-cell">${fmtInt(r.transplantado)}</td><td class="num-cell">${fmtInt(r.perdas)}</td><td class="num-cell">${r.germinacao?r.germinacao.toLocaleString('pt-BR'):'--'} dias</td><td>${r.data?formatDate(r.data):'--'}</td></tr>`}).join(''):`<tr><td colspan="9" class="empty-row">Nenhum registro encontrado para os filtros selecionados.</td></tr>`;document.getElementById('tableCount').textContent=`${tableRows.length} registro(s) exibido(s) — cada data permanece em uma linha separada; o campo de germinação é exibido somente como total de dias`;updateFilterContextStatus()}
 
 
