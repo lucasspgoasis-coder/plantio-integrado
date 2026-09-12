@@ -111,34 +111,28 @@
 
     <div id="loginScreen" class="fixed inset-0 z-50 login-bg flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 w-full max-w-md relative overflow-hidden">
-            <!-- Decorative circle -->
             <div class="absolute -top-16 -right-16 w-32 h-32 bg-emerald-50 rounded-full opacity-50"></div>
-            
             <div class="flex flex-col items-center mb-8 relative z-10">
-                <div class="w-20 h-20 flex items-center justify-center mb-4">
-                    <img src="https://i.imgur.com/3BHy9Rv.jpeg" alt="Ícone" class="w-16 h-16 object-contain rounded-2xl shadow-sm border-0 ring-0 outline-none mix-blend-multiply">
-                </div>
                 <h2 class="text-2xl font-extrabold text-slate-800 text-center">Acesso ao Sistema</h2>
                 <p class="text-sm text-slate-500 mt-2 text-center font-medium">Digite suas credenciais para entrar no sistema.</p>
             </div>
-
-            <form id="loginForm" class="space-y-5 relative z-10">
+            <form id="loginForm" class="space-y-4 relative z-10">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Login</label>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Login</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-user text-slate-400"></i>
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-user text-slate-400 text-sm"></i>
                         </div>
-                        <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all" placeholder="Seu usuário" required>
+                        <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/10 transition-all shadow-sm" placeholder="Seu usuário" required>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Senha</label>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Senha</label>
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-lock text-slate-400"></i>
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-slate-400 text-sm"></i>
                         </div>
-                        <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all" placeholder="Sua senha" required>
+                        <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/10 transition-all shadow-sm" placeholder="Sua senha" required>
                     </div>
                 </div>
                 
@@ -146,7 +140,7 @@
                     <i class="fa-solid fa-circle-exclamation"></i> Credenciais incorretas. Tente novamente.
                 </div>
 
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/30 transition-all transform hover:-translate-y-0.5 mt-4">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/30 transition-all transform hover:-translate-y-0.5 mt-2">
                     Entrar no Sistema
                 </button>
             </form>
@@ -155,30 +149,48 @@
 
     <div id="dashboardScreen" class="hidden h-full flex flex-col w-full">
         <header class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 shadow-md z-10 sticky top-0 relative overflow-hidden">
-            
             <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative z-10">
                 <div class="flex items-center gap-4">
-                    <div class="p-2 flex items-center justify-center">
-                        <img src="https://i.imgur.com/3BHy9Rv.jpeg" alt="Ícone" class="w-10 h-10 object-contain rounded-xl shadow-sm border-0 ring-0 outline-none mix-blend-screen">
-                    </div>
                     <div>
                         <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-tight">
                             Sistema Integrado
                         </h1>
                         <p class="text-emerald-200 text-xs sm:text-sm font-medium tracking-wide">
-                            Mudas, Transplantio e Contabilização de Perdas
+                            Mudas, Transplantio, Germinação, Rendimento & Produção
                         </p>
                     </div>
                 </div>
-                <div id="loadingIndicator" class="hidden items-center text-sm font-semibold text-emerald-900 bg-emerald-100 px-4 py-2 rounded-full shadow-sm">
-                    <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Atualizando...
+                <div class="flex items-center gap-3">
+                    <button onclick="init()" id="btnAtualizarDados" class="bg-emerald-800 hover:bg-emerald-700 text-emerald-100 hover:text-white px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-2 border border-emerald-700/50">
+                        <i class="fa-solid fa-rotate"></i> Atualizar Dados
+                    </button>
+                    <div id="loadingIndicator" class="hidden items-center text-sm font-semibold text-emerald-900 bg-emerald-100 px-4 py-2 rounded-full shadow-sm">
+                        <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Atualizando...
+                    </div>
                 </div>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50">
-            <div class="max-w-[95rem] mx-auto space-y-6">
-                
+        <!-- Navigation Tabs Bar -->
+        <nav class="bg-white border-b border-slate-200 shadow-sm px-4 sm:px-6 lg:px-8 flex items-center gap-2 overflow-x-auto z-10">
+            <button onclick="switchTab('transplantio')" id="tabBtn-transplantio" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 flex items-center gap-2 transition-colors whitespace-nowrap">
+                <i class="fa-solid fa-seedling"></i> Transplantio
+            </button>
+            <button onclick="switchTab('germinacao')" id="tabBtn-germinacao" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors whitespace-nowrap">
+                <i class="fa-solid fa-chart-line"></i> Germinação
+            </button>
+            <button onclick="switchTab('rendimento')" id="tabBtn-rendimento" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors whitespace-nowrap">
+                <i class="fa-solid fa-clock"></i> Rendimento
+            </button>
+            <button onclick="switchTab('producao')" id="tabBtn-producao" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors whitespace-nowrap">
+                <i class="fa-solid fa-clipboard-check"></i> Produção & Perdas
+            </button>
+        </nav>
+
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50 relative">
+            <!-- TAB 1: Transplantio -->
+            <div id="tabContent-transplantio" class="tab-content space-y-6">
+                <!-- Filtros T1 -->
                 <section class="elegant-card p-6 relative z-20">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                         <div class="flex items-center gap-3">
@@ -191,7 +203,6 @@
                             <i class="fa-solid fa-eraser"></i> Limpar Filtros
                         </button>
                     </div>
-                    
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                         <div class="dropdown relative" id="dropdownLocal">
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Local (Bloco)</label>
@@ -201,7 +212,6 @@
                             </button>
                             <div class="dropdown-content p-2" id="optionsLocal"></div>
                         </div>
-
                         <div class="dropdown relative" id="dropdownCiclo">
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ciclo</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownCiclo')">
@@ -210,7 +220,6 @@
                             </button>
                             <div class="dropdown-content p-2" id="optionsCiclo"></div>
                         </div>
-
                         <div class="dropdown relative" id="dropdownVariedade">
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variedade</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownVariedade')">
@@ -219,137 +228,479 @@
                             </button>
                             <div class="dropdown-content p-2" id="optionsVariedade"></div>
                         </div>
-
                         <div>
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Data Início</label>
                             <input type="date" id="filterDataInicio" class="w-full filter-input rounded-xl p-3 text-sm font-bold text-slate-700 outline-none">
                         </div>
-
                         <div>
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Data Fim</label>
                             <input type="date" id="filterDataFim" class="w-full filter-input rounded-xl p-3 text-sm font-bold text-slate-700 outline-none">
                         </div>
                     </div>
                 </section>
-
-                <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
-                    <!-- Made KPI cards more compact (p-4 instead of p-5) and used stronger, more saturated colors -->
-                    <div class="kpi-card bg-gradient-to-br from-sky-100 to-sky-200 p-4 flex flex-col justify-center relative overflow-hidden group shadow-sm">
-                        <div class="absolute right-0 top-0 w-20 h-20 bg-sky-300/30 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                        <i class="fa-solid fa-box text-xl text-sky-600 mb-1.5 relative z-10"></i>
-                        <span class="text-[10px] font-bold text-sky-800 uppercase tracking-wider mb-0.5 relative z-10">Total Bandejas</span>
-                        <span id="kpiBandejas" class="text-2xl font-extrabold text-sky-950 relative z-10">0</span>
+                <!-- KPIs T1 -->
+                <section class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="kpi-card bg-emerald-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-layer-group text-xl text-emerald-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-emerald-900 uppercase tracking-wider mb-0.5">Bandejas</span>
+                        <span id="kpiBandejas" class="text-2xl font-extrabold text-emerald-950">0</span>
                     </div>
-                    
-                    <div class="kpi-card bg-gradient-to-br from-indigo-100 to-indigo-200 p-4 flex flex-col justify-center relative overflow-hidden group shadow-sm">
-                        <div class="absolute right-0 top-0 w-20 h-20 bg-indigo-300/30 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                        <i class="fa-solid fa-seedling text-xl text-indigo-600 mb-1.5 relative z-10"></i>
-                        <span class="text-[10px] font-bold text-indigo-800 uppercase tracking-wider mb-0.5 relative z-10">Mudas (Total)</span>
-                        <span id="kpiMudas" class="text-2xl font-extrabold text-indigo-950 relative z-10">0</span>
+                    <div class="kpi-card bg-teal-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-seedling text-xl text-teal-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-teal-900 uppercase tracking-wider mb-0.5">Total Mudas</span>
+                        <span id="kpiMudas" class="text-2xl font-extrabold text-teal-950">0</span>
                     </div>
-                    
-                    <div class="kpi-card bg-gradient-to-br from-emerald-100 to-emerald-200 p-4 flex flex-col justify-center relative overflow-hidden group shadow-sm">
-                        <div class="absolute right-0 top-0 w-20 h-20 bg-emerald-300/30 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                        <i class="fa-solid fa-leaf text-xl text-emerald-600 mb-1.5 relative z-10"></i>
-                        <span class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider mb-0.5 relative z-10">Transplantado</span>
-                        <span id="kpiTransplantado" class="text-2xl font-extrabold text-emerald-950 relative z-10">0</span>
+                    <div class="kpi-card bg-sky-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-check-to-slot text-xl text-sky-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-sky-900 uppercase tracking-wider mb-0.5">Total Transplantado</span>
+                        <span id="kpiTransplantado" class="text-2xl font-extrabold text-sky-950">0</span>
                     </div>
-                    
-                    <div class="kpi-card bg-gradient-to-br from-rose-100 to-rose-200 p-4 flex flex-col justify-center relative overflow-hidden group shadow-sm">
-                        <div class="absolute right-0 top-0 w-20 h-20 bg-rose-300/30 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                        <i class="fa-solid fa-triangle-exclamation text-xl text-rose-600 mb-1.5 relative z-10"></i>
-                        <span class="text-[10px] font-bold text-rose-800 uppercase tracking-wider mb-0.5 relative z-10">Total Perdas</span>
-                        <span id="kpiPerdas" class="text-2xl font-extrabold text-rose-950 relative z-10">0</span>
+                    <div class="kpi-card bg-rose-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-triangle-exclamation text-xl text-rose-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-rose-900 uppercase tracking-wider mb-0.5">Total Perdas</span>
+                        <span id="kpiPerdas" class="text-2xl font-extrabold text-rose-950">0</span>
                     </div>
-                    
-                    <div class="kpi-card bg-white p-4 flex flex-col justify-center relative shadow-sm border border-slate-200">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">% Plantado</span>
-                        <div class="flex items-baseline gap-2">
-                            <span id="kpiPctPlantado" class="text-2xl font-extrabold text-slate-800">0%</span>
+                </section>
+                <!-- Progress Bars T1 -->
+                <section class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <div class="elegant-card p-5 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">% Plantado Geral</span>
+                            <span id="kpiPctPlantado" class="text-lg font-extrabold text-emerald-600">0%</span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2 mt-2 overflow-hidden">
-                            <div id="barPctPlantado" class="bg-emerald-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                            <div id="barPctPlantado" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
-                    
-                    <div class="kpi-card bg-white p-4 flex flex-col justify-center relative shadow-sm border border-slate-200">
-                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">% Perdas</span>
-                        <div class="flex items-baseline gap-2">
-                            <span id="kpiPctPerdas" class="text-2xl font-extrabold text-slate-800">0%</span>
+                    <div class="elegant-card p-5 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-extrabold text-slate-500 uppercase tracking-wider">% Perdas Geral</span>
+                            <span id="kpiPctPerdas" class="text-lg font-extrabold text-rose-500">0%</span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-2 mt-2 overflow-hidden">
-                            <div id="barPctPerdas" class="bg-rose-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                            <div id="barPctPerdas" class="bg-rose-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
                 </section>
-
-                <section class="elegant-card p-6 z-10 relative">
-                    <div class="mb-8 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+                <!-- Charts & Table T1 -->
+                <section class="elegant-card p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                         <div>
-                            <h2 class="text-xl font-extrabold text-slate-800 mb-2 flex items-center gap-3">
-                                <div class="bg-indigo-50 text-indigo-500 p-2 rounded-lg">
-                                    <i class="fa-solid fa-chart-column"></i>
-                                </div>
-                                Desempenho por Bloco e Variedade
-                            </h2>
-                            <p class="text-sm text-slate-500 font-medium ml-12">Análise de transplantio, perdas e dias de germinação distribuídos pelos locais.</p>
+                            <h3 class="text-lg font-extrabold text-slate-800">Panorama Geral de Transplantio & Germinação</h3>
+                            <p class="text-sm text-slate-500 font-medium">Visualização por Bloco e Variedade.</p>
                         </div>
-                        <div class="bg-slate-50 rounded-2xl p-4 shadow-sm border border-slate-100 w-full xl:w-auto">
-                            <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-3">Legenda de Variedades</p>
-                            <div id="customLegend" class="flex flex-wrap gap-2 max-w-3xl"></div>
-                        </div>
+                        <div id="customLegend" class="flex flex-wrap gap-2"></div>
                     </div>
-                    
-                    <div class="relative w-full" style="height: 750px;">
-                        <canvas id="mainChart"></canvas>
+                    <div class="relative w-full overflow-x-auto">
+                        <div style="min-width: 700px; height: 650px;">
+                            <canvas id="mainChart"></canvas>
+                        </div>
                     </div>
                 </section>
-                
-                <section class="elegant-card mb-8 overflow-hidden">
-                    <div class="p-6 flex justify-between items-center bg-white">
-                        <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-3">
-                            <div class="bg-slate-100 text-slate-500 p-2 rounded-lg">
-                                <i class="fa-solid fa-table-list"></i>
-                            </div>
-                            Prévia dos Dados
-                        </h3>
-                        <span id="rowCount" class="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-lg shadow-sm">0 registros</span>
+                <section class="elegant-card overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="text-lg font-extrabold text-slate-800">Registros Detalhados</h3>
+                        <span id="rowCount" class="bg-slate-100 text-slate-600 px-3 py-1 rounded-xl text-xs font-bold">0 registros</span>
                     </div>
-                    <div class="overflow-x-auto max-h-[500px]">
-                        <table class="min-w-full text-sm text-left border-collapse">
-                            <thead class="bg-slate-50 sticky top-0 z-10">
+                    <div class="overflow-x-auto max-h-[450px]">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead class="bg-slate-50 sticky top-0 z-10 text-slate-400 uppercase text-[10px] font-extrabold tracking-wider">
                                 <tr>
-                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500">Data</th>
-                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500">Local (Bloco)</th>
-                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500">Ciclo</th>
-                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500">Variedade</th>
-                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500 text-right">Transplantado</th>
-                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500 text-right">Perdas</th>
-                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500 text-right">Germinação</th>
+                                    <th class="px-6 py-4">Data</th>
+                                    <th class="px-6 py-4">Local</th>
+                                    <th class="px-6 py-4">Ciclo</th>
+                                    <th class="px-6 py-4">Variedade</th>
+                                    <th class="px-6 py-4 text-right">Transplantado</th>
+                                    <th class="px-6 py-4 text-right">Perdas</th>
+                                    <th class="px-6 py-4 text-right">Germinação</th>
                                 </tr>
                             </thead>
-                            <tbody id="dataTableBody" class="bg-white">
-                                <!-- Rows will be injected here -->
-                            </tbody>
+                            <tbody id="dataTableBody" class="divide-y divide-slate-100 font-semibold text-slate-700"></tbody>
                         </table>
                     </div>
                 </section>
+            </div>
+
+            <!-- TAB 2: Germinação (Rendimento) -->
+            <div id="tabContent-germinacao" class="tab-content hidden space-y-6">
+                <section class="elegant-card p-6 relative z-20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl">
+                                <i class="fa-solid fa-sliders text-lg"></i>
+                            </div>
+                            <h2 class="text-lg font-bold text-slate-800">Filtros de Germinação e Rendimento</h2>
+                        </div>
+                        <button id="btnLimparFiltrosRendimento" class="text-sm font-bold text-slate-500 hover:text-emerald-700 bg-slate-100 hover:bg-emerald-100 px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-eraser"></i> Limpar Filtros
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="dropdown relative" id="dropdownRendVariedade">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variedade</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownRendVariedade')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedRendVariedadeText">Todas as Variedades</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsRendVariedade"></div>
+                        </div>
+
+                        <div class="dropdown relative" id="dropdownRendCiclo">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ciclo</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownRendCiclo')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedRendCicloText">Todos os Ciclos</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsRendCiclo"></div>
+                        </div>
+
+                        <div class="dropdown relative" id="dropdownRendMes">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Mês</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownRendMes')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedRendMesText">Todos os Meses</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsRendMes"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="kpi-card bg-emerald-100 p-4 flex flex-col justify-center relative overflow-hidden shadow-sm">
+                        <i class="fa-solid fa-leaf text-xl text-emerald-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-emerald-900 uppercase tracking-wider mb-0.5">Total Transplantado</span>
+                        <span id="kpiRendTransplantado" class="text-2xl font-extrabold text-emerald-950">0</span>
+                    </div>
+                    <div class="kpi-card bg-teal-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <span class="text-[10px] font-extrabold text-teal-900 uppercase tracking-wider mb-1">% Plantado</span>
+                        <span id="kpiRendPctPlantado" class="text-2xl font-extrabold text-teal-950">0%</span>
+                    </div>
+                    <div class="kpi-card bg-rose-100 p-4 flex flex-col justify-center relative overflow-hidden shadow-sm">
+                        <i class="fa-solid fa-triangle-exclamation text-xl text-rose-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-rose-900 uppercase tracking-wider mb-0.5">Total Perdas</span>
+                        <span id="kpiRendPerdas" class="text-2xl font-extrabold text-rose-950">0</span>
+                    </div>
+                    <div class="kpi-card bg-amber-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <span class="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider mb-1">% Perdas</span>
+                        <span id="kpiRendPctPerdas" class="text-2xl font-extrabold text-amber-950">0%</span>
+                    </div>
+                </section>
+
+                <section class="elegant-card p-6">
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
+                        <div class="bg-indigo-50 text-indigo-500 p-2 rounded-lg">
+                            <i class="fa-solid fa-circle-dot"></i>
+                        </div>
+                        Quantidade Transplantada por Bloco & Variedade
+                    </h3>
+                    <div class="relative w-full" style="height: 450px;">
+                        <canvas id="rendChartPercentage"></canvas>
+                    </div>
+                </section>
+
+                <section class="elegant-card p-6">
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
+                        <div class="bg-amber-50 text-amber-600 p-2 rounded-lg">
+                            <i class="fa-solid fa-chart-bar"></i>
+                        </div>
+                        Comparativo de Rendimento
+                    </h3>
+                    <div class="relative w-full" style="height: 500px;">
+                        <canvas id="rendChartComparison"></canvas>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB 3: Rendimento (Labor & Productivity) -->
+            <div id="tabContent-rendimento" class="tab-content hidden space-y-6">
+                <section class="elegant-card p-6 relative z-20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl">
+                                <i class="fa-solid fa-clock text-lg"></i>
+                            </div>
+                            <h2 class="text-lg font-bold text-slate-800">Filtros de Produtividade</h2>
+                        </div>
+                        <button id="btnLimparFiltrosProd" class="text-sm font-bold text-slate-500 hover:text-indigo-700 bg-slate-100 hover:bg-indigo-100 px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-eraser"></i> Limpar Filtros
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="dropdown relative" id="dropdownProdLocal">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Bloco (Local)</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownProdLocal')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedProdLocalText">Todos os Blocos</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsProdLocal"></div>
+                        </div>
+
+                        <div class="dropdown relative" id="dropdownProdCiclo">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ciclo</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownProdCiclo')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedProdCicloText">Todos os Ciclos</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsProdCiclo"></div>
+                        </div>
+
+                        <div class="dropdown relative" id="dropdownProdVariedade">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variedade</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownProdVariedade')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedProdVariedadeText">Todas as Variedades</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsProdVariedade"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="kpi-card bg-indigo-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-clock text-xl text-indigo-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-indigo-900 uppercase tracking-wider mb-0.5">Total de Horas</span>
+                        <span id="kpiProdHoras" class="text-2xl font-extrabold text-indigo-950">0h</span>
+                    </div>
+                    <div class="kpi-card bg-teal-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-users text-xl text-teal-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-teal-900 uppercase tracking-wider mb-0.5">Total Colaboradores</span>
+                        <span id="kpiProdColab" class="text-2xl font-extrabold text-teal-950">0</span>
+                    </div>
+                    <div class="kpi-card bg-emerald-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-user-check text-xl text-emerald-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-emerald-900 uppercase tracking-wider mb-0.5">Mudas / Colab</span>
+                        <span id="kpiProdMudasColab" class="text-2xl font-extrabold text-emerald-950">0</span>
+                    </div>
+                    <div class="kpi-card bg-sky-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-gauge-high text-xl text-sky-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-sky-900 uppercase tracking-wider mb-0.5">Mudas / Hora</span>
+                        <span id="kpiProdMudasHora" class="text-2xl font-extrabold text-sky-950">0</span>
+                    </div>
+                </section>
+
+                <section class="elegant-card p-6">
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
+                        <div class="bg-indigo-50 text-indigo-500 p-2 rounded-lg">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        Horas Trabalhadas e Transplantado
+                    </h3>
+                    <div class="relative w-full" style="height: 450px;">
+                        <canvas id="prodChartHours"></canvas>
+                    </div>
+                </section>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <section class="elegant-card p-6">
+                        <h3 class="text-lg font-extrabold text-slate-800 mb-2">Rendimento (Mudas/Colaborador)</h3>
+                        <div class="relative w-full" style="height: 400px;">
+                            <canvas id="prodChartBarTime"></canvas>
+                        </div>
+                    </section>
+                    <section class="elegant-card p-6">
+                        <h3 class="text-lg font-extrabold text-slate-800 mb-2">Distribuição Produtividade</h3>
+                        <div class="relative w-full flex items-center justify-center" style="height: 400px;">
+                            <canvas id="prodChartPie"></canvas>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- TAB 4: Produção & Acompanhamento -->
+            <div id="tabContent-producao" class="tab-content hidden space-y-6">
+                <section class="elegant-card p-6 relative z-20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-teal-50 text-teal-700 p-2.5 rounded-xl">
+                                <i class="fa-solid fa-clipboard-check text-lg"></i>
+                            </div>
+                            <h2 class="text-lg font-bold text-slate-800">Filtros de Acompanhamento de Produção</h2>
+                        </div>
+                        <button id="btnLimparFiltrosProdSheet" class="text-sm font-bold text-slate-500 hover:text-teal-700 bg-slate-100 hover:bg-teal-100 px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-eraser"></i> Limpar Filtros
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="dropdown relative" id="dropdownPSSetor">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Setor (Bloco)</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownPSSetor')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedPSSetorText">Todos os Setores</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsPSSetor"></div>
+                        </div>
+
+                        <div class="dropdown relative" id="dropdownPSCiclo">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ciclo</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownPSCiclo')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedPSCicloText">Todos os Ciclos</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsPSCiclo"></div>
+                        </div>
+
+                        <div class="dropdown relative" id="dropdownPSVariedade">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variedade</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownPSVariedade')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedPSVariedadeText">Todas as Variedades</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsPSVariedade"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-2 md:grid-cols-5 gap-4 sm:gap-6">
+                    <div class="kpi-card bg-emerald-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-seedling text-xl text-emerald-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-emerald-900 uppercase tracking-wider mb-0.5">Total Transplantado</span>
+                        <span id="kpiPSTrans" class="text-xl font-extrabold text-emerald-950">0</span>
+                    </div>
+                    <div class="kpi-card bg-rose-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-triangle-exclamation text-xl text-rose-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-rose-900 uppercase tracking-wider mb-0.5">Total Perdas (Causa)</span>
+                        <span id="kpiPSPerdasCausa" class="text-xl font-extrabold text-rose-950">0</span>
+                    </div>
+                    <div class="kpi-card bg-amber-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-percent text-xl text-amber-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider mb-0.5">% Perdas por Causa</span>
+                        <span id="kpiPSPctPerdasCausa" class="text-xl font-extrabold text-amber-950">0%</span>
+                    </div>
+                    <div class="kpi-card bg-teal-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-circle-check text-xl text-teal-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-teal-900 uppercase tracking-wider mb-0.5">Total Colhido</span>
+                        <span id="kpiPSTotalColhido" class="text-xl font-extrabold text-teal-950">0</span>
+                        <span id="kpiPSPctColhido" class="text-[11px] font-bold text-teal-700 mt-1">0% do plantado</span>
+                    </div>
+                    <div class="kpi-card bg-indigo-100 p-4 flex flex-col justify-center relative shadow-sm">
+                        <i class="fa-solid fa-circle-xmark text-xl text-indigo-700 mb-1.5"></i>
+                        <span class="text-[10px] font-extrabold text-indigo-900 uppercase tracking-wider mb-0.5">Total Não Colhido</span>
+                        <span id="kpiPSTotalNaoColhido" class="text-xl font-extrabold text-indigo-950">0</span>
+                        <span id="kpiPSPctNaoColhido" class="text-[11px] font-bold text-indigo-700 mt-1">0% do plantado</span>
+                    </div>
+                </section>
+
+                <div class="elegant-card p-5 bg-teal-50/50 border border-teal-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-teal-600 text-white p-3 rounded-xl shadow-sm">
+                            <i class="fa-solid fa-medal text-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-extrabold text-teal-800 uppercase tracking-wider">Causa Principal de Perdas</h4>
+                            <p id="kpiPSTopCausa" class="text-lg font-extrabold text-teal-950 mt-0.5">Calculando...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="elegant-card p-6">
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
+                        <div class="bg-teal-50 text-teal-600 p-2 rounded-lg">
+                            <i class="fa-solid fa-chart-bar"></i>
+                        </div>
+                        Total Não Colhido e Percentual por Bloco
+                    </h3>
+                    <div class="relative w-full" style="height: 450px;">
+                        <canvas id="psChartBlockNaoColhido"></canvas>
+                    </div>
+                </section>
+
+                <section class="elegant-card p-6">
+                    <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
+                        <div class="bg-rose-50 text-rose-600 p-2 rounded-lg">
+                            <i class="fa-solid fa-chart-column"></i>
+                        </div>
+                        Total de Perdas por Causa e % de Perda
+                    </h3>
+                    <div class="relative w-full" style="height: 450px;">
+                        <canvas id="psChartCausasBarra"></canvas>
+                    </div>
+                </section>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <section class="elegant-card p-6">
+                        <h3 class="text-lg font-extrabold text-slate-800 mb-2">Distribuição das Causas de Perda</h3>
+                        <div class="relative w-full flex items-center justify-center" style="height: 400px;">
+                            <canvas id="psChartCausasPizza"></canvas>
+                        </div>
+                    </section>
+
+                    <section class="elegant-card p-6 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-extrabold text-slate-800 mb-2">Resumo Analítico</h3>
+                        </div>
+                        <div class="overflow-x-auto max-h-[300px]">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead class="bg-slate-50 sticky top-0 text-slate-400 uppercase text-[10px] font-extrabold tracking-wider">
+                                    <tr>
+                                        <th class="p-3">Causa</th>
+                                        <th class="p-3 text-right">Perdas</th>
+                                        <th class="p-3 text-right">% de Perda por Causa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="psTableBody" class="divide-y divide-slate-100 font-semibold text-slate-700 text-xs"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
-        // Register the DataLabels plugin
         Chart.register(ChartDataLabels);
 
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-emerald-600', 'text-emerald-700');
+                btn.classList.add('border-transparent', 'text-slate-500');
+            });
+
+            document.getElementById('tabContent-' + tabName).classList.remove('hidden');
+            const activeBtn = document.getElementById('tabBtn-' + tabName);
+            activeBtn.classList.remove('border-transparent', 'text-slate-500');
+            activeBtn.classList.add('border-emerald-600', 'text-emerald-700');
+
+            if (tabName === 'transplantio' && chartInstance) {
+                chartInstance.resize();
+            } else if (tabName === 'germinacao') {
+                renderRendimentoCharts();
+            } else if (tabName === 'rendimento') {
+                renderProductivityCharts();
+            } else if (tabName === 'producao') {
+                renderProducaoCharts();
+            }
+        }
+
         const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQBafGpPjdS96k2e5uJbMLZpUAC_lxayvEx3tFkKObwyUAt3Ex1ruG4mWNM4V-eIbn5t6w9gUFH5H5d/pub?output=csv";
+        const PROD_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQPXlvM1rHExixKIUDi7CiP1p9bzJp2C7a2hYwdZiv9S_6VbW4q4e_l2m7_HyM1hCpOtq64sGBW9A7_/pub?output=csv";
         
         let allData = [];
+        let prodData = [];
         let filteredData = [];
-        let chartInstance = null;
-        const selectedFilters = { local: new Set(), ciclo: new Set(), variedade: new Set() };
+        let filteredRendData = [];
+        let filteredProdData = [];
+        let filteredProdSheetData = [];
 
-        // Premium Color Palette
+        let chartInstance = null;
+        let rendChartPctInstance = null;
+        let rendChartCompInstance = null;
+        let prodChartHoursInstance = null;
+        let prodChartBarTimeInstance = null;
+        let prodChartPieInstance = null;
+        let psChartBlockNaoColhidoInstance = null;
+        let psChartCausasBarraInstance = null;
+        let psChartCausasPizzaInstance = null;
+
+        const selectedFilters = { local: new Set(), ciclo: new Set(), variedade: new Set() };
+        const selectedRendFilters = { variedade: new Set(), ciclo: new Set(), mes: new Set() };
+        const selectedProdFilters = { local: new Set(), ciclo: new Set(), variedade: new Set() };
+        const selectedProdSheetFilters = { setor: new Set(), ciclo: new Set(), variedade: new Set() };
+
+        const monthsNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const colors = ['#0ea5e9', '#f59e0b', '#8b5cf6', '#10b981', '#f43f5e', '#6366f1', '#84cc16', '#06b6d4', '#ec4899', '#a855f7'];
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -360,7 +711,7 @@
             if (user === 'adm123' && pass === 'lucas@2026') {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('dashboardScreen').classList.remove('hidden');
-                init(); // Load data only after login
+                init();
             } else {
                 const errorEl = document.getElementById('loginError');
                 errorEl.classList.remove('hidden');
@@ -382,421 +733,539 @@
             if (!isActive) dropdown.classList.add('active');
         }
 
+        document.getElementById('btnLimparFiltros').addEventListener('click', () => {
+            document.querySelectorAll('#optionsLocal .item-checkbox').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#optionsCiclo .item-checkbox').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#optionsVariedade .item-checkbox').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#all_local, #all_ciclo, #all_variedade').forEach(cb => cb.checked = true);
+            
+            selectedFilters.local.clear(); selectedFilters.ciclo.clear(); selectedFilters.variedade.clear();
+            [...new Set(allData.map(d => d.local))].forEach(v => selectedFilters.local.add(v));
+            [...new Set(allData.map(d => d.ciclo))].forEach(v => selectedFilters.ciclo.add(v));
+            [...new Set(allData.map(d => d.variedade))].forEach(v => selectedFilters.variedade.add(v));
+            
+            updateDropdownText('local', 'Bloco', selectedFilters.local.size, selectedFilters.local);
+            updateDropdownText('ciclo', 'Ciclo', selectedFilters.ciclo.size, selectedFilters.ciclo);
+            updateDropdownText('variedade', 'Variedade', selectedFilters.variedade.size, selectedFilters.variedade);
+            applyFilters();
+        });
+
+        document.getElementById('btnLimparFiltrosRendimento').addEventListener('click', () => {
+            document.querySelectorAll('#optionsRendVariedade .item-checkbox, #optionsRendCiclo .item-checkbox, #optionsRendMes .item-checkbox').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#all_rendVariedade, #all_rendCiclo, #all_rendMes').forEach(cb => cb.checked = true);
+            
+            selectedRendFilters.variedade.clear(); selectedRendFilters.ciclo.clear(); selectedRendFilters.mes.clear();
+            [...new Set(allData.map(d => d.variedade))].forEach(v => selectedRendFilters.variedade.add(v));
+            [...new Set(allData.map(d => d.ciclo))].forEach(v => selectedRendFilters.ciclo.add(v));
+            [...new Set(allData.map(d => d.mesAno))].forEach(v => selectedRendFilters.mes.add(v));
+            
+            updateDropdownText('rendVariedade', 'Variedade', selectedRendFilters.variedade.size, selectedRendFilters.variedade);
+            updateDropdownText('rendCiclo', 'Ciclo', selectedRendFilters.ciclo.size, selectedRendFilters.ciclo);
+            updateDropdownText('rendMes', 'Mês', selectedRendFilters.mes.size, selectedRendFilters.mes);
+            applyRendFilters();
+        });
+
+        document.getElementById('btnLimparFiltrosProd').addEventListener('click', () => {
+            document.querySelectorAll('#optionsProdLocal .item-checkbox, #optionsProdCiclo .item-checkbox, #optionsProdVariedade .item-checkbox').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#all_prodLocal, #all_prodCiclo, #all_prodVariedade').forEach(cb => cb.checked = true);
+            
+            selectedProdFilters.local.clear(); selectedProdFilters.ciclo.clear(); selectedProdFilters.variedade.clear();
+            [...new Set(allData.map(d => d.local))].forEach(v => selectedProdFilters.local.add(v));
+            [...new Set(allData.map(d => d.ciclo))].forEach(v => selectedProdFilters.ciclo.add(v));
+            [...new Set(allData.map(d => d.variedade))].forEach(v => selectedProdFilters.variedade.add(v));
+            
+            updateDropdownText('prodLocal', 'Bloco', selectedProdFilters.local.size, selectedProdFilters.local);
+            updateDropdownText('prodCiclo', 'Ciclo', selectedProdFilters.ciclo.size, selectedProdFilters.ciclo);
+            updateDropdownText('prodVariedade', 'Variedade', selectedProdFilters.variedade.size, selectedProdFilters.variedade);
+            applyProdFilters();
+        });
+
+        document.getElementById('btnLimparFiltrosProdSheet').addEventListener('click', () => {
+            document.querySelectorAll('#optionsPSSetor .item-checkbox, #optionsPSCiclo .item-checkbox, #optionsPSVariedade .item-checkbox').forEach(cb => cb.checked = true);
+            document.querySelectorAll('#all_psSetor, #all_psCiclo, #all_psVariedade').forEach(cb => cb.checked = true);
+            
+            selectedProdSheetFilters.setor.clear(); selectedProdSheetFilters.ciclo.clear(); selectedProdSheetFilters.variedade.clear();
+            [...new Set(prodData.map(d => d.setor))].forEach(v => selectedProdSheetFilters.setor.add(v));
+            [...new Set(prodData.map(d => d.ciclo))].forEach(v => selectedProdSheetFilters.ciclo.add(v));
+            [...new Set(prodData.map(d => d.variedade))].forEach(v => selectedProdSheetFilters.variedade.add(v));
+            
+            updateDropdownText('psSetor', 'Setor', selectedProdSheetFilters.setor.size, selectedProdSheetFilters.setor);
+            updateDropdownText('psCiclo', 'Ciclo', selectedProdSheetFilters.ciclo.size, selectedProdSheetFilters.ciclo);
+            updateDropdownText('psVariedade', 'Variedade', selectedProdSheetFilters.variedade.size, selectedProdSheetFilters.variedade);
+            applyProdSheetFilters();
+        });
+
+        ['filterDataInicio', 'filterDataFim'].forEach(id => {
+            document.getElementById(id).addEventListener('change', applyFilters);
+        });
+
+        function parseNum(val) {
+            if (typeof val === 'number') return val;
+            if (!val) return 0;
+            return parseFloat(val.toString().replace(/[^\d,-]/g, '').replace(',', '.')) || 0;
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            let parts = dateStr.split('/');
+            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
+            let d = new Date(dateStr);
+            return isNaN(d) ? null : d;
+        }
+
+        function parseHours(hIni, hFin) {
+            if (!hIni || !hFin) return 2.5;
+            try {
+                let partsI = hIni.split(':'), partsF = hFin.split(':');
+                if (partsI.length >= 2 && partsF.length >= 2) {
+                    let diff = (parseInt(partsF[0])*60 + parseInt(partsF[1])) - (parseInt(partsI[0])*60 + parseInt(partsI[1]));
+                    if (diff > 0) return diff / 60;
+                }
+            } catch(e) {}
+            return 2.5;
+        }
+
+        // Função robusta para extrair dados ignorando case sensitive e acentos
+        function getCSVField(row, possibleNames) {
+            // 1. Tenta correspondência exata primeiro
+            for (let name of possibleNames) {
+                if (row[name] !== undefined && row[name] !== '') return row[name];
+            }
+            // 2. Busca ignorando maiúsculas, minúsculas e acentos
+            for (let key in row) {
+                let kLower = key.trim().toLowerCase();
+                let match = possibleNames.find(n => {
+                    let nLower = n.toLowerCase();
+                    // Normaliza strings para remover acentos (ex: não -> nao)
+                    let kNorm = kLower.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    let nNorm = nLower.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    return kLower === nLower || kNorm === nNorm;
+                });
+                if (match) return row[key];
+            }
+            return '';
+        }
+
+        function init() {
+            document.getElementById('btnAtualizarDados').disabled = true;
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            document.getElementById('loadingIndicator').classList.add('flex');
+
+            Promise.all([
+                new Promise((res) => { Papa.parse(SHEET_CSV_URL, { download: true, header: true, complete: function(r) { processRawData(r.data); res(); }, error: function() { loadMockData(); res(); } }); }),
+                new Promise((res) => { Papa.parse(PROD_SHEET_CSV_URL, { download: true, header: true, complete: function(r) { processProdData(r.data); res(); }, error: function() { loadMockProdData(); res(); } }); })
+            ]).then(() => {
+                document.getElementById('btnAtualizarDados').disabled = false;
+                document.getElementById('loadingIndicator').classList.add('hidden');
+                document.getElementById('loadingIndicator').classList.remove('flex');
+            });
+        }
+
         function processRawData(data) {
             if (!data || data.length === 0) { loadMockData(); return; }
-
-            allData = data.map(row => ({
-                dataStr: row['Data - Transplantio'] || row['Data'] || '',
-                dateObj: parseDate(row['Data - Transplantio'] || row['Data']),
-                germinacao: parseNum(row['germinação (dias)'] || row['Germinação (dias)']),
-                local: (row['Local'] || 'Não definido').trim(),
-                ciclo: (row['Ciclo'] || 'Não definido').trim(),
-                cultura: (row['Cultura'] || '').trim(),
-                variedade: (row['Variedade'] || 'Não definida').trim(),
-                bandejas: parseNum(row['Bandejas']),
-                mudas: parseNum(row['Mudas']),
-                transplantado: parseNum(row['Total transplantado']),
-                perdas: parseNum(row['Perdas'])
-            }));
-
-            allData = allData.filter(d => d.local !== 'Não definido' && (d.transplantado > 0 || d.mudas > 0 || d.perdas > 0));
-            populateFilters();
-            applyFilters();
-        }
-
-        function loadMockData() {
-            document.getElementById('loadingIndicator').innerHTML = '<span class="text-amber-500"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Dados de teste</span>';
-            const blocos = ['B01', 'B02', 'B03', 'B04', 'B05'];
-            const variedades = ['Alface Crespa', 'Alface Americana', 'Rúcula', 'Cebolinha', 'Salsa'];
-            const ciclos = ['C1', 'C2', 'C3'];
+            allData = data.map(row => {
+                const dateObj = parseDate(row['Data - Transplantio'] || row['Data']);
+                let mesAno = dateObj && !isNaN(dateObj) ? `${monthsNames[dateObj.getMonth()]} de ${dateObj.getFullYear()}` : 'Indefinido';
+                return {
+                    dataStr: row['Data - Transplantio'] || row['Data'] || '',
+                    dateObj: dateObj, mesAno: mesAno,
+                    germinacao: parseNum(row['germinação (dias)'] || row['Germinação (dias)'] || 5),
+                    local: (row['Local'] || 'Não definido').trim(),
+                    ciclo: (row['Ciclo'] || 'Não definido').trim(),
+                    cultura: (row['Cultura'] || '').trim(),
+                    variedade: (row['Variedade'] || 'Não definida').trim(),
+                    bandejas: parseNum(row['Bandejas']), mudas: parseNum(row['Mudas']),
+                    transplantado: parseNum(row['Total transplantado']), perdas: parseNum(row['Perdas']),
+                    horasTrabalhadas: parseHours(row['Hora Início']||row['Hora Inicio']||'', row['Hora Final']||''),
+                    colaboradores: Math.max(1, parseNum(row['Total de Colaboradores'] || row['Total Colaboradores'] || 3))
+                };
+            }).filter(d => d.local !== 'Não definido' && (d.transplantado > 0 || d.mudas > 0 || d.perdas > 0));
             
-            allData = [];
-            let currentDate = new Date(2023, 9, 1);
-
-            for (let i = 0; i < 60; i++) {
-                let bl = blocos[Math.floor(Math.random() * blocos.length)];
-                let varr = variedades[Math.floor(Math.random() * variedades.length)];
-                let mudas = 3000 + Math.floor(Math.random() * 5000);
-                let perdas = Math.floor(mudas * (Math.random() * 0.12));
-                
-                allData.push({
-                    dataStr: `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth()+1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`,
-                    dateObj: new Date(currentDate),
-                    germinacao: 4 + Math.floor(Math.random() * 5),
-                    local: bl,
-                    ciclo: ciclos[Math.floor(Math.random() * ciclos.length)],
-                    variedade: varr,
-                    bandejas: Math.ceil(mudas / 200),
-                    mudas: mudas,
-                    transplantado: mudas - perdas,
-                    perdas: perdas
-                });
-                currentDate.setDate(currentDate.getDate() + Math.floor(Math.random() * 4));
-            }
-            populateFilters();
-            applyFilters();
+            populateFilters(); populateRendFilters(); populateProdFilters();
+            applyFilters(); applyRendFilters(); applyProdFilters();
         }
+
+        function processProdData(data) {
+            if (!data || data.length === 0) { loadMockProdData(); return; }
+            
+            prodData = data.map(row => {
+                let c = getCSVField(row, ['ciclo', 'Ciclo', 'CICLO']);
+                c = c ? c.toString().trim() : 'Não definido';
+
+                let s = getCSVField(row, ['Setor', 'setor', 'Local', 'Bloco', 'bloco']);
+                s = s ? s.toString().trim() : 'Não definido';
+
+                return {
+                    dataReg: getCSVField(row, ['Data de Registo', 'Data', 'Data de Registro']),
+                    ciclo: c,
+                    setor: s,
+                    cultura: getCSVField(row, ['Cultura']).trim(),
+                    variedade: getCSVField(row, ['Variedade']).trim() || 'Não definida',
+                    qtdColhida: parseNum(getCSVField(row, ['Qtd Colhida', 'Qtd colhida', 'Quantidade Colhida'])),
+                    totalNaoColhido: parseNum(getCSVField(row, ['Total não colhido', 'Total Nao Colhido', 'Total Não Colhido'])),
+                    totalTransplantado: parseNum(getCSVField(row, ['Total transplantado', 'Total Transplantado'])),
+                    causasRegistadas: getCSVField(row, ['Causas Registadas', 'Causas Registradas', 'Causas registadas', 'Causas']).trim() || 'Outros',
+                    perdaPorCausas: parseNum(getCSVField(row, ['Perda por Causas', 'Perdas por Causas', 'Perda por causa']))
+                };
+            }).filter(d => d.setor !== 'Não definido' && (d.totalTransplantado > 0 || d.qtdColhida > 0 || d.totalNaoColhido > 0 || d.perdaPorCausas > 0));
+            
+            if (prodData.length === 0) { loadMockProdData(); return; }
+            populateProdSheetFilters(); applyProdSheetFilters();
+        }
+
+        // --- Multi-Select Generators ---
+        function generateMultiSelect(filterKey, containerId, options, labelPrefix, targetSet, applyCallback) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            targetSet.clear();
+            options.forEach(opt => targetSet.add(opt));
+
+            const allDiv = document.createElement('div');
+            allDiv.className = 'flex items-center p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 mb-1';
+            allDiv.innerHTML = `<input type="checkbox" id="all_${filterKey}" class="custom-checkbox mr-3" checked>
+                                <label for="all_${filterKey}" class="text-sm font-bold text-slate-700 cursor-pointer w-full">Selecionar Todos</label>`;
+            container.appendChild(allDiv);
+
+            const allCheckbox = allDiv.querySelector('input');
+            allCheckbox.addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
+                container.querySelectorAll('.item-checkbox').forEach(cb => {
+                    cb.checked = isChecked;
+                    if(isChecked) targetSet.add(cb.value); else targetSet.delete(cb.value);
+                });
+                updateDropdownText(filterKey, labelPrefix, options.length, targetSet);
+                applyCallback();
+            });
+
+            options.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors';
+                const safeId = `chk_${filterKey}_${String(opt).replace(/[^a-zA-Z0-9]/g, '')}`;
+                div.innerHTML = `<input type="checkbox" id="${safeId}" value="${opt}" class="custom-checkbox item-checkbox mr-3" checked>
+                                 <label for="${safeId}" class="text-sm font-semibold text-slate-600 cursor-pointer w-full select-none">${opt}</label>`;
+                container.appendChild(div);
+
+                div.querySelector('input').addEventListener('change', (e) => {
+                    if (e.target.checked) targetSet.add(opt); else { targetSet.delete(opt); allCheckbox.checked = false; }
+                    if (targetSet.size === options.length) allCheckbox.checked = true;
+                    updateDropdownText(filterKey, labelPrefix, options.length, targetSet);
+                    applyCallback();
+                });
+            });
+            updateDropdownText(filterKey, labelPrefix, options.length, targetSet);
+        }
+
+        const sorter = (key) => (a, b) => {
+            if(key === 'ciclo') {
+                const nA = parseInt(a), nB = parseInt(b);
+                if(!isNaN(nA) && !isNaN(nB)) return nA - nB;
+            }
+            return String(a).localeCompare(String(b));
+        };
 
         function populateFilters() {
-            const getUnique = (key) => [...new Set(allData.map(item => item[key]))].sort();
+            const getU = (k) => [...new Set(allData.map(d => d[k]))].filter(v => v).sort(sorter(k));
+            generateMultiSelect('local', 'optionsLocal', getU('local'), 'Bloco', selectedFilters.local, applyFilters);
+            generateMultiSelect('ciclo', 'optionsCiclo', getU('ciclo'), 'Ciclo', selectedFilters.ciclo, applyFilters);
+            generateMultiSelect('variedade', 'optionsVariedade', getU('variedade'), 'Variedade', selectedFilters.variedade, applyFilters);
             
-            const populateMultiSelect = (filterKey, containerId, options, labelPrefix) => {
-                const container = document.getElementById(containerId);
-                container.innerHTML = '';
-                
-                const allDiv = document.createElement('div');
-                allDiv.className = 'flex items-center p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 mb-1';
-                allDiv.innerHTML = `
-                    <input type="checkbox" id="all_${filterKey}" class="custom-checkbox mr-3" checked>
-                    <label for="all_${filterKey}" class="text-sm font-bold text-slate-700 cursor-pointer w-full">Selecionar Todos</label>
-                `;
-                container.appendChild(allDiv);
-
-                const allCheckbox = allDiv.querySelector('input');
-                allCheckbox.addEventListener('change', (e) => {
-                    const isChecked = e.target.checked;
-                    container.querySelectorAll('.item-checkbox').forEach(cb => {
-                        cb.checked = isChecked;
-                        if(isChecked) selectedFilters[filterKey].add(cb.value);
-                        else selectedFilters[filterKey].delete(cb.value);
-                    });
-                    updateDropdownText(filterKey, labelPrefix, options.length);
-                    applyFilters();
-                });
-
-                options.forEach(opt => {
-                    selectedFilters[filterKey].add(opt);
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors';
-                    const safeId = `chk_${filterKey}_${opt.replace(/[^a-zA-Z0-9]/g, '')}`;
-                    div.innerHTML = `
-                        <input type="checkbox" id="${safeId}" value="${opt}" class="custom-checkbox item-checkbox mr-3" checked>
-                        <label for="${safeId}" class="text-sm font-semibold text-slate-600 cursor-pointer w-full select-none">${opt}</label>
-                    `;
-                    container.appendChild(div);
-
-                    div.querySelector('input').addEventListener('change', (e) => {
-                        if (e.target.checked) selectedFilters[filterKey].add(opt);
-                        else {
-                            selectedFilters[filterKey].delete(opt);
-                            allCheckbox.checked = false;
-                        }
-                        if (selectedFilters[filterKey].size === options.length) allCheckbox.checked = true;
-                        updateDropdownText(filterKey, labelPrefix, options.length);
-                        applyFilters();
-                    });
-                });
-                updateDropdownText(filterKey, labelPrefix, options.length);
-            };
-
-            populateMultiSelect('local', 'optionsLocal', getUnique('local'), 'Bloco');
-            populateMultiSelect('ciclo', 'optionsCiclo', getUnique('ciclo'), 'Ciclo');
-            populateMultiSelect('variedade', 'optionsVariedade', getUnique('variedade'), 'Variedade');
-
-            const dates = allData.map(d => d.dateObj).filter(d => d !== null);
-            if (dates.length > 0) {
-                const fmt = (d) => d.toISOString().split('T')[0];
-                document.getElementById('filterDataInicio').value = fmt(new Date(Math.min(...dates)));
-                document.getElementById('filterDataFim').value = fmt(new Date(Math.max(...dates)));
+            const dts = allData.map(d => d.dateObj).filter(d => d);
+            if (dts.length > 0) {
+                const f = (d) => d.toISOString().split('T')[0];
+                document.getElementById('filterDataInicio').value = f(new Date(Math.min(...dts)));
+                document.getElementById('filterDataFim').value = f(new Date(Math.max(...dts)));
             }
         }
 
-        function updateDropdownText(filterKey, label, total) {
-            const count = selectedFilters[filterKey].size;
-            let textId = filterKey === 'local' ? 'selectedLocalText' : filterKey === 'ciclo' ? 'selectedCicloText' : 'selectedVariedadeText';
-            const el = document.getElementById(textId);
-            
-            if (count === 0) {
-                el.textContent = `Nenhum selecionado`;
-                el.className = 'truncate text-rose-500 font-bold';
-            } else if (count === total) {
-                el.textContent = `Todos os ${label}s`;
-                el.className = 'truncate text-slate-700 font-bold';
-            } else {
-                el.textContent = `${count} ${label}(s) selecionado(s)`;
-                el.className = 'truncate text-emerald-600 font-extrabold';
-            }
+        function populateRendFilters() {
+            const getU = (k) => [...new Set(allData.map(d => d[k]))].filter(v => v).sort(sorter(k));
+            generateMultiSelect('rendVariedade', 'optionsRendVariedade', getU('variedade'), 'Variedade', selectedRendFilters.variedade, applyRendFilters);
+            generateMultiSelect('rendCiclo', 'optionsRendCiclo', getU('ciclo'), 'Ciclo', selectedRendFilters.ciclo, applyRendFilters);
+            generateMultiSelect('rendMes', 'optionsRendMes', getU('mesAno'), 'Mês', selectedRendFilters.mes, applyRendFilters);
         }
 
+        function populateProdFilters() {
+            const getU = (k) => [...new Set(allData.map(d => d[k]))].filter(v => v).sort(sorter(k));
+            generateMultiSelect('prodLocal', 'optionsProdLocal', getU('local'), 'Bloco', selectedProdFilters.local, applyProdFilters);
+            generateMultiSelect('prodCiclo', 'optionsProdCiclo', getU('ciclo'), 'Ciclo', selectedProdFilters.ciclo, applyProdFilters);
+            generateMultiSelect('prodVariedade', 'optionsProdVariedade', getU('variedade'), 'Variedade', selectedProdFilters.variedade, applyProdFilters);
+        }
+
+        function populateProdSheetFilters() {
+            // Utilizando prodData que já foi tratada robustamente para puxar Setores e Ciclos corretos
+            const getU = (k) => [...new Set(prodData.map(d => d[k]))].filter(v => v).sort(sorter(k));
+            generateMultiSelect('psSetor', 'optionsPSSetor', getU('setor'), 'Setor', selectedProdSheetFilters.setor, applyProdSheetFilters);
+            generateMultiSelect('psCiclo', 'optionsPSCiclo', getU('ciclo'), 'Ciclo', selectedProdSheetFilters.ciclo, applyProdSheetFilters);
+            generateMultiSelect('psVariedade', 'optionsPSVariedade', getU('variedade'), 'Variedade', selectedProdSheetFilters.variedade, applyProdSheetFilters);
+        }
+
+        function updateDropdownText(key, label, total, set) {
+            const ids = { local:'selectedLocalText', ciclo:'selectedCicloText', variedade:'selectedVariedadeText',
+                rendVariedade:'selectedRendVariedadeText', rendCiclo:'selectedRendCicloText', rendMes:'selectedRendMesText',
+                prodLocal:'selectedProdLocalText', prodCiclo:'selectedProdCicloText', prodVariedade:'selectedProdVariedadeText',
+                psSetor:'selectedPSSetorText', psCiclo:'selectedPSCicloText', psVariedade:'selectedPSVariedadeText' };
+            const el = document.getElementById(ids[key]);
+            if(!el) return;
+            if (set.size === 0) { el.textContent = 'Nenhum selecionado'; el.className = 'truncate text-rose-500 font-bold'; }
+            else if (set.size === total) { el.textContent = `Todos os ${label}s`; el.className = 'truncate text-slate-700 font-bold'; }
+            else { el.textContent = `${set.size} ${label}(s) selecionado(s)`; el.className = 'truncate text-emerald-600 font-extrabold'; }
+        }
+
+        // --- Filters Applications ---
         function applyFilters() {
-            const dtIniStr = document.getElementById('filterDataInicio').value;
-            const dtFimStr = document.getElementById('filterDataFim').value;
-            const dtIni = dtIniStr ? new Date(dtIniStr) : null;
-            const dtFim = dtFimStr ? new Date(dtFimStr) : null;
-            if(dtFim) dtFim.setHours(23, 59, 59, 999);
-
-            filteredData = allData.filter(d => {
-                if (!selectedFilters.local.has(d.local) || !selectedFilters.ciclo.has(d.ciclo) || !selectedFilters.variedade.has(d.variedade)) return false;
-                if (dtIni && d.dateObj && d.dateObj < dtIni) return false;
-                if (dtFim && d.dateObj && d.dateObj > dtFim) return false;
-                return true;
-            });
+            const di = document.getElementById('filterDataInicio').value ? new Date(document.getElementById('filterDataInicio').value) : null;
+            const df = document.getElementById('filterDataFim').value ? new Date(document.getElementById('filterDataFim').value) : null;
+            if(df) df.setHours(23,59,59,999);
+            filteredData = allData.filter(d => selectedFilters.local.has(d.local) && selectedFilters.ciclo.has(String(d.ciclo)) && selectedFilters.variedade.has(d.variedade) && (!di || d.dateObj >= di) && (!df || d.dateObj <= df));
             updateUI();
         }
 
+        function applyRendFilters() {
+            filteredRendData = allData.filter(d => selectedRendFilters.variedade.has(d.variedade) && selectedRendFilters.ciclo.has(String(d.ciclo)) && selectedRendFilters.mes.has(d.mesAno));
+            updateRendimentoUI();
+        }
+
+        function applyProdFilters() {
+            filteredProdData = allData.filter(d => selectedProdFilters.local.has(d.local) && selectedProdFilters.ciclo.has(String(d.ciclo)) && selectedProdFilters.variedade.has(d.variedade));
+            updateProductivityUI();
+        }
+
+        function applyProdSheetFilters() {
+            filteredProdSheetData = prodData.filter(d => selectedProdSheetFilters.setor.has(d.setor) && selectedProdSheetFilters.ciclo.has(String(d.ciclo)) && selectedProdSheetFilters.variedade.has(d.variedade));
+            updateProducaoUI();
+        }
+
+        // --- UI Updaters ---
         function updateUI() {
             let tBan = 0, tMud = 0, tTrans = 0, tPerd = 0;
             filteredData.forEach(d => { tBan+=d.bandejas; tMud+=d.mudas; tTrans+=d.transplantado; tPerd+=d.perdas; });
-
-            const pctPlan = tMud > 0 ? (tTrans / tMud * 100) : 0;
-            const basePerdas = (tTrans + tPerd) > 0 ? (tTrans + tPerd) : 1; 
-            const pctPerd = (tPerd / basePerdas * 100);
-
-            const roundedPctPlan = Math.round(pctPlan);
-            const roundedPctPerd = Math.round(pctPerd);
-
-            const fmt = (n) => new Intl.NumberFormat('pt-BR').format(n);
-            document.getElementById('kpiBandejas').textContent = fmt(tBan);
-            document.getElementById('kpiMudas').textContent = fmt(tMud);
-            document.getElementById('kpiTransplantado').textContent = fmt(tTrans);
-            document.getElementById('kpiPerdas').textContent = fmt(tPerd);
+            const pctPlan = tMud > 0 ? (tTrans/tMud*100) : 0, pctPerd = (tTrans+tPerd) > 0 ? (tPerd/(tTrans+tPerd)*100) : 0;
             
-            document.getElementById('kpiPctPlantado').textContent = roundedPctPlan + '%';
-            document.getElementById('barPctPlantado').style.width = Math.min(pctPlan, 100) + '%';
+            const f = (n) => new Intl.NumberFormat('pt-BR').format(n);
+            document.getElementById('kpiBandejas').textContent = f(tBan); document.getElementById('kpiMudas').textContent = f(tMud);
+            document.getElementById('kpiTransplantado').textContent = f(tTrans); document.getElementById('kpiPerdas').textContent = f(tPerd);
+            document.getElementById('kpiPctPlantado').textContent = Math.round(pctPlan)+'%'; document.getElementById('barPctPlantado').style.width = Math.min(pctPlan,100)+'%';
+            document.getElementById('kpiPctPerdas').textContent = Math.round(pctPerd)+'%'; document.getElementById('barPctPerdas').style.width = Math.min(pctPerd,100)+'%';
             
-            document.getElementById('kpiPctPerdas').textContent = roundedPctPerd + '%';
-            document.getElementById('barPctPerdas').style.width = Math.min(pctPerd, 100) + '%';
-            
-            updateTable();
-            renderChart();
-        }
-
-        function updateTable() {
-            const tbody = document.getElementById('dataTableBody');
-            document.getElementById('rowCount').textContent = `${filteredData.length} registros`;
-            tbody.innerHTML = '';
-
-            filteredData.slice(0, 150).forEach((d, index) => {
-                const tr = document.createElement('tr');
-                // Subtle striping
-                tr.className = `border-b border-slate-100 last:border-0 hover:bg-emerald-50/50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`;
-                tr.innerHTML = `
+            const tbody = document.getElementById('dataTableBody'); document.getElementById('rowCount').textContent = `${filteredData.length} registros`;
+            tbody.innerHTML = filteredData.slice(0, 150).map((d, i) => `
+                <tr class="border-b border-slate-100 last:border-0 hover:bg-emerald-50/50 transition-colors ${i%2===0?'bg-white':'bg-slate-50/30'}">
                     <td class="px-6 py-4 whitespace-nowrap text-slate-500 font-medium">${d.dataStr}</td>
                     <td class="px-6 py-4 font-extrabold text-slate-700">${d.local}</td>
                     <td class="px-6 py-4"><span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200">${d.ciclo}</span></td>
                     <td class="px-6 py-4 text-slate-600 font-semibold">${d.variedade}</td>
-                    <td class="px-6 py-4 text-right font-extrabold text-emerald-600">${new Intl.NumberFormat('pt-BR').format(d.transplantado)}</td>
-                    <td class="px-6 py-4 text-right font-extrabold ${d.perdas > 0 ? 'text-rose-500' : 'text-slate-400'}">${new Intl.NumberFormat('pt-BR').format(d.perdas)}</td>
+                    <td class="px-6 py-4 text-right font-extrabold text-emerald-600">${f(d.transplantado)}</td>
+                    <td class="px-6 py-4 text-right font-extrabold ${d.perdas>0?'text-rose-500':'text-slate-400'}">${f(d.perdas)}</td>
                     <td class="px-6 py-4 text-right font-bold text-slate-500 bg-slate-50/50">${d.germinacao} <span class="text-[10px] uppercase font-bold text-slate-400 ml-1">dias</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
+                </tr>`).join('');
+            renderChart();
         }
 
+        function updateRendimentoUI() {
+            let tTrans = 0, tPerd = 0, tMud = 0; filteredRendData.forEach(d => { tTrans+=d.transplantado; tPerd+=d.perdas; tMud+=d.mudas; });
+            const fmt = (n) => new Intl.NumberFormat('pt-BR').format(n);
+            document.getElementById('kpiRendTransplantado').textContent = fmt(tTrans);
+            document.getElementById('kpiRendPctPlantado').textContent = (tMud>0?Math.round(tTrans/tMud*100):0) + '%';
+            document.getElementById('kpiRendPerdas').textContent = fmt(tPerd);
+            document.getElementById('kpiRendPctPerdas').textContent = ((tTrans+tPerd)>0?Math.round(tPerd/(tTrans+tPerd)*100):0) + '%';
+            renderRendimentoCharts();
+        }
+
+        function updateProductivityUI() {
+            let h=0, c=0, t=0; filteredProdData.forEach(d => { h+=d.horasTrabalhadas; c+=d.colaboradores; t+=d.transplantado; });
+            const fmt = (n) => new Intl.NumberFormat('pt-BR').format(n);
+            document.getElementById('kpiProdHoras').textContent = h.toFixed(1) + 'h';
+            document.getElementById('kpiProdColab').textContent = fmt(filteredProdData.length>0?Math.round(c/filteredProdData.length):0);
+            document.getElementById('kpiProdMudasColab').textContent = fmt(c>0?Math.round(t/c):0);
+            document.getElementById('kpiProdMudasHora').textContent = fmt(h>0?Math.round(t/h):0);
+            renderProductivityCharts();
+        }
+
+        function updateProducaoUI() {
+            let t=0, c=0, p=0, nc=0, causes={};
+            filteredProdSheetData.forEach(d => {
+                t += d.totalTransplantado;
+                c += d.qtdColhida;
+                p += d.perdaPorCausas;
+                nc += d.totalNaoColhido;
+                let caus = d.causasRegistadas || 'Outros';
+                if (d.perdaPorCausas > 0) {
+                    causes[caus] = (causes[caus] || 0) + d.perdaPorCausas;
+                }
+            });
+
+            // Regra do Mínimo de 1%
+            let calcP = t > 0 ? (p / t * 100) : 0;
+            if (p > 0 && calcP > 0 && calcP < 1) calcP = 1;
+
+            const fmt = (n) => new Intl.NumberFormat('pt-BR').format(n);
+            document.getElementById('kpiPSTrans').textContent = fmt(t);
+            document.getElementById('kpiPSPerdasCausa').textContent = fmt(p);
+            document.getElementById('kpiPSPctPerdasCausa').textContent = (calcP % 1 === 0 ? calcP.toFixed(0) : calcP.toFixed(1)) + '%';
+            
+            // Novos KPIs atualizados para exibir os números reais colhidos/não colhidos
+            document.getElementById('kpiPSTotalColhido').textContent = fmt(c);
+            document.getElementById('kpiPSPctColhido').textContent = (t>0?(c/t*100).toFixed(1):0) + '% do plantado';
+            
+            document.getElementById('kpiPSTotalNaoColhido').textContent = fmt(nc);
+            document.getElementById('kpiPSPctNaoColhido').textContent = (t>0?(nc/t*100).toFixed(1):0) + '% do plantado';
+            
+            let topC='', maxV=-1; for(let k in causes) { if(causes[k]>maxV){ maxV=causes[k]; topC=k; } }
+            document.getElementById('kpiPSTopCausa').textContent = topC !== '' ? `${topC} (${fmt(maxV)})` : 'Sem registros';
+            renderProducaoCharts();
+        }
+
+        // --- Gráficos ---
         function renderChart() {
             const ctx = document.getElementById('mainChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
 
-            let blocks = [...new Set(filteredData.map(d => d.local))].sort();
-            let varieties = [...new Set(filteredData.map(d => d.variedade))].sort();
-            
-            const varietyColors = {};
-            varieties.forEach((v, i) => varietyColors[v] = colors[i % colors.length]);
+            let blocks = [...new Set(filteredData.map(d => d.local))].sort(), varieties = [...new Set(filteredData.map(d => d.variedade))].sort();
+            let ds = [], vColors = {}; varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
 
-            const legend = document.getElementById('customLegend');
-            legend.innerHTML = '';
             varieties.forEach(v => {
-                legend.innerHTML += `
-                    <div class="flex items-center bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm">
-                        <span class="w-3 h-3 rounded-full mr-2 shadow-inner" style="background-color: ${varietyColors[v]}"></span>
-                        <span class="text-[11px] font-extrabold text-slate-600">${v}</span>
-                    </div>
-                `;
-            });
-
-            let datasets = [];
-            varieties.forEach(variety => {
-                let color = varietyColors[variety];
-                let transData = [], perdasData = [], germData = [];
-
-                blocks.forEach(block => {
-                    let rows = filteredData.filter(d => d.local === block && d.variedade === variety);
-                    transData.push(rows.reduce((sum, r) => sum + r.transplantado, 0));
-                    perdasData.push(rows.reduce((sum, r) => sum + r.perdas, 0));
-                    germData.push(rows.length > 0 ? (rows.reduce((sum, r) => sum + r.germinacao, 0) / rows.length) : 0);
-                });
-
-                // MAIN STACK: Transplantado Bars - Made thicker
-                datasets.push({
-                    label: `Transp. ${variety}`,
-                    data: transData,
-                    backgroundColor: color,
-                    borderRadius: 4, // Reduced roundness for thicker bars
-                    stack: variety,
-                    barPercentage: 0.95, // Increased width
-                    categoryPercentage: 0.95, // Increased width
-                    yAxisID: 'y',
-                    datalabels: {
-                        color: '#ffffff', // Ensures text is readable inside dark colored bars
-                        font: { family: 'Poppins', weight: '800', size: 11 },
-                        formatter: (val) => val > 0 ? new Intl.NumberFormat('pt-BR').format(val) : '',
-                        display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0 // Show label if value exists
-                    }
-                });
-
-                // MAIN STACK: Perdas Bars
-                let rgb = hexToRgb(color);
-                datasets.push({
-                    label: `Perdas ${variety}`,
-                    data: perdasData,
-                    backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25)`, // Made slightly darker
-                    borderColor: color,
-                    borderWidth: 1.5,
-                    borderDash: [4, 4],
-                    borderRadius: 4,
-                    stack: variety,
-                    yAxisID: 'y',
-                    datalabels: {
-                        color: '#1e293b', // Dark slate text for better visibility on transparent background
-                        anchor: 'center', // Put label in center of bar
-                        align: 'center',
-                        font: { family: 'Poppins', weight: '800', size: 10 },
-                        formatter: (val) => val > 0 ? `-${val}` : '',
-                        display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0
-                    }
-                });
-                
-                // SECONDARY STACK: Germinação Bars - Made slightly thicker but distinct
-                datasets.push({
-                    label: `Germinação ${variety}`,
-                    data: germData,
-                    type: 'bar',
-                    xAxisID: 'x2',
-                    yAxisID: 'y',
-                    backgroundColor: '#cbd5e1', // Neutral gray so it doesn't clash with varieties
-                    borderColor: '#94a3b8',
-                    borderWidth: 1,
-                    borderRadius: 2,
-                    stack: 'germ_' + variety, 
-                    barPercentage: 0.6, // Thicker than before, but thinner than main data
-                    datalabels: {
-                        color: '#334155', // Dark text
-                        anchor: 'end',
-                        align: 'start', // Keep label inside/near the end of the bar
-                        offset: 4,
-                        font: { family: 'Poppins', weight: '700', size: 10 },
-                        formatter: (val) => val > 0 ? val.toFixed(1) + 'd' : '',
-                        display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0
-                    }
-                });
-            });
-
-            // Adjust height dynamically based on number of blocks to give bars breathing room
-            document.getElementById('mainChart').parentElement.style.height = `${Math.max(700, blocks.length * 150)}px`;
-
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: blocks, datasets: datasets },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'y', intersect: false },
-                    plugins: {
-                        legend: { display: false },
-                        datalabels: {
-                            // Global settings for datalabels if needed
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                            titleFont: { family: 'Poppins', size: 14, weight: '700' },
-                            bodyFont: { family: 'Poppins', size: 12, weight: '500' },
-                            padding: 14,
-                            cornerRadius: 12,
-                            boxPadding: 6,
-                            usePointStyle: true,
-                            callbacks: {
-                                label: (ctx) => {
-                                    let l = ctx.dataset.label || '';
-                                    if(l.includes('Germ')) return `${l}: ${ctx.parsed.x.toFixed(1)} dias`;
-                                    return `${l}: ${new Intl.NumberFormat('pt-BR').format(ctx.parsed.x)} mudas`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            stacked: true,
-                            title: { display: true, text: 'BLOCOS', font: { family: 'Poppins', weight: '800', size: 11, letterSpacing: 1 }, color: '#94a3b8' },
-                            grid: { display: false },
-                            ticks: { font: { family: 'Poppins', weight: '700', size: 12 }, color: '#475569' }
-                        },
-                        x: {
-                            stacked: true,
-                            position: 'bottom',
-                            title: { display: true, text: 'QUANTIDADE (MUDAS / PERDAS)', font: { family: 'Poppins', weight: '800', size: 11, letterSpacing: 1 }, color: '#94a3b8' },
-                            grid: { color: '#f1f5f9', borderDash: [4, 4] }
-                        },
-                        x2: {
-                            position: 'top',
-                            title: { display: true, text: 'DIAS DE GERMINAÇÃO', font: { family: 'Poppins', weight: '800', size: 11, letterSpacing: 1 }, color: '#94a3b8' },
-                            grid: { drawOnChartArea: false },
-                            min: 0,
-                            suggestedMax: 20
-                        }
-                    }
+                let trans = blocks.map(b => filteredData.filter(d => d.local === b && d.variedade === v).reduce((s, r) => s + r.transplantado, 0));
+                let mudas = blocks.map(b => filteredData.filter(d => d.local === b && d.variedade === v).reduce((s, r) => s + r.mudas, 0));
+                if (trans.some(val => val > 0)) {
+                    ds.push({ label: v + ' (Transplantado)', data: trans, backgroundColor: vColors[v], borderRadius: 6,
+                        datalabels: { anchor: 'end', align: 'top', color: vColors[v], font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val>0?new Intl.NumberFormat('pt-BR').format(val):'' }
+                    });
+                    ds.push({ label: v + ' (% Plantado)', data: blocks.map((b,i) => mudas[i]>0?(trans[i]/mudas[i]*100):null), type: 'line', yAxisID: 'y1',
+                        borderColor: vColors[v], backgroundColor: vColors[v], borderWidth: 2, borderDash: [5, 5], datalabels: { display: false }
+                    });
                 }
             });
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar', data: { labels: blocks, datasets: ds },
+                options: { responsive: true, maintainAspectRatio: false, scales: {
+                    x: { grid: { display: false }, ticks: { font: { family: 'Poppins', weight: '700' } } },
+                    y: { title: { display: true, text: 'Qtd. Transplantada' }, ticks: { font: { family: 'Poppins' } } },
+                    y1: { type: 'linear', position: 'right', title: { display: true, text: '% Plantado' }, max: 120 }
+                }, plugins: { legend: { display: false } } }
+            });
+
+            document.getElementById('customLegend').innerHTML = varieties.filter(v=>filteredData.some(d=>d.variedade===v)).map(v => 
+                `<div class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm"><div class="w-3 h-3 rounded-full" style="background-color:${vColors[v]}"></div><span class="text-xs font-bold">${v}</span></div>`).join('');
         }
 
-        function hexToRgb(hex) {
-            var r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return r ? { r: parseInt(r[1], 16), g: parseInt(r[2], 16), b: parseInt(r[3], 16) } : { r:0, g:0, b:0 };
-        }
-        
-        function parseNum(val) {
-            if (!val) return 0;
-            if (typeof val === 'number') return val;
-            let num = parseFloat(val.replace(/\./g, '').replace(',', '.'));
-            return isNaN(num) ? 0 : num;
-        }
-        
-        function parseDate(dateStr) {
-            if (!dateStr) return null;
-            let parts = dateStr.split('/');
-            return parts.length === 3 ? new Date(parts[2], parts[1] - 1, parts[0]) : new Date(dateStr);
+        function renderRendimentoCharts() {
+            let blocks = [...new Set(filteredRendData.map(d => d.local))].sort(), varieties = [...new Set(filteredRendData.map(d => d.variedade))].sort();
+            let vColors = {}; varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
+
+            if (rendChartPctInstance) rendChartPctInstance.destroy();
+            let pctDs = varieties.map(v => {
+                let d = blocks.map(b => {
+                    let r = filteredRendData.filter(x => x.local === b && x.variedade === v);
+                    let m = r.reduce((s,x)=>s+x.mudas,0); return m>0?Math.round(r.reduce((s,x)=>s+x.transplantado,0)/m*100):null;
+                });
+                if(d.some(x=>x!==null)) return { label: `% Plantado (${v})`, data: d, borderColor: vColors[v], backgroundColor: vColors[v], fill: false, datalabels:{align:'top', font:{weight:'bold'}, formatter:val=>val?val+'%':''} };
+            }).filter(Boolean);
+
+            rendChartPctInstance = new Chart(document.getElementById('rendChartPercentage'), {
+                type: 'line', data: { labels: blocks, datasets: pctDs },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { max: 120, grid: { color: '#f1f5f9' } }, x: { grid: { color: '#f1f5f9' } } } }
+            });
+
+            if (rendChartCompInstance) rendChartCompInstance.destroy();
+            let cTrans = [], cPlan = [], cPerd = [];
+            varieties.forEach(v => {
+                let r = filteredRendData.filter(d=>d.variedade===v), t=r.reduce((s,x)=>s+x.transplantado,0), m=r.reduce((s,x)=>s+x.mudas,0), p=r.reduce((s,x)=>s+x.perdas,0);
+                cTrans.push(t); cPlan.push(m>0?Math.round(t/m*100):0); cPerd.push((t+p)>0?Math.round(p/(t+p)*100):0);
+            });
+
+            rendChartCompInstance = new Chart(document.getElementById('rendChartComparison'), {
+                type: 'bar', data: { labels: varieties, datasets: [
+                    { label: 'Transplantado', data: cTrans, backgroundColor: '#059669', datalabels:{anchor:'end', align:'top', font:{weight:'bold', size:10}, formatter:v=>new Intl.NumberFormat('pt-BR').format(v)} },
+                    { label: '% Plantado', data: cPlan, backgroundColor: '#0284c7', datalabels:{anchor:'end', align:'top', font:{weight:'bold', size:10}, formatter:v=>v+'%'} },
+                    { label: '% Perdas', data: cPerd, backgroundColor: '#e11d48', datalabels:{anchor:'end', align:'top', font:{weight:'bold', size:10}, formatter:v=>v+'%'} }
+                ] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { grid: { color: '#f1f5f9' } } } }
+            });
         }
 
-        function init() {
-            const loader = document.getElementById('loadingIndicator');
-            loader.style.display = 'flex';
-            loader.classList.remove('hidden');
+        function renderProductivityCharts() {
+            let blocks = [...new Set(filteredProdData.map(d => d.local))].sort();
             
-            Papa.parse(SHEET_CSV_URL, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: (results) => {
-                    loader.style.display = 'none';
-                    processRawData(results.data);
-                },
-                error: () => loadMockData()
+            if (prodChartHoursInstance) prodChartHoursInstance.destroy();
+            let hTrans = blocks.map(b => filteredProdData.filter(d=>d.local===b).reduce((s,r)=>s+r.transplantado,0));
+            let hHours = blocks.map(b => filteredProdData.filter(d=>d.local===b).reduce((s,r)=>s+r.horasTrabalhadas,0));
+            prodChartHoursInstance = new Chart(document.getElementById('prodChartHours'), {
+                type: 'bar', data: { labels: blocks, datasets: [
+                    { label: 'Transplantado', data: hTrans, backgroundColor: '#6366f1', yAxisID: 'y', datalabels: {anchor:'end', align:'top', formatter:v=>new Intl.NumberFormat('pt-BR').format(v)} },
+                    { label: 'Horas', data: hHours, type: 'line', yAxisID: 'y1', borderColor: '#f59e0b', backgroundColor: '#f59e0b', datalabels: {align:'bottom', formatter:v=>v.toFixed(1)+'h'} }
+                ]}, options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left' }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
+            });
+
+            if (prodChartBarTimeInstance) prodChartBarTimeInstance.destroy();
+            let bMudas = blocks.map(b => { let r=filteredProdData.filter(d=>d.local===b), c=r.reduce((s,x)=>s+x.colaboradores,0); return c>0?Math.round(r.reduce((s,x)=>s+x.transplantado,0)/c):0; });
+            prodChartBarTimeInstance = new Chart(document.getElementById('prodChartBarTime'), {
+                type: 'bar', data: { labels: blocks, datasets: [{ label: 'Mudas/Colab', data: bMudas, backgroundColor: '#10b981', datalabels: {anchor:'end', align:'top', font:{weight:'bold'}} }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            if (prodChartPieInstance) prodChartPieInstance.destroy();
+            prodChartPieInstance = new Chart(document.getElementById('prodChartPie'), {
+                type: 'doughnut', data: { labels: blocks, datasets: [{ data: hTrans, backgroundColor: blocks.map((_,i)=>colors[i%colors.length]), datalabels:{color:'#fff', formatter:(v,ctx)=>{ let s=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0); return s>0?Math.round((v/s)*100)+'%':''}} }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
             });
         }
 
-        document.getElementById('btnLimparFiltros').addEventListener('click', () => {
-            ['local', 'ciclo', 'variedade'].forEach(key => {
-                const container = document.getElementById(`options${key.charAt(0).toUpperCase() + key.slice(1)}`);
-                const checkboxes = container.querySelectorAll('.item-checkbox');
-                selectedFilters[key].clear();
-                checkboxes.forEach(cb => { cb.checked = true; selectedFilters[key].add(cb.value); });
-                const allCb = container.querySelector(`input[id="all_${key}"]`);
-                if(allCb) allCb.checked = true;
-                updateDropdownText(key, key === 'local' ? 'Bloco' : key.charAt(0).toUpperCase() + key.slice(1), checkboxes.length);
-            });
-            const dates = allData.map(d => d.dateObj).filter(d => d !== null);
-            if(dates.length > 0) {
-                const fmt = (d) => new Date(d.getTime() - (d.getTimezoneOffset()*60000)).toISOString().split('T')[0];
-                document.getElementById('filterDataInicio').value = fmt(new Date(Math.min(...dates)));
-                document.getElementById('filterDataFim').value = fmt(new Date(Math.max(...dates)));
-            }
-            applyFilters();
-        });
+        function renderProducaoCharts() {
+            let blocks = [...new Set(filteredProdSheetData.map(d => d.setor))].sort();
+            
+            if (psChartBlockNaoColhidoInstance) psChartBlockNaoColhidoInstance.destroy();
+            let pTrans = blocks.map(b => filteredProdSheetData.filter(d=>d.setor===b).reduce((s,r)=>s+r.totalTransplantado,0));
+            let pNao = blocks.map(b => filteredProdSheetData.filter(d=>d.setor===b).reduce((s,r)=>s+r.totalNaoColhido,0));
+            let pPct = pTrans.map((t,i) => t>0?parseFloat(((pNao[i]/t)*100).toFixed(1)):0);
 
-        document.getElementById('filterDataInicio').addEventListener('change', applyFilters);
-        document.getElementById('filterDataFim').addEventListener('change', applyFilters);
-        
-        // No longer calling init() on DOMContentLoaded. It is called upon successful login.
+            psChartBlockNaoColhidoInstance = new Chart(document.getElementById('psChartBlockNaoColhido'), {
+                type: 'bar', data: { labels: blocks, datasets: [
+                    { label: 'Total Não Colhido', data: pNao, backgroundColor: '#0ea5e9', yAxisID: 'y', datalabels: {anchor:'end', align:'top', color:'#0369a1', font:{weight:'bold'}} },
+                    { label: '% Não Colhido', data: pPct, type: 'line', yAxisID: 'y1', borderColor: '#f43f5e', backgroundColor: '#f43f5e', datalabels: {align:'bottom', color:'#be123c', font:{weight:'bold'}, formatter:v=>v+'%'} }
+                ]}, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { position: 'left' }, y1: { position: 'right', min: 0, grid: { drawOnChartArea: false } } } }
+            });
+
+            let cMap = {}, tT = 0;
+            filteredProdSheetData.forEach(d => {
+                let c = d.causasRegistadas || 'Outros'; 
+                if (d.perdaPorCausas > 0) {
+                    cMap[c] = (cMap[c] || 0) + d.perdaPorCausas;
+                }
+                tT += d.totalTransplantado;
+            });
+            let sCaus = Object.entries(cMap).sort((a,b)=>b[1]-a[1]);
+            let cLbl = sCaus.map(c=>c[0]), cPer = sCaus.map(c=>c[1]);
+            
+            // Regra do Mínimo de 1%
+            let cPct = sCaus.map(c => {
+                let p = tT > 0 ? (c[1] / tT * 100) : 0;
+                if (c[1] > 0 && p > 0 && p < 1) p = 1;
+                return parseFloat(p.toFixed(1));
+            });
+
+            document.getElementById('psTableBody').innerHTML = sCaus.map((c,i) => `
+                <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <td class="p-3 text-slate-700 font-bold">${c[0]}</td>
+                    <td class="p-3 text-right font-extrabold text-rose-500">${new Intl.NumberFormat('pt-BR').format(c[1])}</td>
+                    <td class="p-3 text-right font-bold text-slate-500">${cPct[i]}%</td>
+                </tr>`).join('');
+
+            if (psChartCausasBarraInstance) psChartCausasBarraInstance.destroy();
+            psChartCausasBarraInstance = new Chart(document.getElementById('psChartCausasBarra'), {
+                type: 'bar', data: { labels: cLbl, datasets: [
+                    { label: 'Total Perdas', data: cPer, backgroundColor: '#f43f5e', yAxisID: 'y', datalabels: {anchor:'end', align:'top', font:{weight:'bold'}} },
+                    { label: '% de Perda', data: cPct, type: 'line', yAxisID: 'y1', borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', datalabels: {align:'bottom', font:{weight:'bold'}, formatter:v=>v+'%'} }
+                ]}, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { position: 'left' }, y1: { position: 'right', min: 0, grid: { drawOnChartArea: false } } } }
+            });
+
+            if (psChartCausasPizzaInstance) psChartCausasPizzaInstance.destroy();
+            psChartCausasPizzaInstance = new Chart(document.getElementById('psChartCausasPizza'), {
+                type: 'doughnut', data: { labels: cLbl, datasets: [{ data: cPer, backgroundColor: cLbl.map((_,i)=>colors[(i+4)%colors.length]), datalabels:{color:'#fff', font:{weight:'bold',size:10}, formatter:(v,ctx)=>{ let s=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0); let pct=s>0?(v/s)*100:0; return pct>=5?Math.round(pct)+'%':''; }} }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+            });
+        }
     </script>
 </body>
 </html>
