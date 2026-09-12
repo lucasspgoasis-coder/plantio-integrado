@@ -1,432 +1,802 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Controle de Transplantio e Perdas</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<style>
-body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0fdf4;color:#0f172a}
-.glass{background:rgba(255,255,255,.96);border:1px solid #d1fae5;border-radius:16px;box-shadow:0 8px 25px rgba(6,78,59,.07)}
-.kpi{border-radius:14px;padding:18px;border:1px solid #d1fae5;background:#fff;box-shadow:0 5px 18px rgba(6,78,59,.06)}
-#login-screen{background:linear-gradient(135deg,#022c22,#064e3b 55%,#065f46)}
-.header{background:#064e3b}
-.tab-active{color:#065f46;border-bottom:3px solid #059669;background:#ecfdf5}
-.tab{padding:.8rem 1.1rem;font-weight:700;border-bottom:3px solid transparent;white-space:nowrap}
-.print-hide{}
-.multi-select{position:relative}.multi-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;cursor:pointer}.multi-btn i{font-size:10px;color:#64748b}.multi-menu{position:absolute;z-index:100;top:calc(100% + 5px);left:0;width:100%;min-width:190px;max-height:260px;overflow-y:auto;background:#fff;border:1px solid #cbd5e1;border-radius:10px;box-shadow:0 12px 30px rgba(15,23,42,.15);padding:7px}.multi-option{display:flex;align-items:center;gap:8px;padding:8px 7px;border-radius:7px;font-size:12px;font-weight:600;color:#334155;cursor:pointer}.multi-option:hover{background:#ecfdf5}.multi-option input{accent-color:#059669;width:15px;height:15px}.multi-all{border-bottom:1px solid #e2e8f0;margin-bottom:5px;padding-bottom:8px;color:#065f46}.multi-menu.hidden{display:none}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Integrado de Mudas e Transplantio</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js DataLabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <!-- PapaParse for CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Modern Font: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .custom-checkbox {
+            appearance: none;
+            background-color: #f1f5f9;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.25em;
+            height: 1.25em;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.3em;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .custom-checkbox::before {
+            content: "";
+            width: 0.7em;
+            height: 0.7em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            background-color: white;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .custom-checkbox:checked { background-color: #059669; border-color: #059669; }
+        .custom-checkbox:checked::before { transform: scale(1); }
 
-@media print{.print-hide,#login-screen{display:none!important}body{background:white}.glass{box-shadow:none;break-inside:avoid}main{max-width:none!important}.header{background:#064e3b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 100%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            z-index: 50;
+            border-radius: 0.75rem;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+            border: 1px solid #f1f5f9;
+        }
+        .dropdown.active .dropdown-content { display: block; }
 
-.filters-grid{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px;margin-top:16px}.filter-label{font-size:11px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:5px}.filter-select,.filter-date{width:100%;background:#fff;border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;font-size:13px;color:#0f172a;outline:none}.filter-select:focus,.filter-date:focus{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.12)}.table-wrap{border:1px solid #dbeafe;border-radius:14px;overflow:hidden}.data-table{border-collapse:separate;border-spacing:0}.data-table thead th{background:linear-gradient(180deg,#065f46,#064e3b);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:12px 10px;white-space:nowrap}.data-table tbody tr:nth-child(even){background:#f8fafc}.data-table tbody tr:hover{background:#ecfdf5}.data-table tbody td{padding:11px 10px;border-bottom:1px solid #e2e8f0;color:#334155}.data-table tbody tr:last-child td{border-bottom:0}.block-badge{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;background:#ecfdf5;color:#065f46;font-weight:800;font-size:11px}.var-badge{display:inline-flex;align-items:center;gap:6px;font-weight:800}.var-dot{width:8px;height:8px;border-radius:50%;display:inline-block}.num-cell{font-variant-numeric:tabular-nums;font-weight:700}.empty-row{padding:28px!important;text-align:center;color:#64748b!important}
-@media(max-width:1100px){.filters-grid{grid-template-columns:repeat(2,minmax(180px,1fr))}}@media(max-width:800px){.filters-grid{grid-template-columns:1fr}}
-</style>
+        .elegant-card {
+            background: #ffffff;
+            border-radius: 1.25rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.02), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
+            border: none;
+        }
+        
+        .kpi-card {
+            border-radius: 1.25rem;
+            border: none;
+            box-shadow: inset 0 2px 4px 0 rgba(255, 255, 255, 0.3), 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: inset 0 2px 4px 0 rgba(255, 255, 255, 0.3), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-input {
+            background-color: #f8fafc;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .filter-input:hover { background-color: #f1f5f9; }
+        .filter-input:focus { background-color: #ffffff; border-color: #34d399; box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1); }
+        
+        .login-bg {
+            background: linear-gradient(135deg, #064e3b 0%, #0f766e 100%);
+        }
+    </style>
 </head>
-<body class="min-h-screen">
-<div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-5">
- <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7">
-  <div class="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-seedling text-3xl"></i></div>
-  <h1 class="text-xl font-extrabold text-center text-slate-800">Controle de Transplantio e Perdas</h1>
-  <p class="text-xs text-slate-500 text-center mt-1 mb-6">SPG Oásis</p>
-  <form onsubmit="event.preventDefault();handleLogin()" class="space-y-4">
-   <div><label class="block text-xs font-bold text-slate-600 mb-1">Usuário</label><input id="username" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg" autocomplete="username"></div>
-   <div><label class="block text-xs font-bold text-slate-600 mb-1">Senha</label><input id="password" type="password" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg" autocomplete="current-password"></div>
-   <div id="loginError" class="hidden text-xs text-red-600 bg-red-50 border border-red-200 p-2 rounded-lg text-center">Usuário ou senha incorretos!</div>
-   <button class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-lg">Entrar no Sistema</button>
-  </form>
- </div>
-</div>
-<div id="app" class="hidden min-h-screen flex-col">
-<header class="header text-white shadow-lg">
- <div class="max-w-[1920px] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
-  <div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-emerald-500/25 flex items-center justify-center"><i class="fa-solid fa-seedling text-emerald-200 text-xl"></i></div><div><h1 class="font-extrabold text-lg sm:text-xl">Controle de Transplantio e Contabilidade de Perdas</h1><p class="text-xs text-emerald-100">Dados de mudas, transplantio e perdas</p></div></div>
-  <button onclick="logout()" class="print-hide bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-right-from-bracket mr-1"></i>Sair</button>
- </div>
-</header>
-<main class="max-w-[1920px] w-full mx-auto px-4 sm:px-6 py-6 flex-1">
- <div id="sheetTabs" class="border-b border-emerald-200 mb-5 flex items-end overflow-x-auto gap-1"></div>
- <section id="content-transplantio" class="space-y-5">
-  <div class="glass p-4 print-hide"><div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="font-extrabold text-emerald-900">Filtros de visualização</h2><p class="text-xs text-slate-500">Filtre os dados por bloco, ciclo, variedade e período (data inicial e final) sem alterar a planilha.</p></div><div class="flex gap-2"><button onclick="clearFilters()" class="bg-white hover:bg-slate-50 border border-slate-300 px-3 py-2 rounded-lg text-xs font-bold text-slate-700"><i class="fa-solid fa-filter-circle-xmark mr-1"></i>Limpar filtros</button><button onclick="loadData()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button><button onclick="window.print()" class="bg-white border border-slate-300 px-3 py-2 rounded-lg text-xs font-bold text-slate-700"><i class="fa-solid fa-print mr-1"></i>Printar tela</button></div></div><div class="filters-grid multi-filters"><div><label class="filter-label">Ciclo</label><div class="multi-select" id="filterCycleWrap"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('filterCycleMenu')"><span id="filterCycleLabel">Todos os ciclos</span><i class="fa-solid fa-chevron-down"></i></button><div id="filterCycleMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Bloco</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('filterBlockMenu')"><span id="filterBlockLabel">Todos os blocos</span><i class="fa-solid fa-chevron-down"></i></button><div id="filterBlockMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Variedade</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('filterVarietyMenu')"><span id="filterVarietyLabel">Todas as variedades</span><i class="fa-solid fa-chevron-down"></i></button><div id="filterVarietyMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Data inicial</label><input id="filterStartDate" type="date" class="filter-date" onchange="render()"></div><div><label class="filter-label">Data final</label><input id="filterEndDate" type="date" class="filter-date" onchange="render()"></div></div></div>
-  <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-   <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">Total de bandejas</p><h3 id="kBandejas" class="text-2xl font-extrabold text-emerald-800">--</h3></div>
-   <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">Total de mudas</p><h3 id="kMudas" class="text-2xl font-extrabold text-emerald-800">--</h3><p class="text-[10px] text-slate-400">200 mudas por bandeja</p></div>
-   <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">Total transplantado</p><h3 id="kTrans" class="text-2xl font-extrabold text-emerald-800">--</h3></div>
-   <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">Total de perdas</p><h3 id="kPerdas" class="text-2xl font-extrabold text-orange-600">--</h3></div>
-   <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">% total transplantado</p><h3 id="kGerm" class="text-2xl font-extrabold text-emerald-700">--</h3></div>
-   <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">% total perdido</p><h3 id="kPerdaPct" class="text-2xl font-extrabold text-orange-600">--</h3></div>
-  </div>
-  <div class="glass p-5">
-   <div class="flex items-start justify-between gap-3 mb-3"><div><h2 class="text-base font-extrabold text-slate-800">Transplantio por Bloco e Variedade — todas as barras horizontais</h2><p class="text-xs text-slate-500">Blocos em ordem alfabética. Cada variedade é exibida separadamente; mudas = bandejas × 200. % transplantado = transplantado ÷ mudas e % perdas = perdas ÷ mudas. Os totais respeitam todos os filtros selecionados.</p></div><div id="status" class="text-xs font-semibold text-emerald-700"></div></div>
-   <div class="h-[560px] relative"><canvas id="transplantioChart"></canvas></div>
-  </div>
-  <div class="glass p-4"><div class="flex items-center justify-between gap-3 mb-3"><div><h3 class="font-extrabold text-slate-800">Dados consolidados</h3><p id="tableCount" class="text-xs text-slate-500">--</p></div></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs text-center data-table"><thead><tr><th>Bloco</th><th>Ciclo</th><th>Variedade</th><th>Bandejas</th><th>Mudas</th><th>Transplantado</th><th>Perdas</th><th>Total dias de germinação</th><th>Data</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
- </section>
- <section id="content-rendimento" class="space-y-5 hidden">
-  <div class="glass p-4 print-hide">
-   <div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="font-extrabold text-emerald-900">Rendimento do Transplantio</h2><p class="text-xs text-slate-500">Comparação por bloco. Todos os totais e percentuais respeitam os filtros selecionados; % transplantado = transplantado ÷ total de mudas e % perdas = perdas ÷ total de mudas.</p></div><button onclick="renderRendimento()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button></div>
-   <div class="filters-grid multi-filters">
-    <div><label class="filter-label">Bloco</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('rFilterBlockMenu')"><span id="rFilterBlockLabel">Todos os blocos</span><i class="fa-solid fa-chevron-down"></i></button><div id="rFilterBlockMenu" class="multi-menu hidden"></div></div></div>
-    <div><label class="filter-label">Ciclo</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('rFilterCycleMenu')"><span id="rFilterCycleLabel">Todos os ciclos</span><i class="fa-solid fa-chevron-down"></i></button><div id="rFilterCycleMenu" class="multi-menu hidden"></div></div></div>
-    <div><label class="filter-label">Data inicial</label><input id="rFilterStartDate" type="date" class="filter-date" onchange="renderRendimento()"></div><div><label class="filter-label">Data final</label><input id="rFilterEndDate" type="date" class="filter-date" onchange="renderRendimento()"></div>
-   </div>
-   <div id="rendimentoGeneralKpis" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4"></div>
-  </div>
-  <div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Rendimento por Bloco</h3><p class="text-xs text-slate-500">Linhas mostram transplantado, horas de plantio e colaboradores por bloco, com todos os valores visíveis sobre os pontos.</p></div><div class="flex flex-wrap items-center gap-3 mb-4 text-xs font-bold"><div class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"><span class="w-3 h-3 rounded-sm bg-emerald-700"></span><span>Total transplantado</span></div><div class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"><span class="w-3 h-3 rounded-sm bg-orange-500"></span><span>Total de horas de plantio</span></div><div class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"><span class="w-3 h-3 rounded-full bg-blue-600"></span><span>Colaboradores</span></div></div><div class="h-[500px] relative"><canvas id="rendimentoChart"></canvas></div></div>
-  <div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Rendimento em % por Bloco</h3><p class="text-xs text-slate-500">Produtividade relativa: mudas transplantadas por hora-colaborador. O melhor rendimento do conjunto filtrado representa 100%.</p></div><div class="h-[420px] relative"><canvas id="rendimentoPctChart"></canvas></div></div><div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Participação do rendimento por Bloco</h3><p class="text-xs text-slate-500">Gráfico em pizza com a participação proporcional do rendimento dos blocos filtrados.</p></div><div class="h-[420px] relative"><canvas id="rendimentoPieChart"></canvas></div></div>
-  <div class="glass p-4"><div class="flex items-center justify-between mb-3"><div><h3 class="font-extrabold text-slate-800">Detalhamento do rendimento</h3><p id="rendimentoCount" class="text-xs text-slate-500">--</p></div></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs text-center data-table"><thead><tr><th>Bloco</th><th>Total de mudas</th><th>Total transplantado</th><th>% transplantado</th><th>Total de perdas</th><th>% perdas</th><th>Início do transplantio</th><th>Final do transplantio</th><th>Total de tempo</th><th>Total de colaboradores</th></tr></thead><tbody id="rendimentoTbody"></tbody></table></div></div>
- </section>
- <section id="content-germinacao" class="space-y-5 hidden">
-  <div class="glass p-4 print-hide">
-   <div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="font-extrabold text-emerald-900">Análise de Transplantio</h2><p class="text-xs text-slate-500">Visualização por bloco das variedades BRO e Master. % total transplantado = transplantado ÷ total de mudas; % total perdido = perdas ÷ total de mudas.</p></div><button onclick="renderGerminacao()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar gráfico</button></div>
-   <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
-    <div class="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
-      <div class="flex items-center justify-between mb-3"><h3 class="font-extrabold text-emerald-900">Filtros — BRO</h3><button onclick="clearGermFilters('BRO')" class="text-xs font-bold text-emerald-700">Limpar</button></div>
-      <div class="filters-grid multi-filters">
-       <div><label class="filter-label">Bloco</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('gBroBlockMenu')"><span id="gBroBlockLabel">Todos os blocos</span><i class="fa-solid fa-chevron-down"></i></button><div id="gBroBlockMenu" class="multi-menu hidden"></div></div></div>
-       <div><label class="filter-label">Ciclo</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('gBroCycleMenu')"><span id="gBroCycleLabel">Todos os ciclos</span><i class="fa-solid fa-chevron-down"></i></button><div id="gBroCycleMenu" class="multi-menu hidden"></div></div></div>
-       <div><label class="filter-label">Mês</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('gBroMonthMenu')"><span id="gBroMonthLabel">Todos os meses</span><i class="fa-solid fa-chevron-down"></i></button><div id="gBroMonthMenu" class="multi-menu hidden"></div></div></div>
-      </div>
+<body class="text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-emerald-200 selection:text-emerald-900">
+
+    <div id="loginScreen" class="fixed inset-0 z-50 login-bg flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 w-full max-w-md relative overflow-hidden">
+            <!-- Decorative circle -->
+            <div class="absolute -top-16 -right-16 w-32 h-32 bg-emerald-50 rounded-full opacity-50"></div>
+            
+            <div class="flex flex-col items-center mb-8 relative z-10">
+                <div class="w-20 h-20 flex items-center justify-center mb-4">
+                    <img src="https://i.imgur.com/3BHy9Rv.jpeg" alt="Ícone" class="w-16 h-16 object-contain rounded-2xl shadow-sm border-0 ring-0 outline-none mix-blend-multiply">
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-800 text-center">Acesso ao Sistema</h2>
+                <p class="text-sm text-slate-500 mt-2 text-center font-medium">Digite suas credenciais para entrar no sistema.</p>
+            </div>
+
+            <form id="loginForm" class="space-y-5 relative z-10">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Login</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-user text-slate-400"></i>
+                        </div>
+                        <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all" placeholder="Seu usuário" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Senha</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-slate-400"></i>
+                        </div>
+                        <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all" placeholder="Sua senha" required>
+                    </div>
+                </div>
+                
+                <div id="loginError" class="hidden bg-rose-50 text-rose-600 text-sm font-semibold p-3 rounded-xl flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation"></i> Credenciais incorretas. Tente novamente.
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/30 transition-all transform hover:-translate-y-0.5 mt-4">
+                    Entrar no Sistema
+                </button>
+            </form>
+        </div>
     </div>
-    <div class="rounded-xl border border-orange-100 bg-orange-50/40 p-4">
-      <div class="flex items-center justify-between mb-3"><h3 class="font-extrabold text-orange-900">Filtros — Master</h3><button onclick="clearGermFilters('Master')" class="text-xs font-bold text-orange-700">Limpar</button></div>
-      <div class="filters-grid multi-filters">
-       <div><label class="filter-label">Bloco</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('gMasterBlockMenu')"><span id="gMasterBlockLabel">Todos os blocos</span><i class="fa-solid fa-chevron-down"></i></button><div id="gMasterBlockMenu" class="multi-menu hidden"></div></div></div>
-       <div><label class="filter-label">Ciclo</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('gMasterCycleMenu')"><span id="gMasterCycleLabel">Todos os ciclos</span><i class="fa-solid fa-chevron-down"></i></button><div id="gMasterCycleMenu" class="multi-menu hidden"></div></div></div>
-       <div><label class="filter-label">Mês</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('gMasterMonthMenu')"><span id="gMasterMonthLabel">Todos os meses</span><i class="fa-solid fa-chevron-down"></i></button><div id="gMasterMonthMenu" class="multi-menu hidden"></div></div></div>
-      </div>
+
+    <div id="dashboardScreen" class="hidden h-full flex flex-col w-full">
+        <header class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 shadow-md z-10 sticky top-0 relative overflow-hidden">
+            
+            <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative z-10">
+                <div class="flex items-center gap-4">
+                    <div class="p-2 flex items-center justify-center">
+                        <img src="https://i.imgur.com/3BHy9Rv.jpeg" alt="Ícone" class="w-10 h-10 object-contain rounded-xl shadow-sm border-0 ring-0 outline-none mix-blend-screen">
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-tight">
+                            Sistema Integrado
+                        </h1>
+                        <p class="text-emerald-200 text-xs sm:text-sm font-medium tracking-wide">
+                            Mudas, Transplantio e Contabilização de Perdas
+                        </p>
+                    </div>
+                </div>
+                <div id="loadingIndicator" class="hidden items-center text-sm font-semibold text-emerald-900 bg-emerald-100 px-4 py-2 rounded-full shadow-sm">
+                    <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Atualizando...
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50">
+            <div class="max-w-[95rem] mx-auto space-y-6">
+                
+                <section class="elegant-card p-6 relative z-20">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl">
+                                <i class="fa-solid fa-sliders text-lg"></i>
+                            </div>
+                            <h2 class="text-lg font-bold text-slate-800">Filtros de Análise</h2>
+                        </div>
+                        <button id="btnLimparFiltros" class="text-sm font-bold text-slate-500 hover:text-emerald-700 bg-slate-100 hover:bg-emerald-100 px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-eraser"></i> Limpar Filtros
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        <div class="dropdown relative" id="dropdownLocal">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Local (Bloco)</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownLocal')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedLocalText">Todos os Blocos</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsLocal"></div>
+                        </div>
+
+                        <div class="dropdown relative" id="dropdownCiclo">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ciclo</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownCiclo')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedCicloText">Todos os Ciclos</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsCiclo"></div>
+                        </div>
+
+                        <div class="dropdown relative" id="dropdownVariedade">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variedade</label>
+                            <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownVariedade')">
+                                <span class="truncate text-slate-700 font-bold" id="selectedVariedadeText">Todas as Variedades</span>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                            </button>
+                            <div class="dropdown-content p-2" id="optionsVariedade"></div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Data Início</label>
+                            <input type="date" id="filterDataInicio" class="w-full filter-input rounded-xl p-3 text-sm font-bold text-slate-700 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Data Fim</label>
+                            <input type="date" id="filterDataFim" class="w-full filter-input rounded-xl p-3 text-sm font-bold text-slate-700 outline-none">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+                    <!-- Made KPI cards more compact (p-4 instead of p-5) and used stronger, more saturated colors -->
+                    <div class="kpi-card bg-gradient-to-br from-sky-100 to-sky-200 p-4 flex flex-col justify-center relative overflow-hidden group shadow-sm">
+                        <div class="absolute right-0 top-0 w-20 h-20 bg-sky-300/30 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                        <i class="fa-solid fa-box text-xl text-sky-600 mb-1.5 relative z-10"></i>
+                        <span class="text-[10px] font-bold text-sky-800 uppercase tracking-wider mb-0.5 relative z-10">Total Bandejas</span>
+                        <span id="kpiBandejas" class="text-2xl font-extrabold text-sky-950 relative z-10">0</span>
+                    </div>
+                    
+                    <div class="kpi-card bg-gradient-to-br from-indigo-100 to-indigo-200 p-4 flex flex-col justify-center relative overflow-hidden group shadow-sm">
+                        <div class="absolute right-0 top-0 w-20 h-20 bg-indigo-300/30 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                        <i class="fa-solid fa-seedling text-xl text-indigo-600 mb-1.5 relative z-10"></i>
+                        <span class="text-[10px] font-bold text-indigo-800 uppercase tracking-wider mb-0.5 relative z-10">Mudas (Total)</span>
+                        <span id="kpiMudas" class="text-2xl font-extrabold text-indigo-950 relative z-10">0</span>
+                    </div>
+                    
+                    <div class="kpi-card bg-gradient-to-br from-emerald-100 to-emerald-200 p-4 flex flex-col justify-center relative overflow-hidden group shadow-sm">
+                        <div class="absolute right-0 top-0 w-20 h-20 bg-emerald-300/30 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                        <i class="fa-solid fa-leaf text-xl text-emerald-600 mb-1.5 relative z-10"></i>
+                        <span class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider mb-0.5 relative z-10">Transplantado</span>
+                        <span id="kpiTransplantado" class="text-2xl font-extrabold text-emerald-950 relative z-10">0</span>
+                    </div>
+                    
+                    <div class="kpi-card bg-gradient-to-br from-rose-100 to-rose-200 p-4 flex flex-col justify-center relative overflow-hidden group shadow-sm">
+                        <div class="absolute right-0 top-0 w-20 h-20 bg-rose-300/30 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+                        <i class="fa-solid fa-triangle-exclamation text-xl text-rose-600 mb-1.5 relative z-10"></i>
+                        <span class="text-[10px] font-bold text-rose-800 uppercase tracking-wider mb-0.5 relative z-10">Total Perdas</span>
+                        <span id="kpiPerdas" class="text-2xl font-extrabold text-rose-950 relative z-10">0</span>
+                    </div>
+                    
+                    <div class="kpi-card bg-white p-4 flex flex-col justify-center relative shadow-sm border border-slate-200">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">% Plantado</span>
+                        <div class="flex items-baseline gap-2">
+                            <span id="kpiPctPlantado" class="text-2xl font-extrabold text-slate-800">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 mt-2 overflow-hidden">
+                            <div id="barPctPlantado" class="bg-emerald-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card bg-white p-4 flex flex-col justify-center relative shadow-sm border border-slate-200">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">% Perdas</span>
+                        <div class="flex items-baseline gap-2">
+                            <span id="kpiPctPerdas" class="text-2xl font-extrabold text-slate-800">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2 mt-2 overflow-hidden">
+                            <div id="barPctPerdas" class="bg-rose-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="elegant-card p-6 z-10 relative">
+                    <div class="mb-8 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+                        <div>
+                            <h2 class="text-xl font-extrabold text-slate-800 mb-2 flex items-center gap-3">
+                                <div class="bg-indigo-50 text-indigo-500 p-2 rounded-lg">
+                                    <i class="fa-solid fa-chart-column"></i>
+                                </div>
+                                Desempenho por Bloco e Variedade
+                            </h2>
+                            <p class="text-sm text-slate-500 font-medium ml-12">Análise de transplantio, perdas e dias de germinação distribuídos pelos locais.</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-2xl p-4 shadow-sm border border-slate-100 w-full xl:w-auto">
+                            <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-3">Legenda de Variedades</p>
+                            <div id="customLegend" class="flex flex-wrap gap-2 max-w-3xl"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative w-full" style="height: 750px;">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </section>
+                
+                <section class="elegant-card mb-8 overflow-hidden">
+                    <div class="p-6 flex justify-between items-center bg-white">
+                        <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-3">
+                            <div class="bg-slate-100 text-slate-500 p-2 rounded-lg">
+                                <i class="fa-solid fa-table-list"></i>
+                            </div>
+                            Prévia dos Dados
+                        </h3>
+                        <span id="rowCount" class="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-lg shadow-sm">0 registros</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-[500px]">
+                        <table class="min-w-full text-sm text-left border-collapse">
+                            <thead class="bg-slate-50 sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500">Data</th>
+                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500">Local (Bloco)</th>
+                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500">Ciclo</th>
+                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500">Variedade</th>
+                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500 text-right">Transplantado</th>
+                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500 text-right">Perdas</th>
+                                    <th class="px-6 py-4 font-extrabold uppercase tracking-wider text-[11px] text-slate-500 text-right">Germinação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody" class="bg-white">
+                                <!-- Rows will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
-   </div>
-   <div id="germGeneralKpis" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4"></div>
-  </div>
-  <div class="flex flex-col gap-5">
-   <div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Transplantio — BRO</h3><p class="text-xs text-slate-500">Pontos por bloco: total transplantado, % total transplantado e % total perdido.</p></div><div class="h-[430px] relative"><canvas id="germBroChart"></canvas></div></div>
-   <div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Transplantio — Master</h3><p class="text-xs text-slate-500">Pontos por bloco: total transplantado, % total transplantado e % total perdido.</p></div><div class="h-[430px] relative"><canvas id="germMasterChart"></canvas></div></div>
-  </div>
-  <div class="glass p-5"><div class="mb-3"><h3 class="text-base font-extrabold text-slate-800">Transplantado em % — gráfico de pizza</h3><p class="text-xs text-slate-500">O gráfico mostra a composição total entre transplantado e perdas. As duas partes juntas representam 100%; perdas não são somadas ao transplantado.</p></div><div class="h-[430px] relative"><canvas id="germPieChart"></canvas></div></div>
-  <div class="glass p-4"><div class="flex items-center justify-between mb-3"><div><h3 class="font-extrabold text-slate-800">Resumo do transplantio</h3><p id="germCount" class="text-xs text-slate-500">--</p></div></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs text-center data-table"><thead><tr><th>Bloco</th><th>Variedade</th><th>Total de mudas</th><th>Transplantado</th><th>Perdas</th><th>% total transplantado</th><th>% de perdas</th></tr></thead><tbody id="germTbody"></tbody></table></div></div>
- </section>
- <section id="genericSheets" class="space-y-5 hidden"></section>
-</main>
-</div>
-<script>
-const SHEET_BASE='https://docs.google.com/spreadsheets/d/e/2PACX-1vQBafGpPjdS96k2e5uJbMLZpUAC_lxayvEx3tFkKObwyUAt3Ex1ruG4mWNM4V-eIbn5t6w9gUFH5H5d/pub';
-const SHEET_CSV=SHEET_BASE+'?output=csv';
-const SHEET_XLSX=SHEET_BASE+'?output=xlsx';
-let chart=null, germBroChart=null, germMasterChart=null, germPctChart=null, germPieChart=null, rendimentoChart=null, rendimentoPctChart=null, rendimentoPieChart=null, rows=[], workbookSheets={};
-function handleLogin(){const u=document.getElementById('username').value,p=document.getElementById('password').value;if(u==='adm123'&&p==='lucas@2026'){document.getElementById('loginError').classList.add('hidden');document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.remove('hidden');document.getElementById('app').classList.add('flex');loadData()}else document.getElementById('loginError').classList.remove('hidden')}
-function logout(){location.reload()}
-function activateSheetTab(name){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('tab-active'));const t=[...document.querySelectorAll('.tab')].find(x=>x.dataset.sheet===name);if(t)t.classList.add('tab-active');document.getElementById('content-transplantio').classList.toggle('hidden',name!=='Transplantio');document.getElementById('content-rendimento').classList.toggle('hidden',name!=='Rendimento');document.getElementById('content-germinacao').classList.toggle('hidden',name!=='Germinação');document.getElementById('genericSheets').classList.toggle('hidden',name==='Transplantio'||name==='Rendimento'||name==='Germinação');if(name==='Rendimento')renderRendimento();else if(name==='Germinação')renderGerminacao();else if(name!=='Transplantio')renderGenericSheet(name)}
-function buildSheetTabs(names){const tabs=document.getElementById('sheetTabs');tabs.innerHTML='';const ordered=[...names.filter(n=>norm(n)==='transplantio'), 'Rendimento', 'Germinação', ...names.filter(n=>norm(n)!=='transplantio')];const unique=[...new Set(ordered)];unique.forEach((name,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' tab-active':'');b.dataset.sheet=name;const icon=norm(name)==='transplantio'?'fa-seedling':norm(name)==='rendimento'?'fa-chart-column':norm(name)==='germinacao'?'fa-chart-scatter':'fa-table';b.innerHTML=`<i class="fa-solid ${icon} mr-2"></i>${escapeHtml(name)}`;b.onclick=()=>activateSheetTab(name);tabs.appendChild(b)})}
-function norm(s){return String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()}
-function num(v){if(typeof v==='number')return v;let s=String(v??'').trim().replace(/\s/g,'');if(!s)return 0;if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');else if(s.includes(','))s=s.replace(',','.');let n=Number(s.replace(/[^0-9.-]/g,''));return Number.isFinite(n)?n:0}
-function findKey(keys, terms){return keys.find(k=>terms.some(t=>norm(k).includes(norm(t))))}
-function parseCSV(text){let lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return[];const parse=l=>{let a=[],c='',q=false;for(let i=0;i<l.length;i++){let ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){c+='"';i++}else q=!q}else if(ch===','&&!q){a.push(c);c=''}else c+=ch}a.push(c);return a};let h=parse(lines[0]);return lines.slice(1).map(l=>{let a=parse(l),o={};h.forEach((k,i)=>o[k.trim()]=a[i]??'');return o})}
-function parseDateValue(v){let s=String(v??'').trim();if(!s)return '';if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;let m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;let d=new Date(s);if(!Number.isNaN(d.getTime()))return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;return ''}
-function formatDate(v){if(!v)return '--';const [y,m,d]=v.split('-');return d&&m&&y?`${d}/${m}/${y}`:v}
-function normalizeData(data){
-  const keys=Object.keys(data[0]||{});
-  const blockK=findKey(keys,['bloco','block']);
-  const varK=findKey(keys,['variedade','cultivar']);
-  const bandK=findKey(keys,['bandeja','bandejas']);
-  const mudasK=findKey(keys,['mudas','muda']);
-  const transK=keys.find(k=>norm(k)==='total transplantado')||keys.find(k=>norm(k)==='plantado')||keys.find(k=>norm(k)==='transplantado')||findKey(keys,['total transplantado','plantado','transplantado','transplantadas','transplante']);
-  const germK=findKey(keys,['dias de germinacao','dias germinacao','germinacao','dias']);
-  const dateK=findKey(keys,['data de transplantio','data transplantio','data']);
-  const cycleK=findKey(keys,['ciclo']);
-  const startK=findKey(keys,['inicio','hora inicio','inicio transplantio']);
-  const endK=findKey(keys,['fim','final','hora fim','final transplantio']);
-  const timeK=findKey(keys,['tempo total','tempo','duracao']);
-  const collabK=findKey(keys,['colaborador','colaboradores','funcionarios','pessoas']);
-  return data.map(r=>{
-    // Não tentar descobrir escala multiplicando por 1.000. A planilha já traz
-    // as quantidades de mudas/transplantadas na unidade correta. A perda é
-    // calculada somente depois da consolidação, evitando 2.947% e outros
-    // percentuais impossíveis quando há duas variedades no mesmo bloco/ciclo.
-    const mudas=Math.max(0,Math.round(num(r[mudasK])));
-    const transplantado=Math.max(0,Math.round(num(r[transK])));
-    return {
-      bloco:normalizeBlock(r[blockK]),
-      variedade:String(r[varK]??'').trim(),
-      bandejas:num(r[bandK]),
-      mudas,
-      transplantado,
-      perdas:Math.max(0,mudas-transplantado),
-      germinacao:num(r[germK]),
-      data:parseDateValue(r[dateK]),
-      ciclo:String(r[cycleK]??'').trim(),
-      inicio:String(r[startK]??'').trim(),
-      fim:String(r[endK]??'').trim(),
-      tempo:String(r[timeK]??'').trim(),
-      colaboradores:num(r[collabK])
-    };
-  }).filter(r=>r.bloco&&r.variedade&&(r.bandejas||r.mudas||r.transplantado||r.perdas||r.germinacao))
-}
-function normalizeBlock(v){let s=String(v??'').trim().replace(/^bloco\s*/i,'');if(/^\d+$/.test(s))return String(Number(s));return s}
-function variedade(v){const raw=String(v??'').trim(),n=norm(raw);if(n.includes('master')||n.includes('tsv'))return 'Master TSV';if(n.includes('syngenta')&&n.includes('68'))return 'BRO 68 Syngenta';if(n.includes('pharlap'))return 'Pharlap';if(n.includes('jiraya'))return 'JIRAYA';if(n==='bro'||n.includes('brocol'))return 'BRO';return raw||'Outra'}
-function scaleCandidates(x){const n=Math.max(0,Number(x||0));return [n,n*1000]}
-function resolveCounts(mRaw,tRaw,pRaw){
-  const m0=Math.max(0,Number(mRaw||0)), t0=Math.max(0,Number(tRaw||0)), p0=Math.max(0,Number(pRaw||0));
-  const candidates=[];
-  for(const mf of [1,1000]) for(const tf of [1,1000]) for(const pf of [1,1000]){
-    const m=m0*mf,t=t0*tf,p=p0*pf;
-    const diff=Math.abs(m-(t+p));
-    candidates.push({m,t,p,diff});
-  }
-  candidates.sort((a,b)=>a.diff-b.diff);
-  const best=candidates[0];
-  // Safety: never allow the dashboard to create impossible percentages from a
-  // malformed row. Keep source values but cap the displayed loss to the
-  // available mudas.
-  return {
-    mudas:best.m,
-    transplantado:best.t,
-    perdas:Math.min(best.p,best.m),
-  };
-}
-function rowMudas(r){return Math.max(0,Math.round(Number(r.mudas||0)))}
-function rowTrans(r){return Math.max(0,Math.round(Number(r.transplantado||0)))}
-function rowPerdas(r){return Math.max(0,rowMudas(r)-rowTrans(r))}
 
-/*
- * REGRA ÚNICA DOS TOTAIS
- * 1) Soma mudas e transplantado por bloco/ciclo/variedade.
- * 2) Quando o filtro contém mais de uma variedade/ciclo, soma tudo primeiro.
- * 3) Só depois calcula perdas = mudas - transplantado.
- * 4) Percentuais nunca passam de 100%.
- */
-function aggregateTotals(source, groupBy=['bloco','ciclo','variedade']){
-  const map={};
-  (source||[]).forEach(r=>{
-    const key=groupBy.map(k=>k==='variedade'?variedade(r[k]):String(r[k]??'').trim()).join('___');
-    if(!map[key])map[key]={mudas:0,transplantado:0,bandejas:0};
-    map[key].mudas+=rowMudas(r);
-    map[key].transplantado+=rowTrans(r);
-    map[key].bandejas+=Number(r.bandejas||0);
-  });
-  return Object.values(map).map(g=>{
-    const mudas=Math.max(0,Math.round(g.mudas));
-    const transplantado=Math.min(mudas,Math.max(0,Math.round(g.transplantado)));
-    const perdas=Math.max(0,mudas-transplantado);
-    return {...g,mudas,transplantado,perdas,pctTransplantado:pct(transplantado,mudas),pctPerdas:pct(perdas,mudas)};
-  });
-}
-function totals(source){
-  // Consolida cada combinação única e só então soma os grupos selecionados.
-  const groups=aggregateTotals(source,['bloco','ciclo','variedade']);
-  const mudas=groups.reduce((s,g)=>s+g.mudas,0);
-  const transplantado=Math.min(mudas,groups.reduce((s,g)=>s+g.transplantado,0));
-  return {mudas,transplantado,perdas:Math.max(0,mudas-transplantado)};
-}
-function pct(value,total){
-  if(!(Number(total)>0)) return 0;
-  return Math.min(100,Math.max(0,(Number(value||0)/Number(total))*100));
-}
-function fmtInt(v){return Math.round(Number(v||0)).toLocaleString('pt-BR')}
-function fmtPct(v){return Math.round(pct(v,100)).toLocaleString('pt-BR')+'%'}
-function fmtPct1(v){return Math.round(pct(v,100)).toLocaleString('pt-BR')+'%'}
-function balancePercentages(t){
-  const total=Number(t?.mudas||0); if(!(total>0))return {transplantado:0,perdas:0};
-  const trans=Math.round(pct(Number(t?.transplantado||0),total));
-  return {transplantado:Math.min(100,Math.max(0,trans)),perdas:100-Math.min(100,Math.max(0,trans))};
-}
-function validateTotals(t){
-  return {mudas:Number(t.mudas||0),transplantado:Number(t.transplantado||0),perdas:Number(t.perdas||0),percentualTransplantado:pct(t.transplantado,t.mudas),percentualPerdas:pct(t.perdas,t.mudas)};
-}
+    <script>
+        // Register the DataLabels plugin
+        Chart.register(ChartDataLabels);
 
-async function loadData(){const st=document.getElementById('status');st.textContent='Atualizando...';let erros=[];try{
-  const res=await fetch(SHEET_XLSX+'&cb='+Date.now(),{method:'GET',mode:'cors',cache:'no-store',redirect:'follow'});
-  if(!res.ok)throw new Error('XLSX HTTP '+res.status);
-  const buf=await res.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});
-  workbookSheets={};
-  wb.SheetNames.forEach(nome=>{workbookSheets[nome]=XLSX.utils.sheet_to_json(wb.Sheets[nome],{defval:'',raw:false});});
-  const names=[...wb.SheetNames].sort((a,b)=>norm(a)==='transplantio'?-1:norm(b)==='transplantio'?1:0);buildSheetTabs(names);
-  const nome=names.find(n=>norm(n)==='transplantio')||names[0];
-  const normalized=normalizeData(workbookSheets[nome]||[]);
-  if(!normalized.length)throw new Error(`A aba "${nome}" não possui registros reconhecíveis para o painel de transplantio`);
-  rows=normalized;populateFilters();render();st.textContent=`${rows.length} registros carregados — ${names.length} aba(s) da planilha`;
-}catch(e){console.error(e);st.textContent='Erro ao carregar os dados';alert('Não foi possível carregar as abas da planilha publicada.\n\nO sistema tentou ler todas as abas pela publicação XLSX.\n\nDetalhe: '+(e.message||e));}}
-function aggregateGeneral(source){return totals(source);}
-function germAggregate(source,v){
-  const groups=aggregateTotals(source,['bloco','ciclo']);
-  return groups.map(r=>({
-    ...r,germ:r.transplantado,percent:pct(r.transplantado,r.mudas),perdaPercent:pct(r.perdas,r.mudas),
-    pctTransplantado:pct(r.transplantado,r.mudas),pctPerdas:pct(r.perdas,r.mudas)
-  })).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'}));
-}
-function makeGermChart(canvasId,chartRef,v,data,varietyLabel){if(chartRef)chartRef.destroy();const labels=data.map(r=>displayBlock(r.bloco));const pts=data.map((r,i)=>({x:i,y:r.transplantado}));const ctx=document.getElementById(canvasId);return new Chart(ctx,{type:'scatter',data:{datasets:[{label:varietyLabel,data:pts,showLine:true,tension:0.25,pointRadius:7,pointHoverRadius:10,borderWidth:2,datalabels:{display:true,align:'top',offset:7,font:{size:10,weight:'700'},formatter:(value,ctx)=>{const r=data[ctx.dataIndex];return `${Number(r.transplantado).toLocaleString('pt-BR')}\n${Math.round(r.percent)}%`}}}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{type:'linear',min:-0.6,max:Math.max(0,data.length-.4),ticks:{stepSize:1,callback:value=>labels[value]||''},title:{display:true,text:'Bloco',font:{weight:'700'}}},y:{beginAtZero:true,title:{display:true,text:'Total transplantado (mudas)',font:{weight:'700'}},ticks:{callback:value=>Number(value).toLocaleString('pt-BR')}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'}}},datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:3,font:{size:11,weight:'800'},formatter:v=>Number(v).toLocaleString('pt-BR')},tooltip:{callbacks:{title:ctx=>labels[ctx[0].dataIndex]||'',label:ctx=>{const r=data[ctx.dataIndex];return [`Transplantado: ${fmtInt(r.transplantado)}`,`Total germinado: ${r.germ.toLocaleString('pt-BR')}`,`% total transplantado: ${Math.round(r.percent)}%`,`% de perdas: ${Math.round(r.perdaPercent)}%`,`Perdas: ${fmtInt(r.perdas)}`]}}},datalabels:{display:true}}},plugins:[ChartDataLabels]})}
-function makeGermPctChart(dataBro,dataMaster){
-  if(germPctChart)germPctChart.destroy();
-  const all=[...dataBro.map(r=>({...r,variedade:'BRO 68 Syngenta'})),...dataMaster.map(r=>({...r,variedade:'Master TSV'}))];
-  const labels=all.map(r=>`${displayBlock(r.bloco)} — ${r.variedade}`);
-  germPctChart=new Chart(document.getElementById('germPctChart'),{type:'bar',data:{labels,datasets:[
-    {label:'% transplantado',data:all.map(r=>pct(r.transplantado,r.mudas)),backgroundColor:'#15803d',borderRadius:6,borderWidth:1.5},
-    {label:'% de perdas',data:all.map(r=>pct(r.perdas,r.mudas)),backgroundColor:'#ea580c',borderRadius:6,borderWidth:1.5}
-  ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,max:100,title:{display:true,text:'Percentual (%)',font:{weight:'700'}},ticks:{callback:v=>v+'%'}},y:{stacked:true,title:{display:true,text:'Bloco / variedade',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${Math.round(Number(c.raw))}%`}},datalabels:{display:true,color:'#fff',font:{size:10,weight:'800'},formatter:v=>Math.round(Number(v))+'%'}}},plugins:[ChartDataLabels]});
-}
-function renderGerminacao(){if(!rows.length)return;const broRows=germFilteredRows('BRO'),masterRows=germFilteredRows('Master');const bro=germAggregate(broRows,'BRO 68 Syngenta'),master=germAggregate(masterRows,'Master TSV');const allRows=[...broRows,...masterRows];const gt=aggregateGeneral(allRows),mudas=gt.mudas,trans=gt.transplantado,perdas=gt.perdas,pctTrans=pct(trans,mudas),pctPerdas=pct(perdas,mudas);document.getElementById('germGeneralKpis').innerHTML=[
-    ['Total de mudas',fmtInt(mudas)],
-    ['Total transplantado',fmtInt(trans)],
-    ['% total transplantado',fmtPct(pctTrans)],
-    ['Total de perdas',fmtInt(perdas)],
-    ['% de perdas',fmtPct(pctPerdas)]
-  ].map(x=>`<div class="kpi-card"><div class="text-[10px] uppercase tracking-wide text-slate-500 font-bold">${x[0]}</div><div class="text-xl font-extrabold text-emerald-900 mt-1">${x[1]}</div></div>`).join('');germBroChart=makeGermChart('germBroChart',germBroChart,'BRO 68 Syngenta',bro,'BRO 68 Syngenta');germMasterChart=makeGermChart('germMasterChart',germMasterChart,'Master TSV',master,'Master TSV');const allVarData=aggregateTotals([...broRows,...masterRows],['bloco','variedade']).map(r=>({...r,germ:r.transplantado,percent:pct(r.transplantado,r.mudas),perdaPercent:pct(r.perdas,r.mudas),pctTransplantado:pct(r.transplantado,r.mudas),pctPerdas:pct(r.perdas,r.mudas)}));;makeGermPctChart(bro,master);makeGermPieChart(allVarData);const all=[...bro,...master].sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true})||a.percent-b.percent);document.getElementById('germTbody').innerHTML=all.length?all.map(r=>`<tr><td><span class="block-badge">${escapeHtml(displayBlock(r.bloco))}</span></td><td>${r===bro.find(x=>x.bloco===r.bloco)?'BRO 68 Syngenta':'Master TSV'}</td><td class="num-cell">${fmtInt(rowMudas(r))}</td><td class="num-cell">${fmtInt(r.transplantado)}</td><td class="num-cell">${fmtInt(r.perdas)}</td><td class="num-cell">${fmtPct(r.pctTransplantado)}</td><td class="num-cell">${fmtPct(r.pctPerdas)}</td></tr>`).join(''):'<tr><td colspan="10" class="empty-row">Nenhum registro encontrado para os filtros selecionados.</td></tr>';document.getElementById('germCount').textContent=`${all.length} registro(s) — BRO: ${bro.length} bloco(s) · Master: ${master.length} bloco(s)`}
-function renderGenericSheet(name){const data=workbookSheets[name]||[];const box=document.getElementById('genericSheets');if(!data.length){box.innerHTML='<div class="glass p-6 text-center text-slate-500">Esta aba não possui dados.</div>';return;}const keys=Object.keys(data[0]);const rowsHtml=data.map(r=>`<tr>${keys.map(k=>`<td>${escapeHtml(r[k]??'')}</td>`).join('')}</tr>`).join('');box.innerHTML=`<div class="glass p-5"><div class="flex items-center justify-between mb-4"><div><h2 class="text-lg font-extrabold text-slate-800">${escapeHtml(name)}</h2><p class="text-xs text-slate-500">${data.length.toLocaleString('pt-BR')} registros · dados atualizados diretamente da planilha publicada</p></div><button onclick="loadData()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs data-table"><thead><tr>${keys.map(k=>`<th>${escapeHtml(k)}</th>`).join('')}</tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`}
-function toggleMulti(id){document.querySelectorAll('.multi-menu').forEach(m=>{if(m.id!==id)m.classList.add('hidden')});document.getElementById(id)?.classList.toggle('hidden')}
-document.addEventListener('click',e=>{if(!e.target.closest('.multi-select'))document.querySelectorAll('.multi-menu').forEach(m=>m.classList.add('hidden'))});
-function selectedValues(menuId){return [...document.querySelectorAll('#'+menuId+' input[type=checkbox]:checked:not([data-all])')].map(x=>x.value)}
-function updateMultiLabel(menuId,labelId,allText){const vals=selectedValues(menuId);document.getElementById(labelId).textContent=!vals.length||document.querySelector('#'+menuId+' input[data-all]')?.checked?allText:(vals.length<=2?vals.join(', '):`${vals.length} selecionados`)}
-function makeMulti(menuId,labelId,items,allText,onChange,formatter=x=>x){const menu=document.getElementById(menuId);if(!menu)return;menu.innerHTML=`<label class="multi-option multi-all"><input type="checkbox" data-all checked> Selecionar todos</label>`+items.map((x,i)=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(String(x))}" data-value checked> ${escapeHtml(formatter(x))}</label>`).join('');const all=menu.querySelector('[data-all]');const boxes=[...menu.querySelectorAll('[data-value]')];all.onchange=()=>{boxes.forEach(b=>b.checked=all.checked);updateMultiLabel(menuId,labelId,allText);onChange()};boxes.forEach(b=>b.onchange=()=>{all.checked=boxes.every(x=>x.checked);updateMultiLabel(menuId,labelId,allText);onChange()});updateMultiLabel(menuId,labelId,allText)}
-function populateFilters(){const cycles=[...new Set(rows.map(r=>r.ciclo).filter(Boolean))].sort();const blocks=[...new Set(rows.map(r=>r.bloco).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));const varieties=[...new Set(rows.map(r=>variedade(r.variedade)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));const dates=[...new Set(rows.map(r=>r.data).filter(Boolean))].sort();makeMulti('filterCycleMenu','filterCycleLabel',cycles,'Todos os ciclos',render);makeMulti('filterBlockMenu','filterBlockLabel',blocks,'Todos os blocos',render,displayBlock);makeMulti('filterVarietyMenu','filterVarietyLabel',varieties,'Todas as variedades',render);makeMulti('gBroBlockMenu','gBroBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gBroCycleMenu','gBroCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gBroMonthMenu','gBroMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('gMasterBlockMenu','gMasterBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gMasterCycleMenu','gMasterCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gMasterMonthMenu','gMasterMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('rFilterBlockMenu','rFilterBlockLabel',blocks,'Todos os blocos',renderRendimento,displayBlock);makeMulti('rFilterCycleMenu','rFilterCycleLabel',cycles,'Todos os ciclos',renderRendimento)}
-function filteredRows(){const cy=selectedValues('filterCycleMenu'),b=selectedValues('filterBlockMenu'),v=selectedValues('filterVarietyMenu');const start=document.getElementById('filterStartDate')?.value||'',end=document.getElementById('filterEndDate')?.value||'';return rows.filter(r=>(!cy.length||cy.includes(r.ciclo))&&(!b.length||b.includes(r.bloco))&&(!v.length||v.includes(variedade(r.variedade)))&&(!start||!r.data||r.data>=start)&&(!end||!r.data||r.data<=end))}
-function clearFilters(){['filterCycleMenu','filterBlockMenu','filterVarietyMenu'].forEach(id=>{const m=document.getElementById(id);if(m){m.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=true);const l={filterCycleMenu:['filterCycleLabel','Todos os ciclos'],filterBlockMenu:['filterBlockLabel','Todos os blocos'],filterVarietyMenu:['filterVarietyLabel','Todas as variedades']}[id];updateMultiLabel(id,l[0],l[1])}});const start=document.getElementById('filterStartDate'),end=document.getElementById('filterEndDate');if(start)start.value='';if(end)end.value='';render()}
-function germFilteredRows(variety){const prefix=variety==='BRO'?'gBro':'gMaster';const target=variety==='BRO'?'BRO 68 Syngenta':'Master TSV';const b=selectedValues(prefix+'BlockMenu'),c=selectedValues(prefix+'CycleMenu'),m=selectedValues(prefix+'MonthMenu');return rows.filter(r=>{const v=variedade(r.variedade);return v===target&&(!b.length||b.includes(r.bloco))&&(!c.length||c.includes(r.ciclo))&&(!m.length||(r.data&&m.includes(String(Number(r.data.slice(5,7))))))})}
-function clearGermFilters(variety){const p=variety==='BRO'?'gBro':'gMaster';[['Block','Todos os blocos'],['Cycle','Todos os ciclos'],['Month','Todos os meses']].forEach(([x,t])=>{const m=document.getElementById(p+x+'Menu');if(m)m.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=true);const l=document.getElementById(p+x+'Label');if(l)l.textContent=t});renderGerminacao()}
-function clearRendimentoFilters(){['rFilterBlockMenu','rFilterCycleMenu'].forEach(id=>{const m=document.getElementById(id);if(m)m.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=true)});['rFilterBlockLabel','rFilterCycleLabel'].forEach((id,i)=>document.getElementById(id).textContent=['Todos os blocos','Todos os ciclos'][i]);const start=document.getElementById('rFilterStartDate'),end=document.getElementById('rFilterEndDate');if(start)start.value='';if(end)end.value='';renderRendimento()}
-function rendimentoFilteredRows(){const b=selectedValues('rFilterBlockMenu'),c=selectedValues('rFilterCycleMenu'),start=document.getElementById('rFilterStartDate')?.value||'',end=document.getElementById('rFilterEndDate')?.value||'';return rows.filter(r=>(!b.length||b.includes(r.bloco))&&(!c.length||c.includes(r.ciclo))&&(!start||!r.data||r.data>=start)&&(!end||!r.data||r.data<=end))}
-function timeToMinutes(t){const m=String(t||'').match(/(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null}
-function formatDuration(min){if(min==null||!Number.isFinite(min))return '--';min=Math.max(0,Math.round(min));return `${Math.floor(min/60)}h ${String(min%60).padStart(2,'0')}min`}
-function aggregateRendimento(source){
-  const blocks={};
-  source.forEach(r=>{
-    if(!r.bloco)return;
-    if(!blocks[r.bloco])blocks[r.bloco]={bloco:r.bloco,bandejas:0,mudas:0,transplantado:0,perdas:0,inicio:null,fim:null,minutos:0,colaboradores:0};
-    const b=blocks[r.bloco];
-    b.bandejas+=Number(r.bandejas||0);
-    b.mudas+=rowMudas(r);
-    b.transplantado+=rowTrans(r);
-    const ti=timeToMinutes(r.inicio),tf=timeToMinutes(r.fim);
-    if(ti!=null)b.inicio=b.inicio==null?ti:Math.min(b.inicio,ti);
-    if(tf!=null)b.fim=b.fim==null?tf:Math.max(b.fim,tf);
-    b.colaboradores=Math.max(b.colaboradores,Number(r.colaboradores||0));
-  });
-  return Object.values(blocks).map(b=>{
-    // Soma as durações de cada dia do bloco sem duplicar registros do mesmo dia.
-    const days={};
-    source.filter(r=>r.bloco===b.bloco).forEach(r=>{
-      const day=r.data||'sem-data';
-      const ti=timeToMinutes(r.inicio),tf=timeToMinutes(r.fim);
-      if(ti==null||tf==null)return;
-      if(!days[day])days[day]={ti,tf};
-      else {days[day].ti=Math.min(days[day].ti,ti);days[day].tf=Math.max(days[day].tf,tf)}
-    });
-    b.minutos=Object.values(days).reduce((sum,d)=>{let dur=d.tf-d.ti;if(dur<0)dur+=1440;return sum+dur},0);
-    b.perdas=Math.min(b.mudas,Math.max(0,b.mudas-b.transplantado));
-     return b;
-  }).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'}));
-}
-function clockLabel(m){return m==null?'--':`${String(Math.floor(m/60)%24).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`}
-function makeRendimentoPctChart(data){
-  if(rendimentoPctChart)rendimentoPctChart.destroy();
-  rendimentoPctChart=new Chart(document.getElementById('rendimentoPctChart'),{type:'bar',data:{labels:data.map(r=>displayBlock(r.bloco)),datasets:[
-    {label:'% transplantado',data:data.map(r=>pct(r.transplantado,r.mudas)),backgroundColor:'#15803d',borderRadius:6,borderWidth:1.5},
-    {label:'% de perdas',data:data.map(r=>pct(r.perdas,r.mudas)),backgroundColor:'#ea580c',borderRadius:6,borderWidth:1.5}
-  ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,max:100,title:{display:true,text:'Percentual (%)',font:{weight:'700'}},ticks:{callback:v=>v+'%'}},y:{stacked:true,title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${Math.round(Number(c.raw))}%`}},datalabels:{display:true,color:'#fff',font:{size:10,weight:'800'},formatter:v=>Math.round(Number(v))+'%'}}},plugins:[ChartDataLabels]});
-}
-function makeRendimentoPieChart(data){
-  if(rendimentoPieChart)rendimentoPieChart.destroy();
-  const trans=data.reduce((s,r)=>s+Number(r.transplantado||0),0), perdas=data.reduce((s,r)=>s+Number(r.perdas||0),0), total=trans+perdas;
-  const vals=total?[trans/total*100,perdas/total*100]:[0,0];
-  rendimentoPieChart=new Chart(document.getElementById('rendimentoPieChart'),{type:'pie',data:{labels:['Transplantado','Perdas'],datasets:[{data:vals,borderWidth:2,datalabels:{display:true,color:'#fff',font:{weight:'800',size:11},formatter:v=>Math.round(Number(v))+'%'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'},tooltip:{callbacks:{label:c=>`${c.label}: ${Math.round(Number(c.raw))}%`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
-}
-function makeGermPieChart(data){
-  if(germPieChart)germPieChart.destroy();
-  const trans=data.reduce((s,r)=>s+Number(r.transplantado||0),0), perdas=data.reduce((s,r)=>s+Number(r.perdas||0),0), total=trans+perdas;
-  const vals=total?[trans/total*100,perdas/total*100]:[0,0];
-  germPieChart=new Chart(document.getElementById('germPieChart'),{type:'pie',data:{labels:['Transplantado','Perdas'],datasets:[{data:vals,borderWidth:2,datalabels:{display:true,color:'#fff',font:{weight:'800',size:11},formatter:v=>Math.round(Number(v))+'%'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'},tooltip:{callbacks:{label:c=>`${c.label}: ${Math.round(Number(c.raw))}%`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
-}
-function renderRendimento(){
-  if(!rows.length)return;
-  const source=rendimentoFilteredRows(),data=aggregateRendimento(source),labels=data.map(r=>displayBlock(r.bloco));
-  const rt={mudas:data.reduce((s,r)=>s+Math.round(Number(r.mudas||0)),0),transplantado:data.reduce((s,r)=>s+Math.round(Number(r.transplantado||0)),0),perdas:data.reduce((s,r)=>s+Math.round(Number(r.perdas||0)),0)},totalTrans=rt.transplantado,totalPerdas=rt.perdas,totalHoras=data.reduce((s,r)=>s+(r.minutos||0),0),totalColab=data.reduce((s,r)=>s+Math.round(Number(r.colaboradores||0)),0),blocos=data.length;
-  const bpR=balancePercentages(rt); const pctTransR=bpR.transplantado, pctPerdasR=bpR.perdas;
-  document.getElementById('rendimentoGeneralKpis').innerHTML=[
-    ['Blocos',blocos.toLocaleString('pt-BR')],
-    ['Total de mudas',rt.mudas.toLocaleString('pt-BR')],
-    ['Total transplantado',totalTrans.toLocaleString('pt-BR')],
-    ['% total transplantado',pctTransR+'%'],
-    ['Total de perdas',totalPerdas.toLocaleString('pt-BR')],
-    ['% de perdas',pctPerdasR+'%'],
-    ['Total de horas',formatDuration(totalHoras)],
-    ['Colaboradores',totalColab.toLocaleString('pt-BR')]
-  ].map(x=>`<div class="kpi-card"><div class="text-[10px] uppercase tracking-wide text-slate-500 font-bold">${x[0]}</div><div class="text-xl font-extrabold text-emerald-900 mt-1">${x[1]}</div></div>`).join('');
-  if(rendimentoChart)rendimentoChart.destroy();
-  rendimentoChart=new Chart(document.getElementById('rendimentoChart'),{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'Total transplantado',data:data.map(r=>r.transplantado),yAxisID:'yTrans',borderColor:'#064e3b',backgroundColor:'#064e3b',borderWidth:3,pointRadius:6,pointHoverRadius:9,tension:.25,fill:false,datalabels:{display:true,anchor:'end',align:'top',offset:7,clip:false,clamp:true,font:{size:10,weight:'800'},formatter:v=>Number(v).toLocaleString('pt-BR')}},{label:'Total de perdas',data:data.map(r=>r.perdas||0),yAxisID:'yTrans',borderColor:'#ea580c',backgroundColor:'#ea580c',borderWidth:3,pointRadius:6,pointHoverRadius:9,tension:.25,fill:false,datalabels:{display:true,anchor:'end',align:'top',offset:7,clip:false,clamp:true,font:{size:10,weight:'800'},formatter:v=>Number(v).toLocaleString('pt-BR')}},
-      {label:'Total de horas',data:data.map(r=>r.minutos||0),yAxisID:'yHoras',borderColor:'#f97316',backgroundColor:'#f97316',borderWidth:3,pointRadius:6,pointHoverRadius:9,tension:.25,fill:false,datalabels:{display:true,anchor:'end',align:'top',offset:7,clip:false,clamp:true,font:{size:10,weight:'800'},formatter:v=>formatDuration(v)}},
-      {label:'Colaboradores',data:data.map(r=>r.colaboradores||0),yAxisID:'yColab',borderColor:'#2563eb',backgroundColor:'#2563eb',borderWidth:3,pointRadius:6,pointHoverRadius:9,pointBorderWidth:2,pointBackgroundColor:'#fff',tension:.25,fill:false,datalabels:{display:true,anchor:'end',align:'top',offset:8,clip:false,clamp:true,font:{size:10,weight:'800'},formatter:v=>Number(v).toLocaleString('pt-BR')}}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{
-      x:{title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}},
-      yTrans:{beginAtZero:true,position:'left',title:{display:true,text:'Transplantado (mudas)',font:{weight:'700'}},ticks:{callback:v=>Number(v).toLocaleString('pt-BR')}},
-      yHoras:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},title:{display:true,text:'Tempo (horas)',font:{weight:'700'}},ticks:{callback:v=>formatDuration(v)}},
-      yColab:{beginAtZero:true,position:'right',offset:true,grid:{drawOnChartArea:false},title:{display:true,text:'Colaboradores',font:{weight:'700'}},ticks:{stepSize:1,callback:v=>Number(v).toLocaleString('pt-BR')}}
-    },plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'},padding:16}},tooltip:{callbacks:{label:c=>{const r=data[c.dataIndex];if(c.dataset.label==='Total transplantado')return `Total transplantado: ${fmtInt(r.transplantado)} mudas`;if(c.dataset.label==='Total de perdas')return `Total de perdas: ${(r.perdas||0).toLocaleString('pt-BR')} mudas`;if(c.dataset.label==='Total de horas')return `Total de horas: ${formatDuration(r.minutos)}`;return `Colaboradores: ${r.colaboradores||0}`}}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
-  makeRendimentoPctChart(data);makeRendimentoPieChart(data);
-  document.getElementById('rendimentoTbody').innerHTML=data.length?data.map(r=>{
-    const mudasBloco=Number(r.mudas||0);
-    return `<tr><td><span class="block-badge">${escapeHtml(displayBlock(r.bloco))}</span></td><td class="num-cell">${mudasBloco.toLocaleString('pt-BR')}</td><td class="num-cell">${fmtInt(r.transplantado)}</td><td class="num-cell">${fmtPct(pct(r.transplantado,mudasBloco))}</td><td class="num-cell">${(r.perdas||0).toLocaleString('pt-BR')}</td><td class="num-cell">${fmtPct(pct(r.perdas,mudasBloco))}</td><td>${clockLabel(r.inicio)}</td><td>${clockLabel(r.fim)}</td><td class="num-cell">${formatDuration(r.minutos)}</td><td class="num-cell">${r.colaboradores||'--'}</td></tr>`;
-  }).join(''):'<tr><td colspan="7" class="empty-row">Nenhum registro encontrado para os filtros selecionados.</td></tr>';
-  document.getElementById('rendimentoCount').textContent=`${data.length} bloco(s) exibido(s)`
-}
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQBafGpPjdS96k2e5uJbMLZpUAC_lxayvEx3tFkKObwyUAt3Ex1ruG4mWNM4V-eIbn5t6w9gUFH5H5d/pub?output=csv";
+        
+        let allData = [];
+        let filteredData = [];
+        let chartInstance = null;
+        const selectedFilters = { local: new Set(), ciclo: new Set(), variedade: new Set() };
 
-function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function displayBlock(v){let s=String(v).trim();if(/^bloco\s*/i.test(s))return s.replace(/^bloco\s*/i,'Bloco ');return `Bloco ${s.replace(/^0+/,'')||'0'}`.replace(/Bloco (\d+)$/,(_,n)=>`Bloco ${String(n).padStart(2,'0')}`)}
-/* Aba 01: usa diretamente os campos Mudas, Transplantado e Perdas da planilha. Os valores de Mudas, Transplantado e Perdas são reconciliados a partir dos campos da planilha e consolidados por bloco/ciclo antes do cálculo dos percentuais. */
-function aggregate(source=rows){
-  const map={};
-  source.forEach(r=>{
-    const v=variedade(r.variedade);
-    const ciclo=String(r.ciclo??'').trim();
-    const key=r.bloco+'___'+ciclo+'___'+v;
-    if(!map[key])map[key]={bloco:r.bloco,ciclo,variedade:v,bandejas:0,mudas:0,transplantado:0,perdas:0,germinacao:[]};
-    map[key].bandejas+=Number(r.bandejas||0);
-    map[key].mudas+=rowMudas(r);
-    map[key].transplantado+=rowTrans(r);
-    if(r.germinacao)map[key].germinacao.push(r.germinacao);
-  });
-  return Object.values(map).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})||String(a.ciclo).localeCompare(String(b.ciclo),undefined,{numeric:true,sensitivity:'base'})||a.variedade.localeCompare(b.variedade)).map(r=>{
-    const mudas=Math.max(0,Number(r.mudas||0));
-    const transplantado=Math.min(mudas,Math.max(0,Number(r.transplantado||0)));
-    const perdas=Math.max(0,mudas-transplantado);
-    return {...r,mudas,transplantado,perdas,pctTransplantado:pct(transplantado,mudas),pctPerdas:pct(perdas,mudas)};
-  });
-}
-function aggregateBlockCycle(source=rows){
-  const groups=aggregateTotals(source,['bloco']);
-  return groups.map(g=>({...g,bloco:String(g.bloco??'')})).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'}));
-}
-function avgGerm(r){return r.germinacao&&r.germinacao.length?Math.round(r.germinacao.reduce((a,b)=>a+b,0)/r.germinacao.length):0}
-function render(){
-  const filtered=filteredRows(),d=aggregate(filtered),bc=aggregateBlockCycle(filtered),t=totals(filtered),band=bc.reduce((s,r)=>s+Number(r.bandejas||0),0);
-  const mudas=t.mudas, trans=t.transplantado, perdas=t.perdas;
-  document.getElementById('kBandejas').textContent=fmtInt(band);
-  document.getElementById('kMudas').textContent=fmtInt(mudas);
-  document.getElementById('kTrans').textContent=fmtInt(trans);
-  document.getElementById('kPerdas').textContent=fmtInt(perdas);
-  document.getElementById('kGerm').textContent=fmtPct(pct(trans,mudas));
-  document.getElementById('kPerdaPct').textContent=fmtPct(pct(perdas,mudas));
-const blocks=[...new Set(d.map(x=>x.bloco))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
-const labels=blocks.map(displayBlock);
-const varieties=[...new Set(d.map(x=>x.variedade).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
-const datasets=varieties.flatMap((v,i)=>{
-  const mudasData=blocks.map(b=>{const r=d.find(x=>x.bloco===b&&x.variedade===v);return r?Number(r.mudas||0):null});
-  const transData=blocks.map(b=>{const r=d.find(x=>x.bloco===b&&x.variedade===v);return r?Number(r.transplantado||0):null});
-  const perdaData=blocks.map(b=>{const r=d.find(x=>x.bloco===b&&x.variedade===v);return r?Number(r.perdas||0):null});
-  const palette=['#15803d','#2563eb','#7c3aed','#0891b2','#ca8a04','#db2777','#475569','#0f766e','#be123c'];
-  return [
-    {label:v+' — Total de mudas',data:mudasData,backgroundColor:palette[i%palette.length],borderColor:palette[i%palette.length],borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>x==null?'':Number(x).toLocaleString('pt-BR')}},
-    {label:v+' — Transplantado',data:transData,backgroundColor:palette[i%palette.length],borderColor:palette[i%palette.length],borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>x==null?'':Number(x).toLocaleString('pt-BR')}},
-    {label:v+' — Perdas',data:perdaData,backgroundColor:'rgba(234,88,12,.78)',borderColor:'#ea580c',borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>x==null?'':Number(x).toLocaleString('pt-BR')}}
-  ]
-});
-if(chart)chart.destroy();
-chart=new Chart(document.getElementById('transplantioChart'),{type:'bar',data:{labels,datasets},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{beginAtZero:true,title:{display:true,text:'Quantidade de mudas',font:{weight:'700'}},ticks:{callback:v=>Number(v).toLocaleString('pt-BR')}},y:{title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'},padding:10}},tooltip:{callbacks:{title:c=>labels[c[0].dataIndex],label:c=>`${c.dataset.label}: ${Number(c.parsed.x).toLocaleString('pt-BR')} mudas`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
-const tbody=document.getElementById('tbody');const tableRows=[...filtered].sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})||a.data.localeCompare(b.data)||variedade(a.variedade).localeCompare(variedade(b.variedade)));tbody.innerHTML=tableRows.length?tableRows.map(r=>{const v=variedade(r.variedade);return `<tr><td><span class="block-badge">${escapeHtml(displayBlock(r.bloco))}</span></td><td>${escapeHtml(r.ciclo||'--')}</td><td><span class="var-badge"><span class="var-dot" style="background:${v==='BRO'?'#15803d':'#f97316'}"></span>${escapeHtml(v)}</span></td><td class="num-cell">${fmtInt(r.bandejas)}</td><td class="num-cell">${fmtInt(rowMudas(r))}</td><td class="num-cell">${fmtInt(r.transplantado)}</td><td class="num-cell">${fmtInt(r.perdas)}</td><td class="num-cell">${r.germinacao?r.germinacao.toLocaleString('pt-BR'):'--'} dias</td><td>${r.data?formatDate(r.data):'--'}</td></tr>`}).join(''):`<tr><td colspan="9" class="empty-row">Nenhum registro encontrado para os filtros selecionados.</td></tr>`;document.getElementById('tableCount').textContent=`${tableRows.length} registro(s) exibido(s) — cada data permanece em uma linha separada; o campo de germinação é exibido somente como total de dias`}
+        // Premium Color Palette
+        const colors = ['#0ea5e9', '#f59e0b', '#8b5cf6', '#10b981', '#f43f5e', '#6366f1', '#84cc16', '#06b6d4', '#ec4899', '#a855f7'];
 
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            if (user === 'adm123' && pass === 'lucas@2026') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+                init(); // Load data only after login
+            } else {
+                const errorEl = document.getElementById('loginError');
+                errorEl.classList.remove('hidden');
+                errorEl.classList.add('animate-bounce');
+                setTimeout(() => errorEl.classList.remove('animate-bounce'), 1000);
+            }
+        });
 
-</script></body></html>
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            }
+        });
+
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            const isActive = dropdown.classList.contains('active');
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('active'));
+            if (!isActive) dropdown.classList.add('active');
+        }
+
+        function processRawData(data) {
+            if (!data || data.length === 0) { loadMockData(); return; }
+
+            allData = data.map(row => ({
+                dataStr: row['Data - Transplantio'] || row['Data'] || '',
+                dateObj: parseDate(row['Data - Transplantio'] || row['Data']),
+                germinacao: parseNum(row['germinação (dias)'] || row['Germinação (dias)']),
+                local: (row['Local'] || 'Não definido').trim(),
+                ciclo: (row['Ciclo'] || 'Não definido').trim(),
+                cultura: (row['Cultura'] || '').trim(),
+                variedade: (row['Variedade'] || 'Não definida').trim(),
+                bandejas: parseNum(row['Bandejas']),
+                mudas: parseNum(row['Mudas']),
+                transplantado: parseNum(row['Total transplantado']),
+                perdas: parseNum(row['Perdas'])
+            }));
+
+            allData = allData.filter(d => d.local !== 'Não definido' && (d.transplantado > 0 || d.mudas > 0 || d.perdas > 0));
+            populateFilters();
+            applyFilters();
+        }
+
+        function loadMockData() {
+            document.getElementById('loadingIndicator').innerHTML = '<span class="text-amber-500"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Dados de teste</span>';
+            const blocos = ['B01', 'B02', 'B03', 'B04', 'B05'];
+            const variedades = ['Alface Crespa', 'Alface Americana', 'Rúcula', 'Cebolinha', 'Salsa'];
+            const ciclos = ['C1', 'C2', 'C3'];
+            
+            allData = [];
+            let currentDate = new Date(2023, 9, 1);
+
+            for (let i = 0; i < 60; i++) {
+                let bl = blocos[Math.floor(Math.random() * blocos.length)];
+                let varr = variedades[Math.floor(Math.random() * variedades.length)];
+                let mudas = 3000 + Math.floor(Math.random() * 5000);
+                let perdas = Math.floor(mudas * (Math.random() * 0.12));
+                
+                allData.push({
+                    dataStr: `${currentDate.getDate().toString().padStart(2, '0')}/${(currentDate.getMonth()+1).toString().padStart(2, '0')}/${currentDate.getFullYear()}`,
+                    dateObj: new Date(currentDate),
+                    germinacao: 4 + Math.floor(Math.random() * 5),
+                    local: bl,
+                    ciclo: ciclos[Math.floor(Math.random() * ciclos.length)],
+                    variedade: varr,
+                    bandejas: Math.ceil(mudas / 200),
+                    mudas: mudas,
+                    transplantado: mudas - perdas,
+                    perdas: perdas
+                });
+                currentDate.setDate(currentDate.getDate() + Math.floor(Math.random() * 4));
+            }
+            populateFilters();
+            applyFilters();
+        }
+
+        function populateFilters() {
+            const getUnique = (key) => [...new Set(allData.map(item => item[key]))].sort();
+            
+            const populateMultiSelect = (filterKey, containerId, options, labelPrefix) => {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                
+                const allDiv = document.createElement('div');
+                allDiv.className = 'flex items-center p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 mb-1';
+                allDiv.innerHTML = `
+                    <input type="checkbox" id="all_${filterKey}" class="custom-checkbox mr-3" checked>
+                    <label for="all_${filterKey}" class="text-sm font-bold text-slate-700 cursor-pointer w-full">Selecionar Todos</label>
+                `;
+                container.appendChild(allDiv);
+
+                const allCheckbox = allDiv.querySelector('input');
+                allCheckbox.addEventListener('change', (e) => {
+                    const isChecked = e.target.checked;
+                    container.querySelectorAll('.item-checkbox').forEach(cb => {
+                        cb.checked = isChecked;
+                        if(isChecked) selectedFilters[filterKey].add(cb.value);
+                        else selectedFilters[filterKey].delete(cb.value);
+                    });
+                    updateDropdownText(filterKey, labelPrefix, options.length);
+                    applyFilters();
+                });
+
+                options.forEach(opt => {
+                    selectedFilters[filterKey].add(opt);
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors';
+                    const safeId = `chk_${filterKey}_${opt.replace(/[^a-zA-Z0-9]/g, '')}`;
+                    div.innerHTML = `
+                        <input type="checkbox" id="${safeId}" value="${opt}" class="custom-checkbox item-checkbox mr-3" checked>
+                        <label for="${safeId}" class="text-sm font-semibold text-slate-600 cursor-pointer w-full select-none">${opt}</label>
+                    `;
+                    container.appendChild(div);
+
+                    div.querySelector('input').addEventListener('change', (e) => {
+                        if (e.target.checked) selectedFilters[filterKey].add(opt);
+                        else {
+                            selectedFilters[filterKey].delete(opt);
+                            allCheckbox.checked = false;
+                        }
+                        if (selectedFilters[filterKey].size === options.length) allCheckbox.checked = true;
+                        updateDropdownText(filterKey, labelPrefix, options.length);
+                        applyFilters();
+                    });
+                });
+                updateDropdownText(filterKey, labelPrefix, options.length);
+            };
+
+            populateMultiSelect('local', 'optionsLocal', getUnique('local'), 'Bloco');
+            populateMultiSelect('ciclo', 'optionsCiclo', getUnique('ciclo'), 'Ciclo');
+            populateMultiSelect('variedade', 'optionsVariedade', getUnique('variedade'), 'Variedade');
+
+            const dates = allData.map(d => d.dateObj).filter(d => d !== null);
+            if (dates.length > 0) {
+                const fmt = (d) => d.toISOString().split('T')[0];
+                document.getElementById('filterDataInicio').value = fmt(new Date(Math.min(...dates)));
+                document.getElementById('filterDataFim').value = fmt(new Date(Math.max(...dates)));
+            }
+        }
+
+        function updateDropdownText(filterKey, label, total) {
+            const count = selectedFilters[filterKey].size;
+            let textId = filterKey === 'local' ? 'selectedLocalText' : filterKey === 'ciclo' ? 'selectedCicloText' : 'selectedVariedadeText';
+            const el = document.getElementById(textId);
+            
+            if (count === 0) {
+                el.textContent = `Nenhum selecionado`;
+                el.className = 'truncate text-rose-500 font-bold';
+            } else if (count === total) {
+                el.textContent = `Todos os ${label}s`;
+                el.className = 'truncate text-slate-700 font-bold';
+            } else {
+                el.textContent = `${count} ${label}(s) selecionado(s)`;
+                el.className = 'truncate text-emerald-600 font-extrabold';
+            }
+        }
+
+        function applyFilters() {
+            const dtIniStr = document.getElementById('filterDataInicio').value;
+            const dtFimStr = document.getElementById('filterDataFim').value;
+            const dtIni = dtIniStr ? new Date(dtIniStr) : null;
+            const dtFim = dtFimStr ? new Date(dtFimStr) : null;
+            if(dtFim) dtFim.setHours(23, 59, 59, 999);
+
+            filteredData = allData.filter(d => {
+                if (!selectedFilters.local.has(d.local) || !selectedFilters.ciclo.has(d.ciclo) || !selectedFilters.variedade.has(d.variedade)) return false;
+                if (dtIni && d.dateObj && d.dateObj < dtIni) return false;
+                if (dtFim && d.dateObj && d.dateObj > dtFim) return false;
+                return true;
+            });
+            updateUI();
+        }
+
+        function updateUI() {
+            let tBan = 0, tMud = 0, tTrans = 0, tPerd = 0;
+            filteredData.forEach(d => { tBan+=d.bandejas; tMud+=d.mudas; tTrans+=d.transplantado; tPerd+=d.perdas; });
+
+            const pctPlan = tMud > 0 ? (tTrans / tMud * 100) : 0;
+            const basePerdas = (tTrans + tPerd) > 0 ? (tTrans + tPerd) : 1; 
+            const pctPerd = (tPerd / basePerdas * 100);
+
+            const roundedPctPlan = Math.round(pctPlan);
+            const roundedPctPerd = Math.round(pctPerd);
+
+            const fmt = (n) => new Intl.NumberFormat('pt-BR').format(n);
+            document.getElementById('kpiBandejas').textContent = fmt(tBan);
+            document.getElementById('kpiMudas').textContent = fmt(tMud);
+            document.getElementById('kpiTransplantado').textContent = fmt(tTrans);
+            document.getElementById('kpiPerdas').textContent = fmt(tPerd);
+            
+            document.getElementById('kpiPctPlantado').textContent = roundedPctPlan + '%';
+            document.getElementById('barPctPlantado').style.width = Math.min(pctPlan, 100) + '%';
+            
+            document.getElementById('kpiPctPerdas').textContent = roundedPctPerd + '%';
+            document.getElementById('barPctPerdas').style.width = Math.min(pctPerd, 100) + '%';
+            
+            updateTable();
+            renderChart();
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('dataTableBody');
+            document.getElementById('rowCount').textContent = `${filteredData.length} registros`;
+            tbody.innerHTML = '';
+
+            filteredData.slice(0, 150).forEach((d, index) => {
+                const tr = document.createElement('tr');
+                // Subtle striping
+                tr.className = `border-b border-slate-100 last:border-0 hover:bg-emerald-50/50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`;
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-slate-500 font-medium">${d.dataStr}</td>
+                    <td class="px-6 py-4 font-extrabold text-slate-700">${d.local}</td>
+                    <td class="px-6 py-4"><span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200">${d.ciclo}</span></td>
+                    <td class="px-6 py-4 text-slate-600 font-semibold">${d.variedade}</td>
+                    <td class="px-6 py-4 text-right font-extrabold text-emerald-600">${new Intl.NumberFormat('pt-BR').format(d.transplantado)}</td>
+                    <td class="px-6 py-4 text-right font-extrabold ${d.perdas > 0 ? 'text-rose-500' : 'text-slate-400'}">${new Intl.NumberFormat('pt-BR').format(d.perdas)}</td>
+                    <td class="px-6 py-4 text-right font-bold text-slate-500 bg-slate-50/50">${d.germinacao} <span class="text-[10px] uppercase font-bold text-slate-400 ml-1">dias</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            let blocks = [...new Set(filteredData.map(d => d.local))].sort();
+            let varieties = [...new Set(filteredData.map(d => d.variedade))].sort();
+            
+            const varietyColors = {};
+            varieties.forEach((v, i) => varietyColors[v] = colors[i % colors.length]);
+
+            const legend = document.getElementById('customLegend');
+            legend.innerHTML = '';
+            varieties.forEach(v => {
+                legend.innerHTML += `
+                    <div class="flex items-center bg-white px-3 py-1.5 rounded-lg border border-slate-100 shadow-sm">
+                        <span class="w-3 h-3 rounded-full mr-2 shadow-inner" style="background-color: ${varietyColors[v]}"></span>
+                        <span class="text-[11px] font-extrabold text-slate-600">${v}</span>
+                    </div>
+                `;
+            });
+
+            let datasets = [];
+            varieties.forEach(variety => {
+                let color = varietyColors[variety];
+                let transData = [], perdasData = [], germData = [];
+
+                blocks.forEach(block => {
+                    let rows = filteredData.filter(d => d.local === block && d.variedade === variety);
+                    transData.push(rows.reduce((sum, r) => sum + r.transplantado, 0));
+                    perdasData.push(rows.reduce((sum, r) => sum + r.perdas, 0));
+                    germData.push(rows.length > 0 ? (rows.reduce((sum, r) => sum + r.germinacao, 0) / rows.length) : 0);
+                });
+
+                // MAIN STACK: Transplantado Bars - Made thicker
+                datasets.push({
+                    label: `Transp. ${variety}`,
+                    data: transData,
+                    backgroundColor: color,
+                    borderRadius: 4, // Reduced roundness for thicker bars
+                    stack: variety,
+                    barPercentage: 0.95, // Increased width
+                    categoryPercentage: 0.95, // Increased width
+                    yAxisID: 'y',
+                    datalabels: {
+                        color: '#ffffff', // Ensures text is readable inside dark colored bars
+                        font: { family: 'Poppins', weight: '800', size: 11 },
+                        formatter: (val) => val > 0 ? new Intl.NumberFormat('pt-BR').format(val) : '',
+                        display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0 // Show label if value exists
+                    }
+                });
+
+                // MAIN STACK: Perdas Bars
+                let rgb = hexToRgb(color);
+                datasets.push({
+                    label: `Perdas ${variety}`,
+                    data: perdasData,
+                    backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25)`, // Made slightly darker
+                    borderColor: color,
+                    borderWidth: 1.5,
+                    borderDash: [4, 4],
+                    borderRadius: 4,
+                    stack: variety,
+                    yAxisID: 'y',
+                    datalabels: {
+                        color: '#1e293b', // Dark slate text for better visibility on transparent background
+                        anchor: 'center', // Put label in center of bar
+                        align: 'center',
+                        font: { family: 'Poppins', weight: '800', size: 10 },
+                        formatter: (val) => val > 0 ? `-${val}` : '',
+                        display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0
+                    }
+                });
+                
+                // SECONDARY STACK: Germinação Bars - Made slightly thicker but distinct
+                datasets.push({
+                    label: `Germinação ${variety}`,
+                    data: germData,
+                    type: 'bar',
+                    xAxisID: 'x2',
+                    yAxisID: 'y',
+                    backgroundColor: '#cbd5e1', // Neutral gray so it doesn't clash with varieties
+                    borderColor: '#94a3b8',
+                    borderWidth: 1,
+                    borderRadius: 2,
+                    stack: 'germ_' + variety, 
+                    barPercentage: 0.6, // Thicker than before, but thinner than main data
+                    datalabels: {
+                        color: '#334155', // Dark text
+                        anchor: 'end',
+                        align: 'start', // Keep label inside/near the end of the bar
+                        offset: 4,
+                        font: { family: 'Poppins', weight: '700', size: 10 },
+                        formatter: (val) => val > 0 ? val.toFixed(1) + 'd' : '',
+                        display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0
+                    }
+                });
+            });
+
+            // Adjust height dynamically based on number of blocks to give bars breathing room
+            document.getElementById('mainChart').parentElement.style.height = `${Math.max(700, blocks.length * 150)}px`;
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: blocks, datasets: datasets },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'y', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            // Global settings for datalabels if needed
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleFont: { family: 'Poppins', size: 14, weight: '700' },
+                            bodyFont: { family: 'Poppins', size: 12, weight: '500' },
+                            padding: 14,
+                            cornerRadius: 12,
+                            boxPadding: 6,
+                            usePointStyle: true,
+                            callbacks: {
+                                label: (ctx) => {
+                                    let l = ctx.dataset.label || '';
+                                    if(l.includes('Germ')) return `${l}: ${ctx.parsed.x.toFixed(1)} dias`;
+                                    return `${l}: ${new Intl.NumberFormat('pt-BR').format(ctx.parsed.x)} mudas`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            stacked: true,
+                            title: { display: true, text: 'BLOCOS', font: { family: 'Poppins', weight: '800', size: 11, letterSpacing: 1 }, color: '#94a3b8' },
+                            grid: { display: false },
+                            ticks: { font: { family: 'Poppins', weight: '700', size: 12 }, color: '#475569' }
+                        },
+                        x: {
+                            stacked: true,
+                            position: 'bottom',
+                            title: { display: true, text: 'QUANTIDADE (MUDAS / PERDAS)', font: { family: 'Poppins', weight: '800', size: 11, letterSpacing: 1 }, color: '#94a3b8' },
+                            grid: { color: '#f1f5f9', borderDash: [4, 4] }
+                        },
+                        x2: {
+                            position: 'top',
+                            title: { display: true, text: 'DIAS DE GERMINAÇÃO', font: { family: 'Poppins', weight: '800', size: 11, letterSpacing: 1 }, color: '#94a3b8' },
+                            grid: { drawOnChartArea: false },
+                            min: 0,
+                            suggestedMax: 20
+                        }
+                    }
+                }
+            });
+        }
+
+        function hexToRgb(hex) {
+            var r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return r ? { r: parseInt(r[1], 16), g: parseInt(r[2], 16), b: parseInt(r[3], 16) } : { r:0, g:0, b:0 };
+        }
+        
+        function parseNum(val) {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            let num = parseFloat(val.replace(/\./g, '').replace(',', '.'));
+            return isNaN(num) ? 0 : num;
+        }
+        
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            let parts = dateStr.split('/');
+            return parts.length === 3 ? new Date(parts[2], parts[1] - 1, parts[0]) : new Date(dateStr);
+        }
+
+        function init() {
+            const loader = document.getElementById('loadingIndicator');
+            loader.style.display = 'flex';
+            loader.classList.remove('hidden');
+            
+            Papa.parse(SHEET_CSV_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    loader.style.display = 'none';
+                    processRawData(results.data);
+                },
+                error: () => loadMockData()
+            });
+        }
+
+        document.getElementById('btnLimparFiltros').addEventListener('click', () => {
+            ['local', 'ciclo', 'variedade'].forEach(key => {
+                const container = document.getElementById(`options${key.charAt(0).toUpperCase() + key.slice(1)}`);
+                const checkboxes = container.querySelectorAll('.item-checkbox');
+                selectedFilters[key].clear();
+                checkboxes.forEach(cb => { cb.checked = true; selectedFilters[key].add(cb.value); });
+                const allCb = container.querySelector(`input[id="all_${key}"]`);
+                if(allCb) allCb.checked = true;
+                updateDropdownText(key, key === 'local' ? 'Bloco' : key.charAt(0).toUpperCase() + key.slice(1), checkboxes.length);
+            });
+            const dates = allData.map(d => d.dateObj).filter(d => d !== null);
+            if(dates.length > 0) {
+                const fmt = (d) => new Date(d.getTime() - (d.getTimezoneOffset()*60000)).toISOString().split('T')[0];
+                document.getElementById('filterDataInicio').value = fmt(new Date(Math.min(...dates)));
+                document.getElementById('filterDataFim').value = fmt(new Date(Math.max(...dates)));
+            }
+            applyFilters();
+        });
+
+        document.getElementById('filterDataInicio').addEventListener('change', applyFilters);
+        document.getElementById('filterDataFim').addEventListener('change', applyFilters);
+        
+        // No longer calling init() on DOMContentLoaded. It is called upon successful login.
+    </script>
+</body>
+</html>
