@@ -49,7 +49,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
 <main class="max-w-[1920px] w-full mx-auto px-4 sm:px-6 py-6 flex-1">
  <div id="sheetTabs" class="border-b border-emerald-200 mb-5 flex items-end overflow-x-auto gap-1"></div>
  <section id="content-transplantio" class="space-y-5">
-  <div class="glass p-4 print-hide"><div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="font-extrabold text-emerald-900">Filtros de visualização</h2><p class="text-xs text-slate-500">Filtre os dados por bloco, ciclo, variedade e período (data inicial e final) sem alterar a planilha.</p></div><div class="flex gap-2"><button onclick="clearFilters()" class="bg-white hover:bg-slate-50 border border-slate-300 px-3 py-2 rounded-lg text-xs font-bold text-slate-700"><i class="fa-solid fa-filter-circle-xmark mr-1"></i>Limpar filtros</button><button onclick="loadData()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button><button onclick="window.print()" class="bg-white border border-slate-300 px-3 py-2 rounded-lg text-xs font-bold text-slate-700"><i class="fa-solid fa-print mr-1"></i>Printar tela</button></div></div><div class="filters-grid multi-filters"><div><label class="filter-label">Ciclo</label><div class="multi-select" id="filterCycleWrap"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('filterCycleMenu')"><span id="filterCycleLabel">Todos os ciclos</span><i class="fa-solid fa-chevron-down"></i></button><div id="filterCycleMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Bloco</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('filterBlockMenu')"><span id="filterBlockLabel">Todos os blocos</span><i class="fa-solid fa-chevron-down"></i></button><div id="filterBlockMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Variedade</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('filterVarietyMenu')"><span id="filterVarietyLabel">Todas as variedades</span><i class="fa-solid fa-chevron-down"></i></button><div id="filterVarietyMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Data inicial</label><input id="filterStartDate" type="date" class="filter-date" onchange="render()"></div><div><label class="filter-label">Data final</label><input id="filterEndDate" type="date" class="filter-date" onchange="render()"></div></div><div id="filterContextStatus" class="mt-3 text-[11px] font-semibold text-emerald-700"></div></div>
+  <div class="glass p-4 print-hide"><div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="font-extrabold text-emerald-900">Filtros de visualização</h2><p class="text-xs text-slate-500">Filtre os dados por bloco, ciclo, variedade e período (data inicial e final) sem alterar a planilha.</p></div><div class="flex gap-2"><button onclick="clearFilters()" class="bg-white hover:bg-slate-50 border border-slate-300 px-3 py-2 rounded-lg text-xs font-bold text-slate-700"><i class="fa-solid fa-filter-circle-xmark mr-1"></i>Limpar filtros</button><button onclick="loadData()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button><button onclick="window.print()" class="bg-white border border-slate-300 px-3 py-2 rounded-lg text-xs font-bold text-slate-700"><i class="fa-solid fa-print mr-1"></i>Printar tela</button></div></div><div class="filters-grid multi-filters"><div><label class="filter-label">Ciclo</label><div class="multi-select" id="filterCycleWrap"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('filterCycleMenu')"><span id="filterCycleLabel">Todos os ciclos</span><i class="fa-solid fa-chevron-down"></i></button><div id="filterCycleMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Bloco</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('filterBlockMenu')"><span id="filterBlockLabel">Todos os blocos</span><i class="fa-solid fa-chevron-down"></i></button><div id="filterBlockMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Variedade</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('filterVarietyMenu')"><span id="filterVarietyLabel">Todas as variedades</span><i class="fa-solid fa-chevron-down"></i></button><div id="filterVarietyMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Data inicial</label><input id="filterStartDate" type="date" class="filter-date" onchange="render()"></div><div><label class="filter-label">Data final</label><input id="filterEndDate" type="date" class="filter-date" onchange="render()"></div></div></div>
   <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
    <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">Total de bandejas</p><h3 id="kBandejas" class="text-2xl font-extrabold text-emerald-800">--</h3></div>
    <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">Total de mudas</p><h3 id="kMudas" class="text-2xl font-extrabold text-emerald-800">--</h3><p class="text-[10px] text-slate-400">200 mudas por bandeja</p></div>
@@ -59,7 +59,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
    <div class="kpi"><p class="text-[11px] font-bold text-slate-500 uppercase">% total perdido</p><h3 id="kPerdaPct" class="text-2xl font-extrabold text-orange-600">--</h3></div>
   </div>
   <div class="glass p-5">
-   <div class="flex items-start justify-between gap-3 mb-3"><div><h2 class="text-base font-extrabold text-slate-800">Transplantio por Bloco — variedades selecionadas somadas</h2><p class="text-xs text-slate-500">Blocos em ordem alfabética. Quando houver mais de uma variedade no ciclo/bloco selecionado, os valores são somados no mesmo bloco. Mudas = bandejas × 200. % transplantado = transplantado ÷ mudas e % perdas = perdas ÷ mudas. Os totais respeitam todos os filtros selecionados.</p></div><div class="flex items-center gap-2"><div id="status" class="text-xs font-semibold text-emerald-700"></div><button id="refreshDataBtn" type="button" onclick="loadData(true)" class="px-3 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition" title="Atualizar dados da planilha"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button></div></div>
+   <div class="flex items-start justify-between gap-3 mb-3"><div><h2 class="text-base font-extrabold text-slate-800">Transplantio por Bloco e Variedade — todas as barras horizontais</h2><p class="text-xs text-slate-500">Blocos em ordem alfabética. Cada variedade é exibida separadamente; mudas = bandejas × 200. % transplantado = transplantado ÷ mudas e % perdas = perdas ÷ mudas. Os totais respeitam todos os filtros selecionados.</p></div><div id="status" class="text-xs font-semibold text-emerald-700"></div></div>
    <div class="h-[560px] relative"><canvas id="transplantioChart"></canvas></div>
   </div>
   <div class="glass p-4"><div class="flex items-center justify-between gap-3 mb-3"><div><h3 class="font-extrabold text-slate-800">Dados consolidados</h3><p id="tableCount" class="text-xs text-slate-500">--</p></div></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs text-center data-table"><thead><tr><th>Bloco</th><th>Ciclo</th><th>Variedade</th><th>Bandejas</th><th>Mudas</th><th>Transplantado</th><th>Perdas</th><th>Total dias de germinação</th><th>Data</th></tr></thead><tbody id="tbody"></tbody></table></div></div>
@@ -69,7 +69,7 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
    <div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="font-extrabold text-emerald-900">Rendimento do Transplantio</h2><p class="text-xs text-slate-500">Comparação por bloco. Todos os totais e percentuais respeitam os filtros selecionados; % transplantado = transplantado ÷ total de mudas e % perdas = perdas ÷ total de mudas.</p></div><button onclick="renderRendimento()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button></div>
    <div class="filters-grid multi-filters">
     <div><label class="filter-label">Bloco</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('rFilterBlockMenu')"><span id="rFilterBlockLabel">Todos os blocos</span><i class="fa-solid fa-chevron-down"></i></button><div id="rFilterBlockMenu" class="multi-menu hidden"></div></div></div>
-    <div><label class="filter-label">Ciclo</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('rFilterCycleMenu')"><span id="rFilterCycleLabel">Todos os ciclos</span><i class="fa-solid fa-chevron-down"></i></button><div id="rFilterCycleMenu" class="multi-menu hidden"></div></div></div><div><label class="filter-label">Variedade</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('rFilterVarietyMenu')"><span id="rFilterVarietyLabel">Todas as variedades</span><i class="fa-solid fa-chevron-down"></i></button><div id="rFilterVarietyMenu" class="multi-menu hidden"></div></div></div>
+    <div><label class="filter-label">Ciclo</label><div class="multi-select"><button type="button" class="filter-select multi-btn" onclick="toggleMulti('rFilterCycleMenu')"><span id="rFilterCycleLabel">Todos os ciclos</span><i class="fa-solid fa-chevron-down"></i></button><div id="rFilterCycleMenu" class="multi-menu hidden"></div></div></div>
     <div><label class="filter-label">Data inicial</label><input id="rFilterStartDate" type="date" class="filter-date" onchange="renderRendimento()"></div><div><label class="filter-label">Data final</label><input id="rFilterEndDate" type="date" class="filter-date" onchange="renderRendimento()"></div>
    </div>
    <div id="rendimentoGeneralKpis" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4"></div>
@@ -116,27 +116,12 @@ const SHEET_BASE='https://docs.google.com/spreadsheets/d/e/2PACX-1vQBafGpPjdS96k
 const SHEET_CSV=SHEET_BASE+'?output=csv';
 const SHEET_XLSX=SHEET_BASE+'?output=xlsx';
 let chart=null, germBroChart=null, germMasterChart=null, germPctChart=null, germPieChart=null, rendimentoChart=null, rendimentoPctChart=null, rendimentoPieChart=null, rows=[], workbookSheets={};
-function handleLogin(){const u=document.getElementById('username').value,p=document.getElementById('password').value;if(u==='adm123'&&p==='lucas@2026'){document.getElementById('loginError').classList.add('hidden');document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.remove('hidden');document.getElementById('app').classList.add('flex');loadData();startAutoSync()}else document.getElementById('loginError').classList.remove('hidden')}
+function handleLogin(){const u=document.getElementById('username').value,p=document.getElementById('password').value;if(u==='adm123'&&p==='lucas@2026'){document.getElementById('loginError').classList.add('hidden');document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.remove('hidden');document.getElementById('app').classList.add('flex');loadData()}else document.getElementById('loginError').classList.remove('hidden')}
 function logout(){location.reload()}
 function activateSheetTab(name){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('tab-active'));const t=[...document.querySelectorAll('.tab')].find(x=>x.dataset.sheet===name);if(t)t.classList.add('tab-active');document.getElementById('content-transplantio').classList.toggle('hidden',name!=='Transplantio');document.getElementById('content-rendimento').classList.toggle('hidden',name!=='Rendimento');document.getElementById('content-germinacao').classList.toggle('hidden',name!=='Germinação');document.getElementById('genericSheets').classList.toggle('hidden',name==='Transplantio'||name==='Rendimento'||name==='Germinação');if(name==='Rendimento')renderRendimento();else if(name==='Germinação')renderGerminacao();else if(name!=='Transplantio')renderGenericSheet(name)}
 function buildSheetTabs(names){const tabs=document.getElementById('sheetTabs');tabs.innerHTML='';const ordered=[...names.filter(n=>norm(n)==='transplantio'), 'Rendimento', 'Germinação', ...names.filter(n=>norm(n)!=='transplantio')];const unique=[...new Set(ordered)];unique.forEach((name,i)=>{const b=document.createElement('button');b.className='tab'+(i===0?' tab-active':'');b.dataset.sheet=name;const icon=norm(name)==='transplantio'?'fa-seedling':norm(name)==='rendimento'?'fa-chart-column':norm(name)==='germinacao'?'fa-chart-scatter':'fa-table';b.innerHTML=`<i class="fa-solid ${icon} mr-2"></i>${escapeHtml(name)}`;b.onclick=()=>activateSheetTab(name);tabs.appendChild(b)})}
 function norm(s){return String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()}
-function num(v){
-  if(typeof v==='number')return v;
-  let s=String(v??'').trim().replace(/\s/g,'');
-  if(!s)return 0;
-  // A planilha brasileira usa ponto como separador de milhar (ex.: 16.206)
-  // e vírgula como separador decimal. Preserve isso ao importar XLSX/CSV.
-  if(s.includes(',')&&s.includes('.')){
-    s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');
-  }else if(s.includes(',')){
-    s=s.replace(',','.');
-  }else if(/^[-+]?\d{1,3}(?:\.\d{3})+$/.test(s)){
-    s=s.replace(/\./g,'');
-  }
-  const n=Number(s.replace(/[^0-9.-]/g,''));
-  return Number.isFinite(n)?n:0;
-}
+function num(v){if(typeof v==='number')return v;let s=String(v??'').trim().replace(/\s/g,'');if(!s)return 0;if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');else if(s.includes(','))s=s.replace(',','.');let n=Number(s.replace(/[^0-9.-]/g,''));return Number.isFinite(n)?n:0}
 function findKey(keys, terms){return keys.find(k=>terms.some(t=>norm(k).includes(norm(t))))}
 function parseCSV(text){let lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return[];const parse=l=>{let a=[],c='',q=false;for(let i=0;i<l.length;i++){let ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){c+='"';i++}else q=!q}else if(ch===','&&!q){a.push(c);c=''}else c+=ch}a.push(c);return a};let h=parse(lines[0]);return lines.slice(1).map(l=>{let a=parse(l),o={};h.forEach((k,i)=>o[k.trim()]=a[i]??'');return o})}
 function parseDateValue(v){let s=String(v??'').trim();if(!s)return '';if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;let m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;let d=new Date(s);if(!Number.isNaN(d.getTime()))return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;return ''}
@@ -148,7 +133,6 @@ function normalizeData(data){
   const bandK=findKey(keys,['bandeja','bandejas']);
   const mudasK=findKey(keys,['mudas','muda']);
   const transK=keys.find(k=>norm(k)==='total transplantado')||keys.find(k=>norm(k)==='plantado')||keys.find(k=>norm(k)==='transplantado')||findKey(keys,['total transplantado','plantado','transplantado','transplantadas','transplante']);
-  const lossK=findKey(keys,['perdas','perda']);
   const germK=findKey(keys,['dias de germinacao','dias germinacao','germinacao','dias']);
   const dateK=findKey(keys,['data de transplantio','data transplantio','data']);
   const cycleK=findKey(keys,['ciclo']);
@@ -157,14 +141,19 @@ function normalizeData(data){
   const timeK=findKey(keys,['tempo total','tempo','duracao']);
   const collabK=findKey(keys,['colaborador','colaboradores','funcionarios','pessoas']);
   return data.map(r=>{
-    const resolved=resolveCounts(num(r[mudasK]),num(r[transK]),num(r[lossK]));
+    // Não tentar descobrir escala multiplicando por 1.000. A planilha já traz
+    // as quantidades de mudas/transplantadas na unidade correta. A perda é
+    // calculada somente depois da consolidação, evitando 2.947% e outros
+    // percentuais impossíveis quando há duas variedades no mesmo bloco/ciclo.
+    const mudas=Math.max(0,Math.round(num(r[mudasK])));
+    const transplantado=Math.max(0,Math.round(num(r[transK])));
     return {
       bloco:normalizeBlock(r[blockK]),
       variedade:String(r[varK]??'').trim(),
       bandejas:num(r[bandK]),
-      mudas:resolved.mudas,
-      transplantado:resolved.transplantado,
-      perdas:resolved.perdas,
+      mudas,
+      transplantado,
+      perdas:Math.max(0,mudas-transplantado),
       germinacao:num(r[germK]),
       data:parseDateValue(r[dateK]),
       ciclo:String(r[cycleK]??'').trim(),
@@ -197,140 +186,76 @@ function resolveCounts(mRaw,tRaw,pRaw){
     perdas:Math.min(best.p,best.m),
   };
 }
-function rowMudas(r){return Math.max(0,Number(r.mudas||0))}
-function rowTrans(r){return Math.max(0,Number(r.transplantado||0))}
-/* A perda vem da própria coluna "Perdas" da planilha.
-   Só usamos o saldo como fallback quando a célula de perdas estiver vazia. */
-function rowPerdas(r){
-  // Usa sempre o valor da coluna "Perdas" da planilha. A normalização já
-  // resolve a escala numérica da fonte e preenche somente células realmente vazias.
-  return Math.max(0,Number(r.perdas||0));
+function rowMudas(r){return Math.max(0,Math.round(Number(r.mudas||0)))}
+function rowTrans(r){return Math.max(0,Math.round(Number(r.transplantado||0)))}
+function rowPerdas(r){return Math.max(0,rowMudas(r)-rowTrans(r))}
+
+/*
+ * REGRA ÚNICA DOS TOTAIS
+ * 1) Soma mudas e transplantado por bloco/ciclo/variedade.
+ * 2) Quando o filtro contém mais de uma variedade/ciclo, soma tudo primeiro.
+ * 3) Só depois calcula perdas = mudas - transplantado.
+ * 4) Percentuais nunca passam de 100%.
+ */
+function aggregateTotals(source, groupBy=['bloco','ciclo','variedade']){
+  const map={};
+  (source||[]).forEach(r=>{
+    const key=groupBy.map(k=>k==='variedade'?variedade(r[k]):String(r[k]??'').trim()).join('___');
+    if(!map[key])map[key]={mudas:0,transplantado:0,bandejas:0};
+    map[key].mudas+=rowMudas(r);
+    map[key].transplantado+=rowTrans(r);
+    map[key].bandejas+=Number(r.bandejas||0);
+  });
+  return Object.values(map).map(g=>{
+    const mudas=Math.max(0,Math.round(g.mudas));
+    const transplantado=Math.min(mudas,Math.max(0,Math.round(g.transplantado)));
+    const perdas=Math.max(0,mudas-transplantado);
+    return {...g,mudas,transplantado,perdas,pctTransplantado:pct(transplantado,mudas),pctPerdas:pct(perdas,mudas)};
+  });
 }
 function totals(source){
-  let mudas=0,transplantado=0,perdas=0;
-  (source||[]).forEach(r=>{
-    mudas+=rowMudas(r);
-    transplantado+=rowTrans(r);
-    perdas+=rowPerdas(r);
-  });
-  return {mudas:Math.round(mudas),transplantado:Math.round(transplantado),perdas:Math.round(perdas)};
+  // Consolida cada combinação única e só então soma os grupos selecionados.
+  const groups=aggregateTotals(source,['bloco','ciclo','variedade']);
+  const mudas=groups.reduce((s,g)=>s+g.mudas,0);
+  const transplantado=Math.min(mudas,groups.reduce((s,g)=>s+g.transplantado,0));
+  return {mudas,transplantado,perdas:Math.max(0,mudas-transplantado)};
 }
 function pct(value,total){
   if(!(Number(total)>0)) return 0;
   return Math.min(100,Math.max(0,(Number(value||0)/Number(total))*100));
 }
 function fmtInt(v){return Math.round(Number(v||0)).toLocaleString('pt-BR')}
-/* Percentuais do painel são exibidos sempre arredondados para inteiro: 90,8% -> 91%. */
-function fmtPct(v){return Math.round(Math.min(100,Math.max(0,Number(v||0)))).toLocaleString('pt-BR')+'%'}
-function fmtPct1(v){return Number(Math.min(100,Math.max(0,Number(v||0)))).toFixed(1).replace('.',',')+'%'}
-/* Nos campos gerais, as duas porcentagens são arredondadas e fecham em 100%, sem exibir a soma. */
-function balancePercentages(t){const total=Number(t?.mudas||0);if(!(total>0))return {transplantado:0,perdas:0};const transRaw=pct(Number(t?.transplantado||0),total);const trans=Math.round(transRaw);const perdas=100-trans;return {transplantado:Math.min(100,Math.max(0,trans)),perdas:Math.min(100,Math.max(0,perdas))};}
+function fmtPct(v){return Math.round(pct(v,100)).toLocaleString('pt-BR')+'%'}
+function fmtPct1(v){return Math.round(pct(v,100)).toLocaleString('pt-BR')+'%'}
+function balancePercentages(t){
+  const total=Number(t?.mudas||0); if(!(total>0))return {transplantado:0,perdas:0};
+  const trans=Math.round(pct(Number(t?.transplantado||0),total));
+  return {transplantado:Math.min(100,Math.max(0,trans)),perdas:100-Math.min(100,Math.max(0,trans))};
+}
 function validateTotals(t){
-  return {
-    mudas:Number(t.mudas||0),
-    transplantado:Number(t.transplantado||0),
-    perdas:Number(t.perdas||0),
-    percentualTransplantado:pct(t.transplantado,t.mudas),
-    percentualPerdas:pct(t.perdas,t.mudas),
-    somaTransplantadoPerdas:Number(t.transplantado||0)+Number(t.perdas||0)
-  };
+  return {mudas:Number(t.mudas||0),transplantado:Number(t.transplantado||0),perdas:Number(t.perdas||0),percentualTransplantado:pct(t.transplantado,t.mudas),percentualPerdas:pct(t.perdas,t.mudas)};
 }
 
-function captureFilterState(){
-  const state={};
-  document.querySelectorAll('[id$="Menu"]').forEach(menu=>{
-    const values=[...menu.querySelectorAll('input[data-value]:checked')].map(x=>x.value);
-    const all=menu.querySelector('[data-all]');
-    state[menu.id]={
-      values,
-      allChecked:!!all?.checked
-    };
-  });
-  return state;
+async function loadData(){const st=document.getElementById('status');st.textContent='Atualizando...';let erros=[];try{
+  const res=await fetch(SHEET_XLSX+'&cb='+Date.now(),{method:'GET',mode:'cors',cache:'no-store',redirect:'follow'});
+  if(!res.ok)throw new Error('XLSX HTTP '+res.status);
+  const buf=await res.arrayBuffer();const wb=XLSX.read(buf,{type:'array'});
+  workbookSheets={};
+  wb.SheetNames.forEach(nome=>{workbookSheets[nome]=XLSX.utils.sheet_to_json(wb.Sheets[nome],{defval:'',raw:false});});
+  const names=[...wb.SheetNames].sort((a,b)=>norm(a)==='transplantio'?-1:norm(b)==='transplantio'?1:0);buildSheetTabs(names);
+  const nome=names.find(n=>norm(n)==='transplantio')||names[0];
+  const normalized=normalizeData(workbookSheets[nome]||[]);
+  if(!normalized.length)throw new Error(`A aba "${nome}" não possui registros reconhecíveis para o painel de transplantio`);
+  rows=normalized;populateFilters();render();st.textContent=`${rows.length} registros carregados — ${names.length} aba(s) da planilha`;
+}catch(e){console.error(e);st.textContent='Erro ao carregar os dados';alert('Não foi possível carregar as abas da planilha publicada.\n\nO sistema tentou ler todas as abas pela publicação XLSX.\n\nDetalhe: '+(e.message||e));}}
+function aggregateGeneral(source){return totals(source);}
+function germAggregate(source,v){
+  const groups=aggregateTotals(source,['bloco','ciclo']);
+  return groups.map(r=>({
+    ...r,germ:r.transplantado,percent:pct(r.transplantado,r.mudas),perdaPercent:pct(r.perdas,r.mudas),
+    pctTransplantado:pct(r.transplantado,r.mudas),pctPerdas:pct(r.perdas,r.mudas)
+  })).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'}));
 }
-function restoreFilterState(state){
-  if(!state)return;
-  Object.entries(state).forEach(([menuId,info])=>{
-    const menu=document.getElementById(menuId);
-    if(!menu)return;
-    const boxes=[...menu.querySelectorAll('input[data-value]')];
-    const all=menu.querySelector('[data-all]');
-    const wanted=new Set(info.values||[]);
-    boxes.forEach(b=>b.checked=wanted.has(b.value));
-    if(all)all.checked=info.allChecked && !boxes.length ? true : (boxes.length ? boxes.every(b=>b.checked) : true);
-    const labelId=menuId.replace('Menu','Label');
-    const label=document.getElementById(labelId);
-    if(label){
-      const text=menuId.startsWith('filterCycle')?'Todos os ciclos':
-        menuId.startsWith('filterBlock')||menuId.startsWith('rFilterBlock')||menuId.startsWith('gBroBlock')||menuId.startsWith('gMasterBlock')?'Todos os blocos':
-        menuId.startsWith('filterVariety')||menuId.startsWith('rFilterVariety')?'Todas as variedades':
-        menuId.includes('Month')?'Todos os meses':'Todos';
-      updateMultiLabel(menuId,labelId,text);
-    }
-  });
-}
-async function loadData(manual=false){
-  const st=document.getElementById('status');
-  const btn=document.getElementById('refreshDataBtn');
-  const previousState=captureFilterState();
-  st.textContent='Atualizando dados da planilha...';
-  if(btn)btn.disabled=true;
-  try{
-    // A URL publicada do Google Sheets é a fonte oficial. O parâmetro cb
-    // impede que uma cópia em cache seja reutilizada.
-    const res=await fetch(SHEET_XLSX+'&cb='+Date.now(),{
-      method:'GET',mode:'cors',cache:'no-store',redirect:'follow'
-    });
-    if(!res.ok)throw new Error('XLSX HTTP '+res.status);
-    const buf=await res.arrayBuffer();
-    const wb=XLSX.read(buf,{type:'array'});
-    workbookSheets={};
-    wb.SheetNames.forEach(nome=>{
-      workbookSheets[nome]=XLSX.utils.sheet_to_json(wb.Sheets[nome],{defval:'',raw:false});
-    });
-    const names=[...wb.SheetNames].sort((a,b)=>norm(a)==='transplantio'?-1:norm(b)==='transplantio'?1:0);
-    buildSheetTabs(names);
-    const nome=names.find(n=>norm(n)==='transplantio')||names[0];
-    const normalized=normalizeData(workbookSheets[nome]||[]);
-    if(!normalized.length)throw new Error(`A aba "${nome}" não possui registros reconhecíveis para o painel de transplantio`);
-    rows=normalized;
-    populateFilters();
-    restoreFilterState(previousState);
-    updateFilterContextStatus();
-    render();
-    if(document.querySelector('.tab.tab-active')?.dataset.sheet==='Rendimento')renderRendimento();
-    if(document.querySelector('.tab.tab-active')?.dataset.sheet==='Germinação')renderGerminacao();
-    st.textContent=`Sincronizado com a planilha • ${rows.length} registros • ${new Date().toLocaleTimeString('pt-BR')}`;
-  }catch(e){
-    console.error(e);
-    st.textContent='Erro ao atualizar a planilha';
-    if(manual)alert('Não foi possível atualizar os dados da planilha publicada.\n\nDetalhe: '+(e.message||e));
-  }finally{
-    if(btn)btn.disabled=false;
-  }
-}
-let syncTimer=null;
-function startAutoSync(){
-  clearInterval(syncTimer);
-  // Atualiza automaticamente a cada 60 segundos enquanto o painel estiver aberto.
-  syncTimer=setInterval(()=>{if(!document.hidden)loadData(false)},60000);
-}
-document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden && rows.length)loadData(false);
-});
-function aggregateGeneral(source){
-  let mudas=0,transplantado=0,perdas=0;
-  (source||[]).forEach(r=>{
-    mudas+=rowMudas(r);
-    transplantado+=rowTrans(r);
-    perdas+=rowPerdas(r);
-  });
-  return {mudas:Math.round(mudas),transplantado:Math.round(transplantado),perdas:Math.round(perdas)};
-}
-function germAggregate(source,v){const map={};source.forEach(r=>{const ciclo=String(r.ciclo??'').trim();const k=r.bloco+'___'+ciclo;if(!map[k])map[k]={bloco:r.bloco,ciclo,bandejas:0,mudas:0,transplantado:0,perdas:0};map[k].bandejas+=Number(r.bandejas||0);map[k].mudas+=rowMudas(r);map[k].transplantado+=rowTrans(r);map[k].perdas+=rowPerdas(r)});return Object.values(map).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})).map(r=>{
-  const mudas=Number(r.mudas||0),trans=Math.min(mudas,Number(r.transplantado||0)),perdas=Math.min(mudas,Math.max(0,mudas-trans));
-  return {...r,mudas,germ:trans,perdas,percent:pct(trans,mudas),perdaPercent:pct(perdas,mudas),pctTransplantado:pct(trans,mudas),pctPerdas:pct(perdas,mudas)};
-})}
 function makeGermChart(canvasId,chartRef,v,data,varietyLabel){if(chartRef)chartRef.destroy();const labels=data.map(r=>displayBlock(r.bloco));const pts=data.map((r,i)=>({x:i,y:r.transplantado}));const ctx=document.getElementById(canvasId);return new Chart(ctx,{type:'scatter',data:{datasets:[{label:varietyLabel,data:pts,showLine:true,tension:0.25,pointRadius:7,pointHoverRadius:10,borderWidth:2,datalabels:{display:true,align:'top',offset:7,font:{size:10,weight:'700'},formatter:(value,ctx)=>{const r=data[ctx.dataIndex];return `${Number(r.transplantado).toLocaleString('pt-BR')}\n${Math.round(r.percent)}%`}}}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{type:'linear',min:-0.6,max:Math.max(0,data.length-.4),ticks:{stepSize:1,callback:value=>labels[value]||''},title:{display:true,text:'Bloco',font:{weight:'700'}}},y:{beginAtZero:true,title:{display:true,text:'Total transplantado (mudas)',font:{weight:'700'}},ticks:{callback:value=>Number(value).toLocaleString('pt-BR')}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'}}},datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:3,font:{size:11,weight:'800'},formatter:v=>Number(v).toLocaleString('pt-BR')},tooltip:{callbacks:{title:ctx=>labels[ctx[0].dataIndex]||'',label:ctx=>{const r=data[ctx.dataIndex];return [`Transplantado: ${fmtInt(r.transplantado)}`,`Total germinado: ${r.germ.toLocaleString('pt-BR')}`,`% total transplantado: ${Math.round(r.percent)}%`,`% de perdas: ${Math.round(r.perdaPercent)}%`,`Perdas: ${fmtInt(r.perdas)}`]}}},datalabels:{display:true}}},plugins:[ChartDataLabels]})}
 function makeGermPctChart(dataBro,dataMaster){
   if(germPctChart)germPctChart.destroy();
@@ -344,97 +269,23 @@ function makeGermPctChart(dataBro,dataMaster){
 function renderGerminacao(){if(!rows.length)return;const broRows=germFilteredRows('BRO'),masterRows=germFilteredRows('Master');const bro=germAggregate(broRows,'BRO 68 Syngenta'),master=germAggregate(masterRows,'Master TSV');const allRows=[...broRows,...masterRows];const gt=aggregateGeneral(allRows),mudas=gt.mudas,trans=gt.transplantado,perdas=gt.perdas,pctTrans=pct(trans,mudas),pctPerdas=pct(perdas,mudas);document.getElementById('germGeneralKpis').innerHTML=[
     ['Total de mudas',fmtInt(mudas)],
     ['Total transplantado',fmtInt(trans)],
-    ['% total transplantado',Math.round(pctTrans).toLocaleString('pt-BR')+'%'],
+    ['% total transplantado',fmtPct(pctTrans)],
     ['Total de perdas',fmtInt(perdas)],
-    ['% de perdas',Math.round(pctPerdas).toLocaleString('pt-BR')+'%']
-  ].map(x=>`<div class="kpi-card"><div class="text-[10px] uppercase tracking-wide text-slate-500 font-bold">${x[0]}</div><div class="text-xl font-extrabold text-emerald-900 mt-1">${x[1]}</div></div>`).join('');germBroChart=makeGermChart('germBroChart',germBroChart,'BRO 68 Syngenta',bro,'BRO 68 Syngenta');germMasterChart=makeGermChart('germMasterChart',germMasterChart,'Master TSV',master,'Master TSV');const allVarMap={};[...broRows,...masterRows].forEach(r=>{const v=variedade(r.variedade),k=r.bloco+'___'+v;if(!allVarMap[k])allVarMap[k]={bloco:r.bloco,variedade:v,bandejas:0,mudas:0,transplantado:0,perdas:0};allVarMap[k].bandejas+=Number(r.bandejas||0);allVarMap[k].mudas+=rowMudas(r);allVarMap[k].transplantado+=rowTrans(r);allVarMap[k].perdas+=rowPerdas(r)});const allVarData=Object.values(allVarMap).map(r=>{const mudas=Number(r.mudas||0),trans=Math.min(mudas,Number(r.transplantado||0)),perdas=Math.min(mudas,Math.max(0,mudas-trans));return {...r,mudas,germ:trans,perdas,percent:pct(trans,mudas),perdaPercent:pct(perdas,mudas),pctTransplantado:pct(trans,mudas),pctPerdas:pct(perdas,mudas)}});makeGermPctChart(bro,master);makeGermPieChart(allVarData);const all=[...bro,...master].sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true})||a.percent-b.percent);document.getElementById('germTbody').innerHTML=all.length?all.map(r=>`<tr><td><span class="block-badge">${escapeHtml(displayBlock(r.bloco))}</span></td><td>${r===bro.find(x=>x.bloco===r.bloco)?'BRO 68 Syngenta':'Master TSV'}</td><td class="num-cell">${fmtInt(rowMudas(r))}</td><td class="num-cell">${fmtInt(r.transplantado)}</td><td class="num-cell">${fmtInt(r.perdas)}</td><td class="num-cell">${r.pctTransplantado.toFixed(0)}%</td><td class="num-cell">${r.pctPerdas.toFixed(0).padStart(2,'0')}%</td></tr>`).join(''):'<tr><td colspan="10" class="empty-row">Nenhum registro encontrado para os filtros selecionados.</td></tr>';document.getElementById('germCount').textContent=`${all.length} registro(s) — BRO: ${bro.length} bloco(s) · Master: ${master.length} bloco(s)`}
-function genericFilteredData(name){
-  const data=workbookSheets[name]||[];
-  if(!data.length)return [];
-  const keys=Object.keys(data[0]);
-  const blockK=findKey(keys,['bloco','block']), cycleK=findKey(keys,['ciclo']), varietyK=findKey(keys,['variedade','cultivar']);
-  const b=selectedValues('filterBlockMenu'), c=selectedValues('filterCycleMenu'), v=selectedValues('filterVarietyMenu');
-  return data.filter(r=>{
-    const rb=blockK?normalizeBlock(r[blockK]):'';
-    const rc=cycleK?String(r[cycleK]??'').trim():'';
-    const rv=varietyK?variedade(r[varietyK]):'';
-    return (!blockK||!b.length||b.includes(rb))&&(!cycleK||!c.length||c.includes(rc))&&(!varietyK||!v.length||v.includes(rv));
-  });
-}
-function renderGenericSheet(name){
-  const data=workbookSheets[name]||[],filtered=genericFilteredData(name),box=document.getElementById('genericSheets');
-  if(!data.length){box.innerHTML='<div class="glass p-6 text-center text-slate-500">Esta aba não possui dados.</div>';return;}
-  const keys=Object.keys(data[0]);
-  const rowsHtml=filtered.map(r=>`<tr>${keys.map(k=>`<td>${escapeHtml(r[k]??'')}</td>`).join('')}</tr>`).join('');
-  const hasCommon=findKey(keys,['bloco','block'])||findKey(keys,['ciclo'])||findKey(keys,['variedade','cultivar']);
-  box.innerHTML=`<div class="glass p-5"><div class="flex items-center justify-between mb-4"><div><h2 class="text-lg font-extrabold text-slate-800">${escapeHtml(name)}</h2><p class="text-xs text-slate-500">${filtered.length.toLocaleString('pt-BR')} de ${data.length.toLocaleString('pt-BR')} registros · filtros gerais aplicados quando a aba possui os campos correspondentes</p></div><button onclick="loadData()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button></div>${hasCommon?'<div class="mb-3 text-[11px] font-semibold text-emerald-700">Esta aba está respeitando os filtros de ciclo, bloco e variedade selecionados na aba Transplantio.</div>':''}<div class="table-wrap overflow-x-auto"><table class="w-full text-xs data-table"><thead><tr>${keys.map(k=>`<th>${escapeHtml(k)}</th>`).join('')}</tr></thead><tbody>${rowsHtml||'<tr><td colspan="'+keys.length+'" class="empty-row">Nenhum registro encontrado para os filtros selecionados.</td></tr>'}</tbody></table></div></div>`;
-}
+    ['% de perdas',fmtPct(pctPerdas)]
+  ].map(x=>`<div class="kpi-card"><div class="text-[10px] uppercase tracking-wide text-slate-500 font-bold">${x[0]}</div><div class="text-xl font-extrabold text-emerald-900 mt-1">${x[1]}</div></div>`).join('');germBroChart=makeGermChart('germBroChart',germBroChart,'BRO 68 Syngenta',bro,'BRO 68 Syngenta');germMasterChart=makeGermChart('germMasterChart',germMasterChart,'Master TSV',master,'Master TSV');const allVarData=aggregateTotals([...broRows,...masterRows],['bloco','variedade']).map(r=>({...r,germ:r.transplantado,percent:pct(r.transplantado,r.mudas),perdaPercent:pct(r.perdas,r.mudas),pctTransplantado:pct(r.transplantado,r.mudas),pctPerdas:pct(r.perdas,r.mudas)}));;makeGermPctChart(bro,master);makeGermPieChart(allVarData);const all=[...bro,...master].sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true})||a.percent-b.percent);document.getElementById('germTbody').innerHTML=all.length?all.map(r=>`<tr><td><span class="block-badge">${escapeHtml(displayBlock(r.bloco))}</span></td><td>${r===bro.find(x=>x.bloco===r.bloco)?'BRO 68 Syngenta':'Master TSV'}</td><td class="num-cell">${fmtInt(rowMudas(r))}</td><td class="num-cell">${fmtInt(r.transplantado)}</td><td class="num-cell">${fmtInt(r.perdas)}</td><td class="num-cell">${fmtPct(r.pctTransplantado)}</td><td class="num-cell">${fmtPct(r.pctPerdas)}</td></tr>`).join(''):'<tr><td colspan="10" class="empty-row">Nenhum registro encontrado para os filtros selecionados.</td></tr>';document.getElementById('germCount').textContent=`${all.length} registro(s) — BRO: ${bro.length} bloco(s) · Master: ${master.length} bloco(s)`}
+function renderGenericSheet(name){const data=workbookSheets[name]||[];const box=document.getElementById('genericSheets');if(!data.length){box.innerHTML='<div class="glass p-6 text-center text-slate-500">Esta aba não possui dados.</div>';return;}const keys=Object.keys(data[0]);const rowsHtml=data.map(r=>`<tr>${keys.map(k=>`<td>${escapeHtml(r[k]??'')}</td>`).join('')}</tr>`).join('');box.innerHTML=`<div class="glass p-5"><div class="flex items-center justify-between mb-4"><div><h2 class="text-lg font-extrabold text-slate-800">${escapeHtml(name)}</h2><p class="text-xs text-slate-500">${data.length.toLocaleString('pt-BR')} registros · dados atualizados diretamente da planilha publicada</p></div><button onclick="loadData()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-bold"><i class="fa-solid fa-rotate mr-1"></i>Atualizar</button></div><div class="table-wrap overflow-x-auto"><table class="w-full text-xs data-table"><thead><tr>${keys.map(k=>`<th>${escapeHtml(k)}</th>`).join('')}</tr></thead><tbody>${rowsHtml}</tbody></table></div></div>`}
 function toggleMulti(id){document.querySelectorAll('.multi-menu').forEach(m=>{if(m.id!==id)m.classList.add('hidden')});document.getElementById(id)?.classList.toggle('hidden')}
 document.addEventListener('click',e=>{if(!e.target.closest('.multi-select'))document.querySelectorAll('.multi-menu').forEach(m=>m.classList.add('hidden'))});
 function selectedValues(menuId){return [...document.querySelectorAll('#'+menuId+' input[type=checkbox]:checked:not([data-all])')].map(x=>x.value)}
 function updateMultiLabel(menuId,labelId,allText){const vals=selectedValues(menuId);document.getElementById(labelId).textContent=!vals.length||document.querySelector('#'+menuId+' input[data-all]')?.checked?allText:(vals.length<=2?vals.join(', '):`${vals.length} selecionados`)}
-function makeMulti(menuId,labelId,items,allText,onChange,formatter=x=>x){
-  const menu=document.getElementById(menuId);if(!menu)return;
-  menu.innerHTML=`<label class="multi-option multi-all"><input type="checkbox" data-all checked> Selecionar todos</label>`+
-    items.map(x=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(String(x))}" data-value checked> ${escapeHtml(formatter(x))}</label>`).join('');
-  const all=menu.querySelector('[data-all]');
-  const boxes=[...menu.querySelectorAll('[data-value]')];
-  const changed=()=>{updateMultiLabel(menuId,labelId,allText);onChange()};
-  all.onchange=()=>{boxes.forEach(b=>b.checked=all.checked);changed()};
-  boxes.forEach(b=>b.onchange=()=>{all.checked=boxes.every(x=>x.checked);changed()});
-  updateMultiLabel(menuId,labelId,allText);
-}
-function populateFilters(){const cycles=[...new Set(rows.map(r=>String(r.ciclo??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));const blocks=[...new Set(rows.map(r=>String(r.bloco??'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));const varieties=[...new Set(rows.map(r=>variedade(r.variedade)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));makeMulti('filterCycleMenu','filterCycleLabel',cycles,'Todos os ciclos',render);makeMulti('filterBlockMenu','filterBlockLabel',blocks,'Todos os blocos',render,displayBlock);makeMulti('filterVarietyMenu','filterVarietyLabel',varieties,'Todas as variedades',render);makeMulti('gBroBlockMenu','gBroBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gBroCycleMenu','gBroCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gBroMonthMenu','gBroMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('gMasterBlockMenu','gMasterBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gMasterCycleMenu','gMasterCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gMasterMonthMenu','gMasterMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('rFilterBlockMenu','rFilterBlockLabel',blocks,'Todos os blocos',renderRendimento,displayBlock);makeMulti('rFilterCycleMenu','rFilterCycleLabel',cycles,'Todos os ciclos',renderRendimento);makeMulti('rFilterVarietyMenu','rFilterVarietyLabel',varieties,'Todas as variedades',renderRendimento)}
-function filteredRows(){const cy=selectedValues('filterCycleMenu').map(x=>String(x).trim()),b=selectedValues('filterBlockMenu').map(x=>String(x).trim()),v=selectedValues('filterVarietyMenu').map(x=>String(x).trim());const start=document.getElementById('filterStartDate')?.value||'',end=document.getElementById('filterEndDate')?.value||'';return rows.filter(r=>{const rc=String(r.ciclo??'').trim(),rb=String(r.bloco??'').trim(),rv=variedade(r.variedade);return (!cy.length||cy.includes(rc))&&(!b.length||b.includes(rb))&&(!v.length||v.includes(rv))&&(!start||!r.data||r.data>=start)&&(!end||!r.data||r.data<=end)})}
-function updateFilterContextStatus(){
-  const c=selectedValues('filterCycleMenu'),b=selectedValues('filterBlockMenu'),v=selectedValues('filterVarietyMenu');
-  const parts=[];
-  if(c.length)parts.push(`Ciclo: ${c.join(', ')}`);
-  if(b.length)parts.push(`Bloco: ${b.map(displayBlock).join(', ')}`);
-  if(v.length)parts.push(`Variedade: ${v.join(', ')}`);
-  const el=document.getElementById('filterContextStatus');
-  if(el)el.textContent=parts.length?`Contexto ativo nas abas: ${parts.join(' · ')}`:'Nenhum filtro de ciclo, bloco ou variedade selecionado.';
-}
-function selectedFilterContext(){
-  return {
-    cycles:selectedValues('filterCycleMenu'),
-    blocks:selectedValues('filterBlockMenu'),
-    varieties:selectedValues('filterVarietyMenu')
-  };
-}
-function refreshContextFilterMenus(){
-  if(!rows.length)return;
-  const ctx=selectedFilterContext();
-  const availableRows=rows.filter(r=>
-    (!ctx.cycles.length||ctx.cycles.includes(r.ciclo))&&
-    (!ctx.blocks.length||ctx.blocks.includes(r.bloco))&&
-    (!ctx.varieties.length||ctx.varieties.includes(variedade(r.variedade)))
-  );
-  const availableCycles=[...new Set(availableRows.map(r=>r.ciclo).filter(Boolean))].sort();
-  const availableBlocks=[...new Set(availableRows.map(r=>r.bloco).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
-  const availableVarieties=[...new Set(availableRows.map(r=>variedade(r.variedade)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
-  // Keep the selected values; only rebuild when a selection would otherwise point to a value
-  // that is no longer valid for the chosen cycle/block/variety combination.
-  const rebuild=(menuId,labelId,items,allText,selected,formatter=String)=>{
-    const menu=document.getElementById(menuId); if(!menu)return;
-    const valid=selected.filter(x=>items.includes(x));
-    makeMulti(menuId,labelId,items,allText,render,formatter);
-    const boxes=[...menu.querySelectorAll('input[data-value]')];
-    boxes.forEach(x=>x.checked=valid.includes(x.value));
-    const all=menu.querySelector('[data-all]');
-    if(all)all.checked=valid.length===0;
-    updateMultiLabel(menuId,labelId,allText);
-  };
-  rebuild('filterCycleMenu','filterCycleLabel',availableCycles,'Todos os ciclos',ctx.cycles);
-  rebuild('filterBlockMenu','filterBlockLabel',availableBlocks,'Todos os blocos',ctx.blocks,displayBlock);
-  rebuild('filterVarietyMenu','filterVarietyLabel',availableVarieties,'Todas as variedades',ctx.varieties);
-  updateFilterContextStatus();
-}
+function makeMulti(menuId,labelId,items,allText,onChange,formatter=x=>x){const menu=document.getElementById(menuId);if(!menu)return;menu.innerHTML=`<label class="multi-option multi-all"><input type="checkbox" data-all checked> Selecionar todos</label>`+items.map((x,i)=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(String(x))}" data-value checked> ${escapeHtml(formatter(x))}</label>`).join('');const all=menu.querySelector('[data-all]');const boxes=[...menu.querySelectorAll('[data-value]')];all.onchange=()=>{boxes.forEach(b=>b.checked=all.checked);updateMultiLabel(menuId,labelId,allText);onChange()};boxes.forEach(b=>b.onchange=()=>{all.checked=boxes.every(x=>x.checked);updateMultiLabel(menuId,labelId,allText);onChange()});updateMultiLabel(menuId,labelId,allText)}
+function populateFilters(){const cycles=[...new Set(rows.map(r=>r.ciclo).filter(Boolean))].sort();const blocks=[...new Set(rows.map(r=>r.bloco).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));const varieties=[...new Set(rows.map(r=>variedade(r.variedade)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));const dates=[...new Set(rows.map(r=>r.data).filter(Boolean))].sort();makeMulti('filterCycleMenu','filterCycleLabel',cycles,'Todos os ciclos',render);makeMulti('filterBlockMenu','filterBlockLabel',blocks,'Todos os blocos',render,displayBlock);makeMulti('filterVarietyMenu','filterVarietyLabel',varieties,'Todas as variedades',render);makeMulti('gBroBlockMenu','gBroBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gBroCycleMenu','gBroCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gBroMonthMenu','gBroMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('gMasterBlockMenu','gMasterBlockLabel',blocks,'Todos os blocos',renderGerminacao,displayBlock);makeMulti('gMasterCycleMenu','gMasterCycleLabel',cycles,'Todos os ciclos',renderGerminacao);makeMulti('gMasterMonthMenu','gMasterMonthLabel',[1,2,3,4,5,6,7,8,9,10,11,12],'Todos os meses',renderGerminacao,x=>['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][x]);makeMulti('rFilterBlockMenu','rFilterBlockLabel',blocks,'Todos os blocos',renderRendimento,displayBlock);makeMulti('rFilterCycleMenu','rFilterCycleLabel',cycles,'Todos os ciclos',renderRendimento)}
+function filteredRows(){const cy=selectedValues('filterCycleMenu'),b=selectedValues('filterBlockMenu'),v=selectedValues('filterVarietyMenu');const start=document.getElementById('filterStartDate')?.value||'',end=document.getElementById('filterEndDate')?.value||'';return rows.filter(r=>(!cy.length||cy.includes(r.ciclo))&&(!b.length||b.includes(r.bloco))&&(!v.length||v.includes(variedade(r.variedade)))&&(!start||!r.data||r.data>=start)&&(!end||!r.data||r.data<=end))}
 function clearFilters(){['filterCycleMenu','filterBlockMenu','filterVarietyMenu'].forEach(id=>{const m=document.getElementById(id);if(m){m.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=true);const l={filterCycleMenu:['filterCycleLabel','Todos os ciclos'],filterBlockMenu:['filterBlockLabel','Todos os blocos'],filterVarietyMenu:['filterVarietyLabel','Todas as variedades']}[id];updateMultiLabel(id,l[0],l[1])}});const start=document.getElementById('filterStartDate'),end=document.getElementById('filterEndDate');if(start)start.value='';if(end)end.value='';render()}
 function germFilteredRows(variety){const prefix=variety==='BRO'?'gBro':'gMaster';const target=variety==='BRO'?'BRO 68 Syngenta':'Master TSV';const b=selectedValues(prefix+'BlockMenu'),c=selectedValues(prefix+'CycleMenu'),m=selectedValues(prefix+'MonthMenu');return rows.filter(r=>{const v=variedade(r.variedade);return v===target&&(!b.length||b.includes(r.bloco))&&(!c.length||c.includes(r.ciclo))&&(!m.length||(r.data&&m.includes(String(Number(r.data.slice(5,7))))))})}
 function clearGermFilters(variety){const p=variety==='BRO'?'gBro':'gMaster';[['Block','Todos os blocos'],['Cycle','Todos os ciclos'],['Month','Todos os meses']].forEach(([x,t])=>{const m=document.getElementById(p+x+'Menu');if(m)m.querySelectorAll('input[type=checkbox]').forEach(c=>c.checked=true);const l=document.getElementById(p+x+'Label');if(l)l.textContent=t});renderGerminacao()}
-function clearRendimentoFilters(){['rFilterBlockMenu','rFilterCycleMenu','rFilterVarietyMenu'].forEach(id=>{const m=document.getElementById(id);if(m)m.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=true)});['rFilterBlockLabel','rFilterCycleLabel','rFilterVarietyLabel'].forEach((id,i)=>document.getElementById(id).textContent=['Todos os blocos','Todos os ciclos','Todas as variedades'][i]);const start=document.getElementById('rFilterStartDate'),end=document.getElementById('rFilterEndDate');if(start)start.value='';if(end)end.value='';renderRendimento()}
-function rendimentoFilteredRows(){const b=selectedValues('rFilterBlockMenu'),c=selectedValues('rFilterCycleMenu'),v=selectedValues('rFilterVarietyMenu'),start=document.getElementById('rFilterStartDate')?.value||'',end=document.getElementById('rFilterEndDate')?.value||'';const gb=selectedValues('filterBlockMenu'),gc=selectedValues('filterCycleMenu'),gv=selectedValues('filterVarietyMenu');return rows.filter(r=>(!b.length||b.includes(r.bloco))&&(!c.length||c.includes(r.ciclo))&&(!v.length||v.includes(variedade(r.variedade)))&&(!gb.length||gb.includes(r.bloco))&&(!gc.length||gc.includes(r.ciclo))&&(!gv.length||gv.includes(variedade(r.variedade)))&&(!start||!r.data||r.data>=start)&&(!end||!r.data||r.data<=end))}
+function clearRendimentoFilters(){['rFilterBlockMenu','rFilterCycleMenu'].forEach(id=>{const m=document.getElementById(id);if(m)m.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=true)});['rFilterBlockLabel','rFilterCycleLabel'].forEach((id,i)=>document.getElementById(id).textContent=['Todos os blocos','Todos os ciclos'][i]);const start=document.getElementById('rFilterStartDate'),end=document.getElementById('rFilterEndDate');if(start)start.value='';if(end)end.value='';renderRendimento()}
+function rendimentoFilteredRows(){const b=selectedValues('rFilterBlockMenu'),c=selectedValues('rFilterCycleMenu'),start=document.getElementById('rFilterStartDate')?.value||'',end=document.getElementById('rFilterEndDate')?.value||'';return rows.filter(r=>(!b.length||b.includes(r.bloco))&&(!c.length||c.includes(r.ciclo))&&(!start||!r.data||r.data>=start)&&(!end||!r.data||r.data<=end))}
 function timeToMinutes(t){const m=String(t||'').match(/(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null}
 function formatDuration(min){if(min==null||!Number.isFinite(min))return '--';min=Math.max(0,Math.round(min));return `${Math.floor(min/60)}h ${String(min%60).padStart(2,'0')}min`}
 function aggregateRendimento(source){
@@ -446,7 +297,6 @@ function aggregateRendimento(source){
     b.bandejas+=Number(r.bandejas||0);
     b.mudas+=rowMudas(r);
     b.transplantado+=rowTrans(r);
-    b.perdas+=rowPerdas(r);
     const ti=timeToMinutes(r.inicio),tf=timeToMinutes(r.fim);
     if(ti!=null)b.inicio=b.inicio==null?ti:Math.min(b.inicio,ti);
     if(tf!=null)b.fim=b.fim==null?tf:Math.max(b.fim,tf);
@@ -463,54 +313,17 @@ function aggregateRendimento(source){
       else {days[day].ti=Math.min(days[day].ti,ti);days[day].tf=Math.max(days[day].tf,tf)}
     });
     b.minutos=Object.values(days).reduce((sum,d)=>{let dur=d.tf-d.ti;if(dur<0)dur+=1440;return sum+dur},0);
-    b.perdas=Math.round(b.perdas);
+    b.perdas=Math.min(b.mudas,Math.max(0,b.mudas-b.transplantado));
      return b;
   }).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'}));
 }
 function clockLabel(m){return m==null?'--':`${String(Math.floor(m/60)%24).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`}
 function makeRendimentoPctChart(data){
   if(rendimentoPctChart)rendimentoPctChart.destroy();
-  const labels=data.map(r=>displayBlock(r.bloco));
-  const count=Math.max(1,data.length);
-  const barPct=count<=5?0.34:count<=10?0.48:0.62;
-  rendimentoPctChart=new Chart(document.getElementById('rendimentoPctChart'),{
-    type:'bar',
-    data:{
-      labels,
-      datasets:[
-        {label:'% transplantado',data:data.map(r=>pct(r.transplantado,r.mudas)),backgroundColor:'#15803d',borderRadius:7,borderWidth:1.5,maxBarThickness:42,categoryPercentage:.72,barPercentage:barPct},
-        {label:'% de perdas',data:data.map(r=>pct(r.perdas,r.mudas)),backgroundColor:'#ea580c',borderRadius:7,borderWidth:1.5,maxBarThickness:42,categoryPercentage:.72,barPercentage:barPct}
-      ]
-    },
-    options:{
-      indexAxis:'x',
-      responsive:true,
-      maintainAspectRatio:false,
-      layout:{padding:{top:12,right:16,bottom:8,left:12}},
-      scales:{
-        x:{
-          stacked:false,
-          offset:true,
-          grid:{display:false},
-          title:{display:true,text:'Bloco',font:{weight:'700'}},
-          ticks:{font:{weight:'700'},autoSkip:false,maxRotation:0,minRotation:0}
-        },
-        y:{
-          beginAtZero:true,
-          max:100,
-          grid:{color:'rgba(148,163,184,.18)'},
-          title:{display:true,text:'Percentual (%)',font:{weight:'700'}},
-          ticks:{stepSize:10,callback:v=>v+'%'}
-        }
-      },
-      plugins:{
-        legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'},padding:18}},
-        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${Math.round(Number(c.raw))}%`}},
-        datalabels:{display:true,anchor:'end',align:'top',offset:4,clip:false,clamp:true,font:{size:10,weight:'800'},formatter:v=>Math.round(Number(v))+'%'}
-      }
-    },
-    plugins:[ChartDataLabels]
-  });
+  rendimentoPctChart=new Chart(document.getElementById('rendimentoPctChart'),{type:'bar',data:{labels:data.map(r=>displayBlock(r.bloco)),datasets:[
+    {label:'% transplantado',data:data.map(r=>pct(r.transplantado,r.mudas)),backgroundColor:'#15803d',borderRadius:6,borderWidth:1.5},
+    {label:'% de perdas',data:data.map(r=>pct(r.perdas,r.mudas)),backgroundColor:'#ea580c',borderRadius:6,borderWidth:1.5}
+  ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,max:100,title:{display:true,text:'Percentual (%)',font:{weight:'700'}},ticks:{callback:v=>v+'%'}},y:{stacked:true,title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${Math.round(Number(c.raw))}%`}},datalabels:{display:true,color:'#fff',font:{size:10,weight:'800'},formatter:v=>Math.round(Number(v))+'%'}}},plugins:[ChartDataLabels]});
 }
 function makeRendimentoPieChart(data){
   if(rendimentoPieChart)rendimentoPieChart.destroy();
@@ -566,7 +379,7 @@ function displayBlock(v){let s=String(v).trim();if(/^bloco\s*/i.test(s))return s
 /* Aba 01: usa diretamente os campos Mudas, Transplantado e Perdas da planilha. Os valores de Mudas, Transplantado e Perdas são reconciliados a partir dos campos da planilha e consolidados por bloco/ciclo antes do cálculo dos percentuais. */
 function aggregate(source=rows){
   const map={};
-  (source||[]).forEach(r=>{
+  source.forEach(r=>{
     const v=variedade(r.variedade);
     const ciclo=String(r.ciclo??'').trim();
     const key=r.bloco+'___'+ciclo+'___'+v;
@@ -574,66 +387,46 @@ function aggregate(source=rows){
     map[key].bandejas+=Number(r.bandejas||0);
     map[key].mudas+=rowMudas(r);
     map[key].transplantado+=rowTrans(r);
-    map[key].perdas+=rowPerdas(r);
     if(r.germinacao)map[key].germinacao.push(r.germinacao);
   });
   return Object.values(map).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})||String(a.ciclo).localeCompare(String(b.ciclo),undefined,{numeric:true,sensitivity:'base'})||a.variedade.localeCompare(b.variedade)).map(r=>{
-    const mudas=Math.round(Math.max(0,r.mudas||0));
-    const transplantado=Math.round(Math.max(0,r.transplantado||0));
-    const perdas=Math.round(Math.max(0,r.perdas||0));
+    const mudas=Math.max(0,Number(r.mudas||0));
+    const transplantado=Math.min(mudas,Math.max(0,Number(r.transplantado||0)));
+    const perdas=Math.max(0,mudas-transplantado);
     return {...r,mudas,transplantado,perdas,pctTransplantado:pct(transplantado,mudas),pctPerdas:pct(perdas,mudas)};
   });
 }
 function aggregateBlockCycle(source=rows){
-  // Consolida SOMENTE pelo bloco depois que os filtros de ciclo e variedade
-  // já foram aplicados. Portanto, Bloco 01 + Ciclo 06 soma todas as variedades
-  // e todas as linhas daquele bloco/ciclo, exatamente como na planilha.
-  const map=new Map();
-  (source||[]).forEach(r=>{
-    const bloco=String(r.bloco??'').trim();
-    if(!bloco)return;
-    if(!map.has(bloco))map.set(bloco,{bloco,bandejas:0,mudas:0,transplantado:0,perdas:0});
-    const g=map.get(bloco);
-    g.bandejas+=Number(r.bandejas||0);
-    g.mudas+=rowMudas(r);
-    g.transplantado+=rowTrans(r);
-    g.perdas+=rowPerdas(r);
-  });
-  return [...map.values()].map(r=>{
-    const mudas=Math.round(Math.max(0,r.mudas||0));
-    const transplantado=Math.round(Math.max(0,r.transplantado||0));
-    const perdas=Math.round(Math.max(0,r.perdas||0));
-    return {...r,mudas,transplantado,perdas,pctTransplantado:pct(transplantado,mudas),pctPerdas:pct(perdas,mudas)};
-  }).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'}));
+  const groups=aggregateTotals(source,['bloco']);
+  return groups.map(g=>({...g,bloco:String(g.bloco??'')})).sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'}));
 }
 function avgGerm(r){return r.germinacao&&r.germinacao.length?Math.round(r.germinacao.reduce((a,b)=>a+b,0)/r.germinacao.length):0}
 function render(){
-  const filtered=filteredRows(),d=aggregate(filtered),bc=aggregateBlockCycle(filtered),band=bc.reduce((s,r)=>s+Number(r.bandejas||0),0);
-  // Os KPIs gerais usam o resultado já consolidado por bloco. Portanto,
-  // múltiplos ciclos e/ou variedades selecionados são somados primeiro e só
-  // depois são calculadas as perdas e os percentuais.
-  const mudas=bc.reduce((s,r)=>s+Number(r.mudas||0),0);
-  const trans=bc.reduce((s,r)=>s+Number(r.transplantado||0),0);
-  const perdas=bc.reduce((s,r)=>s+Number(r.perdas||0),0);
+  const filtered=filteredRows(),d=aggregate(filtered),bc=aggregateBlockCycle(filtered),t=totals(filtered),band=bc.reduce((s,r)=>s+Number(r.bandejas||0),0);
+  const mudas=t.mudas, trans=t.transplantado, perdas=t.perdas;
   document.getElementById('kBandejas').textContent=fmtInt(band);
   document.getElementById('kMudas').textContent=fmtInt(mudas);
   document.getElementById('kTrans').textContent=fmtInt(trans);
   document.getElementById('kPerdas').textContent=fmtInt(perdas);
   document.getElementById('kGerm').textContent=fmtPct(pct(trans,mudas));
   document.getElementById('kPerdaPct').textContent=fmtPct(pct(perdas,mudas));
-// O gráfico da Aba 01 consolida por BLOCO tudo o que passou pelos filtros.
-// Assim, ao selecionar Bloco 01 + Ciclo 6, as duas variedades desse ciclo
-// aparecem somadas em um único conjunto de barras para o bloco.
-const chartData=bc;
-const labels=chartData.map(x=>displayBlock(x.bloco));
-const datasets=[
-  {label:'Total de mudas',data:chartData.map(r=>Number(r.mudas||0)),backgroundColor:'#15803d',borderColor:'#15803d',borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>Number(x).toLocaleString('pt-BR')}},
-  {label:'Transplantado',data:chartData.map(r=>Number(r.transplantado||0)),backgroundColor:'#2563eb',borderColor:'#2563eb',borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>Number(x).toLocaleString('pt-BR')}},
-  {label:'Perdas',data:chartData.map(r=>Number(r.perdas||0)),backgroundColor:'#ea580c',borderColor:'#ea580c',borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>Number(x).toLocaleString('pt-BR')}}
-];
+const blocks=[...new Set(d.map(x=>x.bloco))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
+const labels=blocks.map(displayBlock);
+const varieties=[...new Set(d.map(x=>x.variedade).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
+const datasets=varieties.flatMap((v,i)=>{
+  const mudasData=blocks.map(b=>{const r=d.find(x=>x.bloco===b&&x.variedade===v);return r?Number(r.mudas||0):null});
+  const transData=blocks.map(b=>{const r=d.find(x=>x.bloco===b&&x.variedade===v);return r?Number(r.transplantado||0):null});
+  const perdaData=blocks.map(b=>{const r=d.find(x=>x.bloco===b&&x.variedade===v);return r?Number(r.perdas||0):null});
+  const palette=['#15803d','#2563eb','#7c3aed','#0891b2','#ca8a04','#db2777','#475569','#0f766e','#be123c'];
+  return [
+    {label:v+' — Total de mudas',data:mudasData,backgroundColor:palette[i%palette.length],borderColor:palette[i%palette.length],borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>x==null?'':Number(x).toLocaleString('pt-BR')}},
+    {label:v+' — Transplantado',data:transData,backgroundColor:palette[i%palette.length],borderColor:palette[i%palette.length],borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>x==null?'':Number(x).toLocaleString('pt-BR')}},
+    {label:v+' — Perdas',data:perdaData,backgroundColor:'rgba(234,88,12,.78)',borderColor:'#ea580c',borderWidth:1.5,borderRadius:7,maxBarThickness:34,datalabels:{display:true,clip:false,clamp:true,anchor:'end',align:'top',offset:4,font:{size:10,weight:'800'},formatter:x=>x==null?'':Number(x).toLocaleString('pt-BR')}}
+  ]
+});
 if(chart)chart.destroy();
-chart=new Chart(document.getElementById('transplantioChart'),{type:'bar',data:{labels,datasets},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{beginAtZero:true,title:{display:true,text:'Quantidade de mudas',font:{weight:'700'}},ticks:{callback:v=>Number(v).toLocaleString('pt-BR')}},y:{title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'},padding:12}},tooltip:{callbacks:{title:c=>labels[c[0].dataIndex],label:c=>`${c.dataset.label}: ${Number(c.parsed.x).toLocaleString('pt-BR')} mudas`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
-const tbody=document.getElementById('tbody');const tableRows=[...filtered].sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})||a.data.localeCompare(b.data)||variedade(a.variedade).localeCompare(variedade(b.variedade)));tbody.innerHTML=tableRows.length?tableRows.map(r=>{const v=variedade(r.variedade);return `<tr><td><span class="block-badge">${escapeHtml(displayBlock(r.bloco))}</span></td><td>${escapeHtml(r.ciclo||'--')}</td><td><span class="var-badge"><span class="var-dot" style="background:${v==='BRO'?'#15803d':'#f97316'}"></span>${escapeHtml(v)}</span></td><td class="num-cell">${fmtInt(r.bandejas)}</td><td class="num-cell">${fmtInt(rowMudas(r))}</td><td class="num-cell">${fmtInt(r.transplantado)}</td><td class="num-cell">${fmtInt(r.perdas)}</td><td class="num-cell">${r.germinacao?r.germinacao.toLocaleString('pt-BR'):'--'} dias</td><td>${r.data?formatDate(r.data):'--'}</td></tr>`}).join(''):`<tr><td colspan="9" class="empty-row">Nenhum registro encontrado para os filtros selecionados.</td></tr>`;document.getElementById('tableCount').textContent=`${tableRows.length} registro(s) exibido(s) — cada data permanece em uma linha separada; o campo de germinação é exibido somente como total de dias`;updateFilterContextStatus()}
+chart=new Chart(document.getElementById('transplantioChart'),{type:'bar',data:{labels,datasets},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{beginAtZero:true,title:{display:true,text:'Quantidade de mudas',font:{weight:'700'}},ticks:{callback:v=>Number(v).toLocaleString('pt-BR')}},y:{title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'},padding:10}},tooltip:{callbacks:{title:c=>labels[c[0].dataIndex],label:c=>`${c.dataset.label}: ${Number(c.parsed.x).toLocaleString('pt-BR')} mudas`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
+const tbody=document.getElementById('tbody');const tableRows=[...filtered].sort((a,b)=>a.bloco.localeCompare(b.bloco,undefined,{numeric:true,sensitivity:'base'})||a.data.localeCompare(b.data)||variedade(a.variedade).localeCompare(variedade(b.variedade)));tbody.innerHTML=tableRows.length?tableRows.map(r=>{const v=variedade(r.variedade);return `<tr><td><span class="block-badge">${escapeHtml(displayBlock(r.bloco))}</span></td><td>${escapeHtml(r.ciclo||'--')}</td><td><span class="var-badge"><span class="var-dot" style="background:${v==='BRO'?'#15803d':'#f97316'}"></span>${escapeHtml(v)}</span></td><td class="num-cell">${fmtInt(r.bandejas)}</td><td class="num-cell">${fmtInt(rowMudas(r))}</td><td class="num-cell">${fmtInt(r.transplantado)}</td><td class="num-cell">${fmtInt(r.perdas)}</td><td class="num-cell">${r.germinacao?r.germinacao.toLocaleString('pt-BR'):'--'} dias</td><td>${r.data?formatDate(r.data):'--'}</td></tr>`}).join(''):`<tr><td colspan="9" class="empty-row">Nenhum registro encontrado para os filtros selecionados.</td></tr>`;document.getElementById('tableCount').textContent=`${tableRows.length} registro(s) exibido(s) — cada data permanece em uma linha separada; o campo de germinação é exibido somente como total de dias`}
 
 
 </script></body></html>
