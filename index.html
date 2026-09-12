@@ -217,10 +217,10 @@ function totals(source){
 }
 function pct(value,total){
   if(!(Number(total)>0)) return 0;
-  return Math.min(100,Math.max(0,(Number(value||0)/Number(total))*100));
+  return Math.max(0,(Number(value||0)/Number(total))*100);
 }
 function fmtInt(v){return Math.round(Number(v||0)).toLocaleString('pt-BR')}
-function fmtPct(v){return Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%'}
+function fmtPct(v){return Math.round(Number(v||0)).toLocaleString('pt-BR')+'%'}
 function validateTotals(t){
   return {
     mudas:Number(t.mudas||0),
@@ -256,7 +256,7 @@ function makeGermPctChart(dataBro,dataMaster){
   germPctChart=new Chart(document.getElementById('germPctChart'),{type:'bar',data:{labels,datasets:[
     {label:'% transplantado',data:all.map(r=>pct(r.transplantado,r.mudas)),backgroundColor:'#15803d',borderRadius:6,borderWidth:1.5},
     {label:'% de perdas',data:all.map(r=>pct(r.perdas,r.mudas)),backgroundColor:'#ea580c',borderRadius:6,borderWidth:1.5}
-  ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,max:100,title:{display:true,text:'Percentual (%)',font:{weight:'700'}},ticks:{callback:v=>v+'%'}},y:{stacked:true,title:{display:true,text:'Bloco / variedade',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${Number(c.raw).toFixed(1).replace('.',',')}%`}},datalabels:{display:true,color:'#fff',font:{size:10,weight:'800'},formatter:v=>Number(v).toFixed(1).replace('.',',')+'%'}}},plugins:[ChartDataLabels]});
+  ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,max:100,title:{display:true,text:'Percentual (%)',font:{weight:'700'}},ticks:{callback:v=>v+'%'}},y:{stacked:true,title:{display:true,text:'Bloco / variedade',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${Number(c.raw).toFixed(1).replace('.',',')}%`}},datalabels:{display:true,color:'#fff',font:{size:10,weight:'800'},formatter:v=>Math.round(Number(v)).toLocaleString('pt-BR')+'%'}}},plugins:[ChartDataLabels]});
 }
 function renderGerminacao(){if(!rows.length)return;const broRows=germFilteredRows('BRO'),masterRows=germFilteredRows('Master');const bro=germAggregate(broRows,'BRO 68 Syngenta'),master=germAggregate(masterRows,'Master TSV');const allRows=[...broRows,...masterRows];const gt=totals(allRows),mudas=gt.mudas,trans=gt.transplantado,perdas=gt.perdas,pctTrans=pct(trans,mudas),pctPerdas=pct(perdas,mudas);document.getElementById('germGeneralKpis').innerHTML=[
     ['Total de mudas',mudas.toLocaleString('pt-BR')],
@@ -314,19 +314,19 @@ function makeRendimentoPctChart(data){
   rendimentoPctChart=new Chart(document.getElementById('rendimentoPctChart'),{type:'bar',data:{labels:data.map(r=>displayBlock(r.bloco)),datasets:[
     {label:'% transplantado',data:data.map(r=>pct(r.transplantado,r.mudas)),backgroundColor:'#15803d',borderRadius:6,borderWidth:1.5},
     {label:'% de perdas',data:data.map(r=>pct(r.perdas,r.mudas)),backgroundColor:'#ea580c',borderRadius:6,borderWidth:1.5}
-  ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,max:100,title:{display:true,text:'Percentual (%)',font:{weight:'700'}},ticks:{callback:v=>v+'%'}},y:{stacked:true,title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${Number(c.raw).toFixed(1).replace('.',',')}%`}},datalabels:{display:true,color:'#fff',font:{size:10,weight:'800'},formatter:v=>Number(v).toFixed(1).replace('.',',')+'%'}}},plugins:[ChartDataLabels]});
+  ]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,beginAtZero:true,max:100,title:{display:true,text:'Percentual (%)',font:{weight:'700'}},ticks:{callback:v=>v+'%'}},y:{stacked:true,title:{display:true,text:'Bloco',font:{weight:'700'}},ticks:{font:{weight:'700'}}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,font:{weight:'700'}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${Number(c.raw).toFixed(1).replace('.',',')}%`}},datalabels:{display:true,color:'#fff',font:{size:10,weight:'800'},formatter:v=>Math.round(Number(v)).toLocaleString('pt-BR')+'%'}}},plugins:[ChartDataLabels]});
 }
 function makeRendimentoPieChart(data){
   if(rendimentoPieChart)rendimentoPieChart.destroy();
   const trans=data.reduce((s,r)=>s+Number(r.transplantado||0),0), perdas=data.reduce((s,r)=>s+Number(r.perdas||0),0), total=trans+perdas;
   const vals=total?[trans/total*100,perdas/total*100]:[0,0];
-  rendimentoPieChart=new Chart(document.getElementById('rendimentoPieChart'),{type:'pie',data:{labels:['Transplantado','Perdas'],datasets:[{data:vals,borderWidth:2,datalabels:{display:true,color:'#fff',font:{weight:'800',size:11},formatter:v=>Number(v).toFixed(1).replace('.',',')+'%'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'},tooltip:{callbacks:{label:c=>`${c.label}: ${Number(c.raw).toFixed(1).replace('.',',')}%`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
+  rendimentoPieChart=new Chart(document.getElementById('rendimentoPieChart'),{type:'pie',data:{labels:['Transplantado','Perdas'],datasets:[{data:vals,borderWidth:2,datalabels:{display:true,color:'#fff',font:{weight:'800',size:11},formatter:v=>Math.round(Number(v)).toLocaleString('pt-BR')+'%'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'},tooltip:{callbacks:{label:c=>`${c.label}: ${Number(c.raw).toFixed(1).replace('.',',')}%`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
 }
 function makeGermPieChart(data){
   if(germPieChart)germPieChart.destroy();
   const trans=data.reduce((s,r)=>s+Number(r.transplantado||0),0), perdas=data.reduce((s,r)=>s+Number(r.perdas||0),0), total=trans+perdas;
   const vals=total?[trans/total*100,perdas/total*100]:[0,0];
-  germPieChart=new Chart(document.getElementById('germPieChart'),{type:'pie',data:{labels:['Transplantado','Perdas'],datasets:[{data:vals,borderWidth:2,datalabels:{display:true,color:'#fff',font:{weight:'800',size:11},formatter:v=>Number(v).toFixed(1).replace('.',',')+'%'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'},tooltip:{callbacks:{label:c=>`${c.label}: ${Number(c.raw).toFixed(1).replace('.',',')}%`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
+  germPieChart=new Chart(document.getElementById('germPieChart'),{type:'pie',data:{labels:['Transplantado','Perdas'],datasets:[{data:vals,borderWidth:2,datalabels:{display:true,color:'#fff',font:{weight:'800',size:11},formatter:v=>Math.round(Number(v)).toLocaleString('pt-BR')+'%'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'},tooltip:{callbacks:{label:c=>`${c.label}: ${Number(c.raw).toFixed(1).replace('.',',')}%`}},datalabels:{display:true}}},plugins:[ChartDataLabels]});
 }
 function renderRendimento(){
   if(!rows.length)return;
@@ -373,8 +373,11 @@ function aggregate(source=rows){const map={};source.forEach(r=>{const v=variedad
   return {...r,perdas,pctTransplantado:pct(r.transplantado,r.mudas),pctPerdas:pct(perdas,r.mudas)};
 })}
 function avgGerm(r){return r.germinacao&&r.germinacao.length?Math.round(r.germinacao.reduce((a,b)=>a+b,0)/r.germinacao.length):0}
-function render(){const filtered=filteredRows(),d=aggregate(filtered),t=totals(filtered),band=filtered.reduce((s,r)=>s+Number(r.bandejas||0),0),mudas=t.mudas,trans=t.transplantado,perdas=t.perdas;document.getElementById('kBandejas').textContent=band.toLocaleString('pt-BR');document.getElementById('kMudas').textContent=mudas.toLocaleString('pt-BR');document.getElementById('kTrans').textContent=trans.toLocaleString('pt-BR');document.getElementById('kPerdas').textContent=perdas.toLocaleString('pt-BR');document.getElementById('kGerm').textContent=fmtPct(pct(trans,mudas));
-document.getElementById('kPerdaPct').textContent=fmtPct(pct(perdas,mudas));
+function render(){const filtered=filteredRows(),d=aggregate(filtered),t=totals(filtered),band=filtered.reduce((s,r)=>s+Number(r.bandejas||0),0),mudas=t.mudas,trans=t.transplantado,perdas=t.perdas;
+// O geral soma primeiro todas as variedades selecionadas (inclusive BRO + Master no mesmo bloco/ciclo) e calcula depois: % transplantado = transplantado total / mudas total; % perdas = perdas totais / mudas totais.
+const pctTransGeral=pct(trans,mudas),pctPerdasGeral=pct(perdas,mudas);
+document.getElementById('kBandejas').textContent=band.toLocaleString('pt-BR');document.getElementById('kMudas').textContent=mudas.toLocaleString('pt-BR');document.getElementById('kTrans').textContent=trans.toLocaleString('pt-BR');document.getElementById('kPerdas').textContent=perdas.toLocaleString('pt-BR');document.getElementById('kGerm').textContent=fmtPct(pctTransGeral);
+document.getElementById('kPerdaPct').textContent=fmtPct(pctPerdasGeral);
 const blocks=[...new Set(d.map(x=>x.bloco))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
 const labels=blocks.map(displayBlock);
 const varieties=[...new Set(d.map(x=>x.variedade).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR',{sensitivity:'base'}));
