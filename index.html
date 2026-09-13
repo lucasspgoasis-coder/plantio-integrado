@@ -1647,23 +1647,21 @@
                                     const label = this.getLabelForValue(value) || '';
                                     // Mantém os nomes horizontais e quebra os nomes longos
                                     // em duas linhas, preferencialmente no espaço mais próximo do meio.
-                                    if (label.length <= 18) return label;
+                                    if (label.length <= 16) return label;
                                     const palavras = label.split(' ');
-                                    let melhor = 1;
-                                    let menorDiferenca = Infinity;
-                                    for (let i = 1; i < palavras.length; i++) {
-                                        const linha1 = palavras.slice(0, i).join(' ');
-                                        const linha2 = palavras.slice(i).join(' ');
-                                        const diferenca = Math.abs(linha1.length - linha2.length);
-                                        if (diferenca < menorDiferenca) {
-                                            menorDiferenca = diferenca;
-                                            melhor = i;
+                                    const linhas = [];
+                                    let linha = '';
+                                    palavras.forEach(palavra => {
+                                        const teste = linha ? `${linha} ${palavra}` : palavra;
+                                        if (linha && teste.length > 16) {
+                                            linhas.push(linha);
+                                            linha = palavra;
+                                        } else {
+                                            linha = teste;
                                         }
-                                    }
-                                    return [
-                                        palavras.slice(0, melhor).join(' '),
-                                        palavras.slice(melhor).join(' ')
-                                    ];
+                                    });
+                                    if (linha) linhas.push(linha);
+                                    return linhas;
                                 }
                             }
                         },
