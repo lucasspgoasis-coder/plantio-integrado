@@ -1553,14 +1553,6 @@
             let vColors = {}; varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
 
             if (rendChartPctInstance) rendChartPctInstance.destroy();
-            let pctDs = varieties.map(v => {
-                let d = blocks.map(b => {
-                    let r = filteredRendData.filter(x => x.local === b && x.variedade === v);
-                    let m = r.reduce((s,x)=>s+x.mudas,0); return m>0?Math.round(r.reduce((s,x)=>s+x.transplantado,0)/m*100):null;
-                });
-                if(d.some(x=>x!==null)) return { label: `% Plantado (${v})`, data: d, borderColor: vColors[v], backgroundColor: vColors[v], fill: false, tension: 0.42, cubicInterpolationMode: 'monotone', borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, datalabels:{align:'top', font:{weight:'bold'}, formatter:val=>val?val+'%':''} };
-            }).filter(Boolean);
-
             const totalPlantado = blocks.map(b => filteredRendData.filter(d => d.local === b).reduce((s,r) => s + r.mudas, 0));
             const totalTransplantado = blocks.map(b => filteredRendData.filter(d => d.local === b).reduce((s,r) => s + r.transplantado, 0));
             let pctDs = varieties.map(v => {
