@@ -1433,7 +1433,15 @@
                     let r = filteredRendData.filter(x => x.local === b && x.variedade === v);
                     let m = r.reduce((s,x)=>s+x.mudas,0); return m>0?Math.round(r.reduce((s,x)=>s+x.transplantado,0)/m*100):null;
                 });
-                if(d.some(x=>x!==null)) return { label: `% Plantado (${v})`, data: d, borderColor: vColors[v], backgroundColor: vColors[v], fill: false, tension: 0.42, cubicInterpolationMode: 'monotone', borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, datalabels:{align:'top', font:{weight:'bold'}, formatter:val=>val?val+'%':''} };
+                if(d.some(x=>x!==null)) return { label: `% Plantado (${v})`, data: d, borderColor: vColors[v], backgroundColor: vColors[v], fill: false, tension: 0.42, cubicInterpolationMode: 'monotone', borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, datalabels:{align:'top', font:{weight:'bold'}, formatter:(val, context)=>{
+                    if(val===null || val===undefined) return '';
+                    const b=blocks[context.dataIndex];
+                    const r=filteredRendData.filter(x=>x.local===b && x.variedade===v);
+                    const t=r.reduce((s,x)=>s+x.transplantado,0);
+                    const m=r.reduce((s,x)=>s+x.mudas,0);
+                    const pct=m>0?Math.round(t/m*100):0;
+                    return [new Intl.NumberFormat('pt-BR').format(t), pct+'%'];
+                }}};
             }).filter(Boolean);
 
             rendChartPctInstance = new Chart(document.getElementById('rendChartPercentage'), {
