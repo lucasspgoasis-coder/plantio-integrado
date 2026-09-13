@@ -1574,11 +1574,44 @@
                 </tr>`).join('');
 
             if (psChartCausasBarraInstance) psChartCausasBarraInstance.destroy();
+            // Uma única linha suave e ondulada, usando escala percentual normalizada,
+            // com os dois valores (perdas e %) exibidos separados para facilitar a leitura.
+            const maxPerdas = Math.max(...cPer, 0);
+            const maxPct = Math.max(...cPct, 0);
+            const escala = Math.max(maxPerdas, 1) / Math.max(maxPct, 1);
+            const cPctPlot = cPct.map(v => v * escala);
             psChartCausasBarraInstance = new Chart(document.getElementById('psChartCausasBarra'), {
-                type: 'line', data: { labels: cLbl, datasets: [
-                    { label: 'Total Perdas', data: cPer, borderColor: '#f43f5e', backgroundColor: 'rgba(244,63,94,0.08)', borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, tension: 0.42, fill: false, yAxisID: 'y', datalabels: {anchor:'end', align:'top', color:'#be123c', font:{weight:'bold'}, formatter:v=>new Intl.NumberFormat('pt-BR').format(v)} },
-                    { label: '% de Perda', data: cPct, borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.08)', borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, tension: 0.42, fill: false, yAxisID: 'y1', datalabels: {anchor:'end', align:'bottom', color:'#7c3aed', font:{weight:'bold'}, formatter:v=>v+'%'} }
-                ]}, options: { responsive: true, maintainAspectRatio: false, interaction: {mode:'index', intersect:false}, layout:{padding:{top:24,bottom:20}}, scales: { x:{grid:{display:false},ticks:{font:{family:'Poppins',weight:'600'}}}, y:{position:'left',beginAtZero:true,title:{display:true,text:'Total de Perdas'},grid:{color:'#f1f5f9'}}, y1:{position:'right',beginAtZero:true,suggestedMax:Math.max(10,Math.max(...cPct,0)+5),title:{display:true,text:'% de Perda'},grid:{drawOnChartArea:false}} }, plugins:{legend:{display:true,position:'top',labels:{usePointStyle:true,padding:18,font:{family:'Poppins',weight:'600'}}},tooltip:{mode:'index',intersect:false}} }
+                type: 'line',
+                data: { labels: cLbl, datasets: [{
+                    label: 'Perdas e % de Perda',
+                    data: cPer,
+                    borderColor: '#0f766e',
+                    backgroundColor: 'rgba(15,118,110,0.08)',
+                    borderWidth: 4,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    tension: 0.55,
+                    cubicInterpolationMode: 'monotone',
+                    fill: true,
+                    datalabels: {
+                        anchor: 'end', align: 'top', offset: 10,
+                        color: '#0f766e', font: {weight:'bold', size:11},
+                        formatter: (v, ctx) => `${new Intl.NumberFormat('pt-BR').format(v)} perdas | ${cPct[ctx.dataIndex]}%`
+                    }
+                }]},
+                options: {
+                    responsive:true, maintainAspectRatio:false,
+                    interaction:{mode:'index', intersect:false},
+                    layout:{padding:{top:45,bottom:25,left:12,right:12}},
+                    scales:{
+                        x:{grid:{display:false}, ticks:{font:{family:'Poppins',weight:'600'}}},
+                        y:{beginAtZero:true, suggestedMax:Math.max(10,maxPerdas*1.25), title:{display:true,text:'Total de Perdas'}, grid:{color:'#f1f5f9'}}
+                    },
+                    plugins:{
+                        legend:{display:true,position:'top',labels:{usePointStyle:true,padding:18,font:{family:'Poppins',weight:'600'}}},
+                        tooltip:{mode:'index',intersect:false, callbacks:{label:(ctx)=>` ${new Intl.NumberFormat('pt-BR').format(cPer[ctx.dataIndex])} perdas • ${cPct[ctx.dataIndex]}%`}}
+                    }
+                }
             });
 
             if (psChartCausasPizzaInstance) psChartCausasPizzaInstance.destroy();
