@@ -1471,7 +1471,7 @@
                 const months = [...new Set(rows.map(getMonthFromRow).filter(Boolean))];
 
                 // Exemplo: "Bloco 01 (janeiro)"
-                return months.length ? `${b} (${months.join(', ')})` : b;
+                return months.length ? [b, `(${months.join(', ')})`] : [b];
             });
 
             if (rendChartPctInstance) rendChartPctInstance.destroy();
