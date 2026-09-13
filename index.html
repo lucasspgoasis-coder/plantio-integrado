@@ -1631,7 +1631,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
-                    layout: { padding: { top: 38, bottom: 20, left: 8, right: 8 } },
+                    layout: { padding: { top: 38, bottom: 34, left: 8, right: 8 } },
                     scales: {
                         x: {
                             grid: { display: false },
@@ -1642,7 +1642,29 @@
                                 minRotation: 0,
                                 padding: 14,
                                 font: { family: 'Poppins', weight: '600', size: 10 },
-                                color: '#475569'
+                                color: '#475569',
+                                callback: function(value) {
+                                    const label = this.getLabelForValue(value) || '';
+                                    // Mantém os nomes horizontais e quebra os nomes longos
+                                    // em duas linhas, preferencialmente no espaço mais próximo do meio.
+                                    if (label.length <= 18) return label;
+                                    const palavras = label.split(' ');
+                                    let melhor = 1;
+                                    let menorDiferenca = Infinity;
+                                    for (let i = 1; i < palavras.length; i++) {
+                                        const linha1 = palavras.slice(0, i).join(' ');
+                                        const linha2 = palavras.slice(i).join(' ');
+                                        const diferenca = Math.abs(linha1.length - linha2.length);
+                                        if (diferenca < menorDiferenca) {
+                                            menorDiferenca = diferenca;
+                                            melhor = i;
+                                        }
+                                    }
+                                    return [
+                                        palavras.slice(0, melhor).join(' '),
+                                        palavras.slice(melhor).join(' ')
+                                    ];
+                                }
                             }
                         },
                         yPerdas: {
