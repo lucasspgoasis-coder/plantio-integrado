@@ -998,7 +998,9 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('print-active'));
         });
 
-;
+        // Cria os botões de Print e PDF assim que o dashboard carrega.
+        // Antes eles estavam definidos na função, mas a função não era executada.
+        addPrintButtons();
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -1472,18 +1474,23 @@
 
             let blocks = [...new Set(filteredData.map(d => d.local))].sort(), varieties = [...new Set(filteredData.map(d => d.variedade))].sort();
             let ds = [], vColors = {}; varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
+            const totalTransplantado = blocks.map(b => filteredData.filter(d => d.local === b).reduce((s, r) => s + r.transplantado, 0));
 
             varieties.forEach(v => {
                 let trans = blocks.map(b => filteredData.filter(d => d.local === b && d.variedade === v).reduce((s, r) => s + r.transplantado, 0));
                 let mudas = blocks.map(b => filteredData.filter(d => d.local === b && d.variedade === v).reduce((s, r) => s + r.mudas, 0));
                 if (trans.some(val => val > 0)) {
                     ds.push({ label: v + ' (Transplantado)', data: trans, backgroundColor: vColors[v], borderRadius: 6,
-                        datalabels: { anchor: 'end', align: 'top', color: vColors[v], font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val>0?new Intl.NumberFormat('pt-BR').format(val):'' }
+                        datalabels: { anchor: 'end', align: 'top', offset: 2, color: vColors[v], font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val>0?new Intl.NumberFormat('pt-BR').format(val):'' }
                     });
                     ds.push({ label: v + ' (% Plantado)', data: blocks.map((b,i) => mudas[i]>0?(trans[i]/mudas[i]*100):null), type: 'line', yAxisID: 'y1',
-                        borderColor: vColors[v], backgroundColor: vColors[v], borderWidth: 3, borderDash: [], tension: 0.42, cubicInterpolationMode: 'monotone', pointRadius: 4, pointHoverRadius: 6, datalabels: { display: true, align: 'top', anchor: 'end', font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val != null ? Math.round(val) + '%' : '' }
+                        borderColor: vColors[v], backgroundColor: vColors[v], borderWidth: 3, borderDash: [], tension: 0.42, cubicInterpolationMode: 'monotone', pointRadius: 4, pointHoverRadius: 6,
+                        datalabels: { display: true, align: 'top', anchor: 'end', offset: 10, font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val != null ? Math.round(val) + '%' : '' }
                     });
                 }
+            });
+            ds.push({ label: 'Total Transplantado', data: totalTransplantado, backgroundColor: 'rgba(15,23,42,0.78)', borderRadius: 7, order: 20,
+                datalabels: { anchor: 'end', align: 'top', offset: 3, color: '#0f172a', font: { family: 'Poppins', weight: '800', size: 11 }, formatter: val => val > 0 ? new Intl.NumberFormat('pt-BR').format(val) : '' }
             });
 
             chartInstance = new Chart(ctx, {
