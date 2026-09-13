@@ -380,15 +380,19 @@
         .print-btn { background:#047857; }
         .pdf-btn { background:#b91c1c; }
         @page { size: A4 landscape; margin: 5mm; }
+        /* Preparação do relatório: remove filtros e dimensiona cada aba para uma única folha. */
+        .pdf-capture .print-toolbar,
+        .pdf-capture > section:first-of-type { display:none !important; }
+        .pdf-capture { background:#fff !important; }
         @media print {
             html, body { width:100%!important; height:auto!important; min-height:0!important; overflow:hidden!important; background:#fff!important; }
             body { display:block!important; font-size:8px!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
             #loginScreen, #dashboardScreen > nav, #btnAtualizarDados, #loadingIndicator, .print-exclude, .print-toolbar { display:none!important; }
-            #dashboardScreen { display:block!important; position:static!important; width:100%!important; height:auto!important; min-height:0!important; overflow:hidden!important; }
+            #dashboardScreen { display:block!important; position:static!important; width:100%!important; height:auto!important; min-height:0!important; overflow:visible!important; }
             #dashboardScreen > header { display:block!important; position:relative!important; height:48px!important; min-height:48px!important; padding:5px 10px!important; box-shadow:none!important; border:0!important; border-radius:8px!important; margin-bottom:4px!important; }
-            #dashboardScreen main { display:block!important; width:100%!important; height:auto!important; min-height:0!important; overflow:hidden!important; padding:0!important; background:#fff!important; }
+            #dashboardScreen main { display:block!important; width:100%!important; height:auto!important; min-height:0!important; overflow:visible!important; padding:0!important; background:#fff!important; }
             .tab-content.hidden { display:none!important; }
-            .tab-content.print-active { display:block!important; width:100%!important; height:auto!important; max-height:calc(100vh - 58px)!important; overflow:hidden!important; transform-origin:top left!important; zoom:.82!important; width:121.95%!important; }
+            .tab-content.print-active { display:block!important; width:calc(100% / var(--print-scale, 1))!important; height:auto!important; max-height:none!important; overflow:visible!important; transform-origin:top left!important; zoom:var(--print-scale, 1)!important; }
             #tabContent-transplantio > section:first-of-type, #tabContent-germinacao > section:first-of-type, #tabContent-rendimento > section:first-of-type, #tabContent-producao > section:first-of-type { display:none!important; }
             .elegant-card, .kpi-card { box-shadow:none!important; break-inside:avoid!important; page-break-inside:avoid!important; }
             .overflow-x-auto, .overflow-y-auto { overflow:visible!important; }
@@ -978,28 +982,65 @@
             const tab = document.getElementById('tabContent-' + tabName);
             if (!tab) return null;
             switchTab(tabName);
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('print-active'));
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('print-active', 'pdf-capture');
+                el.style.removeProperty('--print-scale');
+            });
             tab.classList.add('print-active');
             document.body.classList.add('printing');
+
+            // Remove a área de filtros do cálculo para o relatório aproveitar a folha.
+            const firstSection = tab.querySelector(':scope > section:first-of-type');
+            const toolbar = tab.querySelector('.print-toolbar');
+            const oldSectionDisplay = firstSection ? firstSection.style.display : '';
+            const oldToolbarDisplay = toolbar ? toolbar.style.display : '';
+            if (firstSection) firstSection.style.display = 'none';
+            if (toolbar) toolbar.style.display = 'none';
+            void tab.offsetHeight;
+
+            // Altura útil aproximada de A4 paisagem em CSS px (margens de 5 mm).
+            const usableHeight = 718;
+            const naturalHeight = Math.max(tab.scrollHeight, 1);
+            const scale = Math.min(1, Math.max(0.48, usableHeight / naturalHeight));
+            tab.style.setProperty('--print-scale', scale.toFixed(3));
+
+            // Guarda os estados para restaurar após a impressão/geração.
+            tab.dataset.oldSectionDisplay = oldSectionDisplay;
+            tab.dataset.oldToolbarDisplay = oldToolbarDisplay;
             return tab;
         }
 
+        function restorePrintTab(tab) {
+            if (!tab) return;
+            const firstSection = tab.querySelector(':scope > section:first-of-type');
+            const toolbar = tab.querySelector('.print-toolbar');
+            if (firstSection) firstSection.style.display = tab.dataset.oldSectionDisplay || '';
+            if (toolbar) toolbar.style.display = tab.dataset.oldToolbarDisplay || '';
+            delete tab.dataset.oldSectionDisplay;
+            delete tab.dataset.oldToolbarDisplay;
+            tab.style.removeProperty('--print-scale');
+            tab.classList.remove('print-active', 'pdf-capture');
+            document.body.classList.remove('printing');
+        }
+
         function printTabPage(tabName) {
-            if (!preparePrintTab(tabName)) return;
-            // Impressão direta: A4 horizontal e conteúdo reduzido para caber em uma folha.
+            const tab = preparePrintTab(tabName);
+            if (!tab) return;
             requestAnimationFrame(() => setTimeout(() => window.print(), 400));
         }
 
         async function saveTabPdf(tabName) {
             const tab = preparePrintTab(tabName);
             if (!tab) return;
+            tab.classList.add('pdf-capture');
             const toolbar = tab.querySelector('.print-toolbar');
             const oldDisplay = toolbar ? toolbar.style.display : '';
             if (toolbar) toolbar.style.display = 'none';
 
             try {
                 if (!window.html2canvas || !window.jspdf) throw new Error('Bibliotecas de PDF não carregadas.');
-                await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 250)));
+                await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 350)));
+
                 const canvas = await html2canvas(tab, {
                     scale: 1.5,
                     useCORS: true,
@@ -1008,16 +1049,23 @@
                     windowWidth: tab.scrollWidth,
                     windowHeight: tab.scrollHeight
                 });
+
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4', compress:true });
                 const pageW = 297, pageH = 210, margin = 5;
-                const usableW = pageW - margin*2, usableH = pageH - margin*2;
-                // Preenche a área útil da folha A4 paisagem, mantendo uma margem segura.
-                // O conteúdo é dimensionado para ocupar a folha inteira, evitando ficar concentrado no meio.
-                const imgW = usableW;
-                const imgH = usableH;
-                const x = margin, y = margin;
-                pdf.addImage(canvas.toDataURL('image/jpeg', 0.90), 'JPEG', x, y, imgW, imgH, undefined, 'FAST');
+                const usableW = pageW - margin * 2;
+                const usableH = pageH - margin * 2;
+                // Mantém a proporção real para não deformar nem cortar o relatório.
+                const ratio = canvas.width / canvas.height;
+                let imgW = usableW;
+                let imgH = imgW / ratio;
+                if (imgH > usableH) {
+                    imgH = usableH;
+                    imgW = imgH * ratio;
+                }
+                const x = margin + (usableW - imgW) / 2;
+                const y = margin + (usableH - imgH) / 2;
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.94), 'JPEG', x, y, imgW, imgH, undefined, 'FAST');
                 const nomes = { transplantio:'Transplantio', germinacao:'Germinacao', rendimento:'Rendimento', producao:'Producao_e_Perdas' };
                 pdf.save('Dashboard_' + (nomes[tabName] || tabName) + '.pdf');
             } catch (err) {
@@ -1025,14 +1073,13 @@
                 alert('Não foi possível gerar o PDF diretamente. Verifique sua conexão e tente novamente.');
             } finally {
                 if (toolbar) toolbar.style.display = oldDisplay;
-                document.body.classList.remove('printing');
-                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('print-active'));
+                restorePrintTab(tab);
             }
         }
 
         window.addEventListener('afterprint', () => {
-            document.body.classList.remove('printing');
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('print-active'));
+            const active = document.querySelector('.tab-content.print-active');
+            restorePrintTab(active);
         });
 
         // Cria os botões de Print e PDF assim que o dashboard carrega.
@@ -1512,7 +1559,6 @@
             let blocks = [...new Set(filteredData.map(d => d.local))].sort(), varieties = [...new Set(filteredData.map(d => d.variedade))].sort();
             let ds = [], vColors = {}; varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
             const totalPlantado = blocks.map(b => filteredData.filter(d => d.local === b).reduce((s, r) => s + r.mudas, 0));
-            const totalTransplantado = blocks.map(b => filteredData.filter(d => d.local === b).reduce((s, r) => s + r.transplantado, 0));
 
             ds.push({ label: 'Total Plantado', data: totalPlantado, backgroundColor: 'rgba(100,116,139,0.38)', borderColor: 'rgba(71,85,105,0.85)', borderWidth: 1, borderRadius: 7, order: 30,
                 datalabels: { anchor: 'end', align: 'top', offset: 3, color: '#334155', font: { family: 'Poppins', weight: '800', size: 10 }, formatter: val => val > 0 ? new Intl.NumberFormat('pt-BR').format(val) : '' }
@@ -1531,10 +1577,6 @@
                     });
                 }
             });
-            ds.push({ label: 'Total Transplantado', data: totalTransplantado, backgroundColor: 'rgba(15,23,42,0.78)', borderRadius: 7, order: 20,
-                datalabels: { anchor: 'end', align: 'top', offset: 3, color: '#0f172a', font: { family: 'Poppins', weight: '800', size: 11 }, formatter: val => val > 0 ? new Intl.NumberFormat('pt-BR').format(val) : '' }
-            });
-
             chartInstance = new Chart(ctx, {
                 type: 'bar', data: { labels: blocks, datasets: ds },
                 options: { responsive: true, maintainAspectRatio: false, scales: {
