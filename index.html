@@ -16,9 +16,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Geração de PDF direto no navegador (sem abrir impressora) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Modern Font: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -374,34 +371,6 @@
             .kpi-card { border-radius: 15px; }
         }
 
-        /* Impressão / PDF: A4 paisagem, tudo em uma única folha */
-        .print-toolbar { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-bottom:12px; }
-        .print-toolbar button { color:#fff; border:0; border-radius:10px; padding:9px 13px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:7px; cursor:pointer; box-shadow:0 5px 14px rgba(0,0,0,.10); }
-        .print-btn { background:#047857; }
-        .pdf-btn { background:#b91c1c; }
-        @page { size: A4 landscape; margin: 5mm; }
-        /* Preparação do relatório: remove filtros e dimensiona cada aba para uma única folha. */
-        .pdf-capture .print-toolbar,
-        .pdf-capture > section:first-of-type { display:none !important; }
-        .pdf-capture { background:#fff !important; }
-        @media print {
-            html, body { width:100%!important; height:auto!important; min-height:0!important; overflow:hidden!important; background:#fff!important; }
-            body { display:block!important; font-size:8px!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
-            #loginScreen, #dashboardScreen > nav, #btnAtualizarDados, #loadingIndicator, .print-exclude, .print-toolbar { display:none!important; }
-            #dashboardScreen { display:block!important; position:static!important; width:100%!important; height:auto!important; min-height:0!important; overflow:visible!important; }
-            #dashboardScreen > header { display:block!important; position:relative!important; height:48px!important; min-height:48px!important; padding:5px 10px!important; box-shadow:none!important; border:0!important; border-radius:8px!important; margin-bottom:4px!important; }
-            #dashboardScreen main { display:block!important; width:100%!important; height:auto!important; min-height:0!important; overflow:visible!important; padding:0!important; background:#fff!important; }
-            .tab-content.hidden { display:none!important; }
-            .tab-content.print-active { display:block!important; width:calc(100% / var(--print-scale, 1))!important; height:auto!important; max-height:none!important; overflow:visible!important; transform-origin:top left!important; zoom:var(--print-scale, 1)!important; }
-            #tabContent-transplantio > section:first-of-type, #tabContent-germinacao > section:first-of-type, #tabContent-rendimento > section:first-of-type, #tabContent-producao > section:first-of-type { display:none!important; }
-            .elegant-card, .kpi-card { box-shadow:none!important; break-inside:avoid!important; page-break-inside:avoid!important; }
-            .overflow-x-auto, .overflow-y-auto { overflow:visible!important; }
-            [class*="max-h-"] { max-height:none!important; }
-            [class*="min-w-"] { min-width:0!important; }
-            canvas { max-width:100%!important; }
-            table { width:100%!important; }
-            section, .space-y-6 > section { break-inside:avoid!important; page-break-inside:avoid!important; }
-        }
     </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-emerald-200 selection:text-emerald-900">
@@ -955,137 +924,6 @@
     <script>
         Chart.register(ChartDataLabels);
 
-        function addPrintButtons() {
-            const tabs = [
-                ['transplantio', 'Transplantio'],
-                ['germinacao', 'Germinação'],
-                ['rendimento', 'Rendimento'],
-                ['producao', 'Produção & Perdas']
-            ];
-            tabs.forEach(([tabName]) => {
-                const tab = document.getElementById('tabContent-' + tabName);
-                if (!tab || tab.querySelector('.print-toolbar')) return;
-                const toolbar = document.createElement('div');
-                toolbar.className = 'print-toolbar print-exclude';
-                toolbar.innerHTML = `
-                    <button type="button" class="print-btn" onclick="printTabPage('${tabName}')" title="Tirar print da aba">
-                        <i class="fa-solid fa-camera"></i> Print
-                    </button>
-                    <button type="button" class="pdf-btn" onclick="saveTabPdf('${tabName}')" title="Salvar esta aba em PDF">
-                        <i class="fa-solid fa-file-pdf"></i> PDF
-                    </button>`;
-                tab.insertBefore(toolbar, tab.firstElementChild);
-            });
-        }
-
-        function preparePrintTab(tabName) {
-            const tab = document.getElementById('tabContent-' + tabName);
-            if (!tab) return null;
-            switchTab(tabName);
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.remove('print-active', 'pdf-capture');
-                el.style.removeProperty('--print-scale');
-            });
-            tab.classList.add('print-active');
-            document.body.classList.add('printing');
-
-            // Remove a área de filtros do cálculo para o relatório aproveitar a folha.
-            const firstSection = tab.querySelector(':scope > section:first-of-type');
-            const toolbar = tab.querySelector('.print-toolbar');
-            const oldSectionDisplay = firstSection ? firstSection.style.display : '';
-            const oldToolbarDisplay = toolbar ? toolbar.style.display : '';
-            if (firstSection) firstSection.style.display = 'none';
-            if (toolbar) toolbar.style.display = 'none';
-            void tab.offsetHeight;
-
-            // Altura útil aproximada de A4 paisagem em CSS px (margens de 5 mm).
-            const usableHeight = 718;
-            const naturalHeight = Math.max(tab.scrollHeight, 1);
-            const scale = Math.min(1, Math.max(0.48, usableHeight / naturalHeight));
-            tab.style.setProperty('--print-scale', scale.toFixed(3));
-
-            // Guarda os estados para restaurar após a impressão/geração.
-            tab.dataset.oldSectionDisplay = oldSectionDisplay;
-            tab.dataset.oldToolbarDisplay = oldToolbarDisplay;
-            return tab;
-        }
-
-        function restorePrintTab(tab) {
-            if (!tab) return;
-            const firstSection = tab.querySelector(':scope > section:first-of-type');
-            const toolbar = tab.querySelector('.print-toolbar');
-            if (firstSection) firstSection.style.display = tab.dataset.oldSectionDisplay || '';
-            if (toolbar) toolbar.style.display = tab.dataset.oldToolbarDisplay || '';
-            delete tab.dataset.oldSectionDisplay;
-            delete tab.dataset.oldToolbarDisplay;
-            tab.style.removeProperty('--print-scale');
-            tab.classList.remove('print-active', 'pdf-capture');
-            document.body.classList.remove('printing');
-        }
-
-        function printTabPage(tabName) {
-            const tab = preparePrintTab(tabName);
-            if (!tab) return;
-            requestAnimationFrame(() => setTimeout(() => window.print(), 400));
-        }
-
-        async function saveTabPdf(tabName) {
-            const tab = preparePrintTab(tabName);
-            if (!tab) return;
-            tab.classList.add('pdf-capture');
-            const toolbar = tab.querySelector('.print-toolbar');
-            const oldDisplay = toolbar ? toolbar.style.display : '';
-            if (toolbar) toolbar.style.display = 'none';
-
-            try {
-                if (!window.html2canvas || !window.jspdf) throw new Error('Bibliotecas de PDF não carregadas.');
-                await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 350)));
-
-                const canvas = await html2canvas(tab, {
-                    scale: 1.5,
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    logging: false,
-                    windowWidth: tab.scrollWidth,
-                    windowHeight: tab.scrollHeight
-                });
-
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4', compress:true });
-                const pageW = 297, pageH = 210, margin = 5;
-                const usableW = pageW - margin * 2;
-                const usableH = pageH - margin * 2;
-                // Mantém a proporção real para não deformar nem cortar o relatório.
-                const ratio = canvas.width / canvas.height;
-                let imgW = usableW;
-                let imgH = imgW / ratio;
-                if (imgH > usableH) {
-                    imgH = usableH;
-                    imgW = imgH * ratio;
-                }
-                const x = margin + (usableW - imgW) / 2;
-                const y = margin + (usableH - imgH) / 2;
-                pdf.addImage(canvas.toDataURL('image/jpeg', 0.94), 'JPEG', x, y, imgW, imgH, undefined, 'FAST');
-                const nomes = { transplantio:'Transplantio', germinacao:'Germinacao', rendimento:'Rendimento', producao:'Producao_e_Perdas' };
-                pdf.save('Dashboard_' + (nomes[tabName] || tabName) + '.pdf');
-            } catch (err) {
-                console.error(err);
-                alert('Não foi possível gerar o PDF diretamente. Verifique sua conexão e tente novamente.');
-            } finally {
-                if (toolbar) toolbar.style.display = oldDisplay;
-                restorePrintTab(tab);
-            }
-        }
-
-        window.addEventListener('afterprint', () => {
-            const active = document.querySelector('.tab-content.print-active');
-            restorePrintTab(active);
-        });
-
-        // Cria os botões de Print e PDF assim que o dashboard carrega.
-        // Antes eles estavam definidos na função, mas a função não era executada.
-        addPrintButtons();
-
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1558,25 +1396,20 @@
 
             let blocks = [...new Set(filteredData.map(d => d.local))].sort(), varieties = [...new Set(filteredData.map(d => d.variedade))].sort();
             let ds = [], vColors = {}; varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
-            const totalPlantado = blocks.map(b => filteredData.filter(d => d.local === b).reduce((s, r) => s + r.mudas, 0));
-
-            ds.push({ label: 'Total Plantado', data: totalPlantado, backgroundColor: 'rgba(100,116,139,0.38)', borderColor: 'rgba(71,85,105,0.85)', borderWidth: 1, borderRadius: 7, order: 30,
-                datalabels: { anchor: 'end', align: 'top', offset: 3, color: '#334155', font: { family: 'Poppins', weight: '800', size: 10 }, formatter: val => val > 0 ? new Intl.NumberFormat('pt-BR').format(val) : '' }
-            });
 
             varieties.forEach(v => {
                 let trans = blocks.map(b => filteredData.filter(d => d.local === b && d.variedade === v).reduce((s, r) => s + r.transplantado, 0));
                 let mudas = blocks.map(b => filteredData.filter(d => d.local === b && d.variedade === v).reduce((s, r) => s + r.mudas, 0));
                 if (trans.some(val => val > 0)) {
                     ds.push({ label: v + ' (Transplantado)', data: trans, backgroundColor: vColors[v], borderRadius: 6,
-                        datalabels: { anchor: 'end', align: 'top', offset: 2, color: vColors[v], font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val>0?new Intl.NumberFormat('pt-BR').format(val):'' }
+                        datalabels: { anchor: 'end', align: 'top', color: vColors[v], font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val>0?new Intl.NumberFormat('pt-BR').format(val):'' }
                     });
                     ds.push({ label: v + ' (% Plantado)', data: blocks.map((b,i) => mudas[i]>0?(trans[i]/mudas[i]*100):null), type: 'line', yAxisID: 'y1',
-                        borderColor: vColors[v], backgroundColor: vColors[v], borderWidth: 3, borderDash: [], tension: 0.42, cubicInterpolationMode: 'monotone', pointRadius: 4, pointHoverRadius: 6,
-                        datalabels: { display: true, align: 'top', anchor: 'end', offset: 10, font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val != null ? Math.round(val) + '%' : '' }
+                        borderColor: vColors[v], backgroundColor: vColors[v], borderWidth: 3, borderDash: [], tension: 0.42, cubicInterpolationMode: 'monotone', pointRadius: 4, pointHoverRadius: 6, datalabels: { display: true, align: 'top', anchor: 'end', font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val != null ? Math.round(val) + '%' : '' }
                     });
                 }
             });
+
             chartInstance = new Chart(ctx, {
                 type: 'bar', data: { labels: blocks, datasets: ds },
                 options: { responsive: true, maintainAspectRatio: false, scales: {
@@ -1595,35 +1428,17 @@
             let vColors = {}; varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
 
             if (rendChartPctInstance) rendChartPctInstance.destroy();
-            const totalPlantado = blocks.map(b => filteredRendData.filter(d => d.local === b).reduce((s,r) => s + r.mudas, 0));
-            const totalTransplantado = blocks.map(b => filteredRendData.filter(d => d.local === b).reduce((s,r) => s + r.transplantado, 0));
             let pctDs = varieties.map(v => {
                 let d = blocks.map(b => {
                     let r = filteredRendData.filter(x => x.local === b && x.variedade === v);
-                    let m = r.reduce((s,x)=>s+x.mudas,0);
-                    return m>0 ? Math.round(r.reduce((s,x)=>s+x.transplantado,0)/m*100) : null;
+                    let m = r.reduce((s,x)=>s+x.mudas,0); return m>0?Math.round(r.reduce((s,x)=>s+x.transplantado,0)/m*100):null;
                 });
-                if(d.some(x=>x!==null)) return { label: `% Plantado (${v})`, data: d, type:'line', yAxisID:'y1', borderColor: vColors[v], backgroundColor: vColors[v], fill: false, tension: 0.42, cubicInterpolationMode: 'monotone', borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, datalabels:{align:'top', anchor:'end', offset:10, font:{weight:'bold', size:10}, formatter:val=>val!==null?val+'%':''} };
+                if(d.some(x=>x!==null)) return { label: `% Plantado (${v})`, data: d, borderColor: vColors[v], backgroundColor: vColors[v], fill: false, tension: 0.42, cubicInterpolationMode: 'monotone', borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, datalabels:{align:'top', font:{weight:'bold'}, formatter:val=>val?val+'%':''} };
             }).filter(Boolean);
 
-            // Barra de Total Plantado + barra de Total Transplantado no mesmo gráfico,
-            // mantendo as linhas de % Plantado no eixo secundário.
-            const barDs = [
-                { label:'Total Plantado', data:totalPlantado, type:'bar', yAxisID:'y', backgroundColor:'rgba(100,116,139,0.42)', borderColor:'rgba(71,85,105,0.9)', borderWidth:1, borderRadius:7, order:30,
-                    datalabels:{anchor:'end', align:'top', offset:3, color:'#334155', font:{family:'Poppins',weight:'800',size:10}, formatter:v=>v>0?new Intl.NumberFormat('pt-BR').format(v):''} },
-                { label:'Total Transplantado', data:totalTransplantado, type:'bar', yAxisID:'y', backgroundColor:'rgba(15,23,42,0.78)', borderRadius:7, order:20,
-                    datalabels:{anchor:'end', align:'top', offset:3, color:'#0f172a', font:{family:'Poppins',weight:'800',size:10}, formatter:v=>v>0?new Intl.NumberFormat('pt-BR').format(v):''} }
-            ];
             rendChartPctInstance = new Chart(document.getElementById('rendChartPercentage'), {
-                type:'bar', data:{labels:blocks, datasets:[...barDs, ...pctDs]},
-                options:{responsive:true, maintainAspectRatio:false,
-                    scales:{
-                        x:{grid:{display:false}, ticks:{font:{family:'Poppins',weight:'700'}}},
-                        y:{title:{display:true,text:'Quantidade (Mudas)'}, beginAtZero:true, ticks:{font:{family:'Poppins'}}},
-                        y1:{type:'linear',position:'right',title:{display:true,text:'% Plantado'},min:0,max:120,grid:{drawOnChartArea:false}}
-                    },
-                    plugins:{legend:{display:true, position:'bottom', labels:{font:{family:'Poppins',weight:'600',size:10}, usePointStyle:true, padding:14}}}
-                }
+                type: 'line', data: { labels: blocks, datasets: pctDs },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { max: 120, grid: { color: '#f1f5f9' } }, x: { grid: { color: '#f1f5f9' } } } }
             });
 
             if (rendChartCompInstance) rendChartCompInstance.destroy();
