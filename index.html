@@ -1422,203 +1422,217 @@
             document.getElementById('customLegend').innerHTML = varieties.filter(v=>filteredData.some(d=>d.variedade===v)).map(v => 
                 `<div class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm"><div class="w-3 h-3 rounded-full" style="background-color:${vColors[v]}"></div><span class="text-xs font-bold">${v}</span></div>`).join('');
         }
-
         function renderRendimentoCharts() {
-            let blocks = [...new Set(filteredRendData.map(d => d.local))].sort();
-            let varieties = [...new Set(filteredRendData.map(d => d.variedade))].sort();
-            let vColors = {};
+            const blocks = [...new Set(filteredRendData.map(d => d.local))].sort();
+            const varieties = [...new Set(filteredRendData.map(d => d.variedade))].sort();
+            const vColors = {};
             varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
 
-            // Mês do transplante por bloco.
-            // Tenta localizar a data nos campos mais comuns usados na planilha.
-            const monthNames = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+            // Rótulo do eixo X em duas linhas:
+            // linha 1 = Bloco
+            // linha 2 = (mês)
+            const monthLabels = blocks.map(b => {
+                const rows = filteredRendData.filter(d => d.local === b && d.dateObj && !isNaN(d.dateObj));
+                if (!rows.length) return [b];
 
-            const getMonthFromRow = (row) => {
-                const candidates = [
-                    row.data, row.Data, row.dt, row.Dt,
-                    row.date, row.Date,
-                    row.dataTransplantio, row['Data Transplantio'],
-                    row['Data Transplante'], row['Data de Transplante'],
-                    row['Data Plantio'], row['Data de Plantio']
-                ];
+                const months = [...new Set(
+                    rows.map(d => monthsNames[d.dateObj.getMonth()])
+                )];
 
-                for (const value of candidates) {
-                    if (!value) continue;
-                    const text = String(value).trim();
-                    let dt = null;
-
-                    // dd/mm/yyyy ou dd-mm-yyyy
-                    const br = text.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})/);
-                    if (br) {
-                        let year = Number(br[3]);
-                        if (year < 100) year += 2000;
-                        dt = new Date(year, Number(br[2]) - 1, Number(br[1]));
-                    } else {
-                        const parsed = new Date(text);
-                        if (!isNaN(parsed.getTime())) dt = parsed;
-                    }
-
-                    if (dt && !isNaN(dt.getTime())) {
-                        return monthNames[dt.getMonth()];
-                    }
-                }
-
-                return null;
-            };
-
-            const blockMonthLabels = blocks.map(b => {
-                const rows = filteredRendData.filter(x => x.local === b);
-                const months = [...new Set(rows.map(getMonthFromRow).filter(Boolean))];
-
-                // Exemplo: "Bloco 01 (janeiro)"
                 return months.length ? [b, `(${months.join(', ')})`] : [b];
             });
 
             if (rendChartPctInstance) rendChartPctInstance.destroy();
 
-            let pctDs = varieties.map(v => {
-                let quantities = [];
-                let percentages = [];
+            const pctDs = varieties.map(v => {
+                const pctData = [];
+                const transData = [];
 
                 blocks.forEach(b => {
-                    let r = filteredRendData.filter(x => x.local === b && x.variedade === v);
-
-                    let transplantado = r.reduce(
-                        (s, x) => s + (Number(x.transplantado) || 0), 0
+                    const r = filteredRendData.filter(
+                        x => x.local === b && x.variedade === v
                     );
 
-                    let mudas = r.reduce(
-                        (s, x) => s + (Number(x.mudas) || 0), 0
-                    );
+                    const mudas = r.reduce((s, x) => s + x.mudas, 0);
+                    const transplantado = r.reduce((s, x) => s + x.transplantado, 0);
 
-                    quantities.push(transplantado);
-                    percentages.push(
-                        mudas > 0 ? Math.round(transplantado / mudas * 100) : null
+                    transData.push(transplantado);
+                    pctData.push(
+                        mudas > 0 ? Math.round((transplantado / mudas) * 100) : null
                     );
                 });
 
-                if (percentages.some(x => x !== null)) {
-                    return {
-                        label: `% Plantado (${v})`,
-                        data: percentages,
-                        borderColor: vColors[v],
-                        backgroundColor: vColors[v],
-                        fill: false,
-                        tension: 0.42,
-                        cubicInterpolationMode: 'monotone',
-                        borderWidth: 3,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        datalabels: {
-                            align: 'top',
-                            anchor: 'end',
-                            offset: 4,
-                            font: { weight: 'bold', size: 10 },
-                            formatter: (val, context) => {
-                                if (val === null || val === undefined) return '';
+                if (!pctData.some(x => x !== null)) return null;
 
-                                const quantidade = quantities[context.dataIndex] || 0;
+                return {
+                    label: `% Plantado (${v})`,
+                    data: pctData,
+                    borderColor: vColors[v],
+                    backgroundColor: vColors[v],
+                    fill: false,
+                    tension: 0.42,
+                    cubicInterpolationMode: 'monotone',
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
 
-                                return [
-                                    new Intl.NumberFormat('pt-BR').format(quantidade),
-                                    val + '%'
-                                ];
-                            }
+                    // Mostra primeiro a quantidade transplantada e abaixo a porcentagem.
+                    datalabels: {
+                        display: true,
+                        align: 'top',
+                        anchor: 'end',
+                        offset: 4,
+                        color: vColors[v],
+                        font: {
+                            family: 'Poppins',
+                            weight: '700',
+                            size: 10
+                        },
+                        formatter: (val, context) => {
+                            if (val === null || val === undefined) return '';
+
+                            const qtd = transData[context.dataIndex] || 0;
+
+                            return [
+                                new Intl.NumberFormat('pt-BR').format(qtd),
+                                Math.round(val) + '%'
+                            ];
                         }
-                    };
-                }
+                    }
+                };
             }).filter(Boolean);
 
-            rendChartPctInstance = new Chart(document.getElementById('rendChartPercentage'), {
-                type: 'line',
-                data: {
-                    labels: blockMonthLabels,
-                    datasets: pctDs
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            max: 120,
-                            grid: { color: '#f1f5f9' }
+            rendChartPctInstance = new Chart(
+                document.getElementById('rendChartPercentage'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: monthLabels,
+                        datasets: pctDs
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                top: 35,
+                                bottom: 12
+                            }
                         },
-                        x: {
-                            grid: { color: '#f1f5f9' },
-                            ticks: {
-                                autoSkip: false,
-                                maxRotation: 0,
-                                minRotation: 0
+                        scales: {
+                            y: {
+                                max: 120,
+                                grid: {
+                                    color: '#f1f5f9'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: '#f1f5f9'
+                                },
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 0,
+                                    minRotation: 0,
+                                    padding: 8,
+                                    font: {
+                                        family: 'Poppins',
+                                        weight: '700'
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            });
+            );
 
             if (rendChartCompInstance) rendChartCompInstance.destroy();
 
-            let cTrans = [], cPlan = [], cPerd = [];
+            const cTrans = [];
+            const cPlan = [];
+            const cPerd = [];
 
             varieties.forEach(v => {
-                let r = filteredRendData.filter(d => d.variedade === v);
-                let t = r.reduce((s,x) => s + (Number(x.transplantado) || 0), 0);
-                let m = r.reduce((s,x) => s + (Number(x.mudas) || 0), 0);
-                let p = r.reduce((s,x) => s + (Number(x.perdas) || 0), 0);
+                const r = filteredRendData.filter(d => d.variedade === v);
+                const t = r.reduce((s, x) => s + x.transplantado, 0);
+                const m = r.reduce((s, x) => s + x.mudas, 0);
+                const p = r.reduce((s, x) => s + x.perdas, 0);
 
                 cTrans.push(t);
-                cPlan.push(m > 0 ? Math.round(t / m * 100) : 0);
-                cPerd.push((t + p) > 0 ? Math.round(p / (t + p) * 100) : 0);
+                cPlan.push(m > 0 ? Math.round((t / m) * 100) : 0);
+                cPerd.push((t + p) > 0 ? Math.round((p / (t + p)) * 100) : 0);
             });
 
-            rendChartCompInstance = new Chart(document.getElementById('rendChartComparison'), {
-                type: 'bar',
-                data: {
-                    labels: varieties,
-                    datasets: [
-                        {
-                            label: 'Transplantado',
-                            data: cTrans,
-                            backgroundColor: '#059669',
-                            datalabels: {
-                                anchor: 'end',
-                                align: 'top',
-                                font: { weight: 'bold', size: 10 },
-                                formatter: v => new Intl.NumberFormat('pt-BR').format(v)
+            rendChartCompInstance = new Chart(
+                document.getElementById('rendChartComparison'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: varieties,
+                        datasets: [
+                            {
+                                label: 'Transplantado',
+                                data: cTrans,
+                                backgroundColor: '#059669',
+                                datalabels: {
+                                    anchor: 'end',
+                                    align: 'top',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 10
+                                    },
+                                    formatter: v =>
+                                        new Intl.NumberFormat('pt-BR').format(v)
+                                }
+                            },
+                            {
+                                label: '% Plantado',
+                                data: cPlan,
+                                backgroundColor: '#0284c7',
+                                datalabels: {
+                                    anchor: 'end',
+                                    align: 'top',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 10
+                                    },
+                                    formatter: v => v + '%'
+                                }
+                            },
+                            {
+                                label: '% Perdas',
+                                data: cPerd,
+                                backgroundColor: '#e11d48',
+                                datalabels: {
+                                    anchor: 'end',
+                                    align: 'top',
+                                    font: {
+                                        weight: 'bold',
+                                        size: 10
+                                    },
+                                    formatter: v => v + '%'
+                                }
                             }
-                        },
-                        {
-                            label: '% Plantado',
-                            data: cPlan,
-                            backgroundColor: '#0284c7',
-                            datalabels: {
-                                anchor: 'end',
-                                align: 'top',
-                                font: { weight: 'bold', size: 10 },
-                                formatter: v => v + '%'
-                            }
-                        },
-                        {
-                            label: '% Perdas',
-                            data: cPerd,
-                            backgroundColor: '#e11d48',
-                            datalabels: {
-                                anchor: 'end',
-                                align: 'top',
-                                font: { weight: 'bold', size: 10 },
-                                formatter: v => v + '%'
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: '#f1f5f9'
+                                }
                             }
                         }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { grid: { display: false } },
-                        y: { grid: { color: '#f1f5f9' } }
                     }
                 }
-            });
+            );
         }
 
         function renderProductivityCharts() {
