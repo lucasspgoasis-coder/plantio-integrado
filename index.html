@@ -371,6 +371,128 @@
             .kpi-card { border-radius: 15px; }
         }
 
+        /* Impressão / PDF: somente a aba ativa, em A4 paisagem e sem filtros/botões */
+        .print-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 0.25rem;
+        }
+        .print-toolbar button {
+            background: linear-gradient(135deg, #047857, #059669);
+            color: #fff;
+            border: 0;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 7px 18px rgba(4,120,87,.18);
+            cursor: pointer;
+        }
+        .print-toolbar button:hover { transform: translateY(-1px); }
+
+        @page {
+            size: A4 landscape;
+            margin: 8mm;
+        }
+
+        @media print {
+            html, body {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+                background: #fff !important;
+            }
+            body {
+                display: block !important;
+                font-size: 10px !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #loginScreen,
+            #dashboardScreen > nav,
+            #btnAtualizarDados,
+            #loadingIndicator,
+            .print-exclude,
+            .print-toolbar {
+                display: none !important;
+            }
+            #dashboardScreen {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+            }
+            #dashboardScreen > header {
+                display: block !important;
+                position: relative !important;
+                height: auto !important;
+                min-height: 62px !important;
+                padding: 10px 16px !important;
+                box-shadow: none !important;
+                border: 0 !important;
+                border-radius: 12px !important;
+                margin-bottom: 10px !important;
+            }
+            #dashboardScreen > header::after { display: none !important; }
+            #dashboardScreen main {
+                display: block !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 0 !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                background: #fff !important;
+            }
+            .tab-content.hidden { display: none !important; }
+            .tab-content.print-active {
+                display: block !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            /* Remove os filtros da impressão, mantendo todos os KPIs, tabelas e gráficos. */
+            #tabContent-transplantio > section:first-of-type,
+            #tabContent-germinacao > section:first-of-type,
+            #tabContent-rendimento > section:first-of-type,
+            #tabContent-producao > section:first-of-type {
+                display: none !important;
+            }
+            .elegant-card, .kpi-card {
+                box-shadow: none !important;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            .elegant-card:hover, .kpi-card:hover {
+                transform: none !important;
+            }
+            .overflow-x-auto, .overflow-y-auto {
+                overflow: visible !important;
+            }
+            [class*="max-h-"] {
+                max-height: none !important;
+            }
+            [class*="min-w-"] {
+                min-width: 0 !important;
+            }
+            canvas {
+                max-width: 100% !important;
+            }
+            table {
+                width: 100% !important;
+            }
+            section, .space-y-6 > section {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+
     </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-emerald-200 selection:text-emerald-900">
@@ -923,6 +1045,50 @@
 
     <script>
         Chart.register(ChartDataLabels);
+
+        function addPrintButtons() {
+            const tabs = [
+                ['transplantio', 'Transplantio'],
+                ['germinacao', 'Germinação'],
+                ['rendimento', 'Rendimento'],
+                ['producao', 'Produção & Perdas']
+            ];
+
+            tabs.forEach(([tabName, tabLabel]) => {
+                const tab = document.getElementById('tabContent-' + tabName);
+                if (!tab || tab.querySelector('.print-toolbar')) return;
+
+                const toolbar = document.createElement('div');
+                toolbar.className = 'print-toolbar print-exclude';
+                toolbar.innerHTML = `
+                    <button type="button" onclick="printTabPage('${tabName}')" title="Imprimir ou salvar esta aba em PDF">
+                        <i class="fa-solid fa-print"></i> Tirar print / Salvar PDF
+                    </button>`;
+                tab.insertBefore(toolbar, tab.firstElementChild);
+            });
+        }
+
+        function printTabPage(tabName) {
+            const tab = document.getElementById('tabContent-' + tabName);
+            if (!tab) return;
+
+            switchTab(tabName);
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('print-active'));
+            tab.classList.add('print-active');
+            document.body.classList.add('printing');
+
+            // Dá tempo para os gráficos redimensionarem antes da captura/impressão.
+            requestAnimationFrame(() => {
+                setTimeout(() => window.print(), 350);
+            });
+        }
+
+        window.addEventListener('afterprint', () => {
+            document.body.classList.remove('printing');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('print-active'));
+        });
+
+        addPrintButtons();
 
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
