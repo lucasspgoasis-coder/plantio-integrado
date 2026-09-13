@@ -16,6 +16,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Geração de PDF direto no navegador (sem abrir impressora) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Modern Font: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -371,29 +374,29 @@
             .kpi-card { border-radius: 15px; }
         }
 
-        /* Impressão / PDF: A4 paisagem, sem filtros e sem botões */
+        /* Impressão / PDF: A4 paisagem, tudo em uma única folha */
         .print-toolbar { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-bottom:12px; }
         .print-toolbar button { color:#fff; border:0; border-radius:10px; padding:9px 13px; font-size:11px; font-weight:800; display:inline-flex; align-items:center; gap:7px; cursor:pointer; box-shadow:0 5px 14px rgba(0,0,0,.10); }
         .print-btn { background:#047857; }
         .pdf-btn { background:#b91c1c; }
-        @page { size: A4 landscape; margin: 8mm; }
+        @page { size: A4 landscape; margin: 5mm; }
         @media print {
-            html, body { width:100%!important; height:auto!important; min-height:0!important; overflow:visible!important; background:#fff!important; }
-            body { display:block!important; font-size:10px!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
+            html, body { width:100%!important; height:auto!important; min-height:0!important; overflow:hidden!important; background:#fff!important; }
+            body { display:block!important; font-size:8px!important; -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
             #loginScreen, #dashboardScreen > nav, #btnAtualizarDados, #loadingIndicator, .print-exclude, .print-toolbar { display:none!important; }
-            #dashboardScreen { display:block!important; position:static!important; width:100%!important; height:auto!important; min-height:0!important; overflow:visible!important; }
-            #dashboardScreen > header { display:block!important; position:relative!important; height:auto!important; min-height:58px!important; padding:8px 14px!important; box-shadow:none!important; border:0!important; border-radius:10px!important; margin-bottom:8px!important; }
-            #dashboardScreen main { display:block!important; width:100%!important; height:auto!important; min-height:0!important; overflow:visible!important; padding:0!important; background:#fff!important; }
+            #dashboardScreen { display:block!important; position:static!important; width:100%!important; height:auto!important; min-height:0!important; overflow:hidden!important; }
+            #dashboardScreen > header { display:block!important; position:relative!important; height:48px!important; min-height:48px!important; padding:5px 10px!important; box-shadow:none!important; border:0!important; border-radius:8px!important; margin-bottom:4px!important; }
+            #dashboardScreen main { display:block!important; width:100%!important; height:auto!important; min-height:0!important; overflow:hidden!important; padding:0!important; background:#fff!important; }
             .tab-content.hidden { display:none!important; }
-            .tab-content.print-active { display:block!important; width:100%!important; height:auto!important; overflow:visible!important; }
+            .tab-content.print-active { display:block!important; width:100%!important; height:auto!important; max-height:calc(100vh - 58px)!important; overflow:hidden!important; transform-origin:top left!important; zoom:.68!important; }
             #tabContent-transplantio > section:first-of-type, #tabContent-germinacao > section:first-of-type, #tabContent-rendimento > section:first-of-type, #tabContent-producao > section:first-of-type { display:none!important; }
-            .elegant-card, .kpi-card { box-shadow:none!important; break-inside:avoid; page-break-inside:avoid; }
+            .elegant-card, .kpi-card { box-shadow:none!important; break-inside:avoid!important; page-break-inside:avoid!important; }
             .overflow-x-auto, .overflow-y-auto { overflow:visible!important; }
             [class*="max-h-"] { max-height:none!important; }
             [class*="min-w-"] { min-width:0!important; }
             canvas { max-width:100%!important; }
             table { width:100%!important; }
-            section, .space-y-6 > section { break-inside:avoid; page-break-inside:avoid; }
+            section, .space-y-6 > section { break-inside:avoid!important; page-break-inside:avoid!important; }
         }
     </style>
 </head>
@@ -983,14 +986,46 @@
 
         function printTabPage(tabName) {
             if (!preparePrintTab(tabName)) return;
-            requestAnimationFrame(() => setTimeout(() => window.print(), 350));
+            // Impressão direta: A4 horizontal e conteúdo reduzido para caber em uma folha.
+            requestAnimationFrame(() => setTimeout(() => window.print(), 400));
         }
 
-        function saveTabPdf(tabName) {
-            // Abre a caixa nativa de impressão já preparada em A4 paisagem;
-            // o usuário escolhe "Salvar como PDF", sem configurar uma impressora.
-            if (!preparePrintTab(tabName)) return;
-            requestAnimationFrame(() => setTimeout(() => window.print(), 350));
+        async function saveTabPdf(tabName) {
+            const tab = preparePrintTab(tabName);
+            if (!tab) return;
+            const toolbar = tab.querySelector('.print-toolbar');
+            const oldDisplay = toolbar ? toolbar.style.display : '';
+            if (toolbar) toolbar.style.display = 'none';
+
+            try {
+                if (!window.html2canvas || !window.jspdf) throw new Error('Bibliotecas de PDF não carregadas.');
+                await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 250)));
+                const canvas = await html2canvas(tab, {
+                    scale: 1.5,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    windowWidth: tab.scrollWidth,
+                    windowHeight: tab.scrollHeight
+                });
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4', compress:true });
+                const pageW = 297, pageH = 210, margin = 5;
+                const usableW = pageW - margin*2, usableH = pageH - margin*2;
+                const ratio = Math.min(usableW / canvas.width, usableH / canvas.height);
+                const imgW = canvas.width * ratio, imgH = canvas.height * ratio;
+                const x = (pageW - imgW) / 2, y = (pageH - imgH) / 2;
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', x, y, imgW, imgH, undefined, 'FAST');
+                const nomes = { transplantio:'Transplantio', germinacao:'Germinacao', rendimento:'Rendimento', producao:'Producao_e_Perdas' };
+                pdf.save('Dashboard_' + (nomes[tabName] || tabName) + '.pdf');
+            } catch (err) {
+                console.error(err);
+                alert('Não foi possível gerar o PDF diretamente. Verifique sua conexão e tente novamente.');
+            } finally {
+                if (toolbar) toolbar.style.display = oldDisplay;
+                document.body.classList.remove('printing');
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('print-active'));
+            }
         }
 
         window.addEventListener('afterprint', () => {
@@ -1474,7 +1509,12 @@
 
             let blocks = [...new Set(filteredData.map(d => d.local))].sort(), varieties = [...new Set(filteredData.map(d => d.variedade))].sort();
             let ds = [], vColors = {}; varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
+            const totalPlantado = blocks.map(b => filteredData.filter(d => d.local === b).reduce((s, r) => s + r.mudas, 0));
             const totalTransplantado = blocks.map(b => filteredData.filter(d => d.local === b).reduce((s, r) => s + r.transplantado, 0));
+
+            ds.push({ label: 'Total Plantado', data: totalPlantado, backgroundColor: 'rgba(100,116,139,0.38)', borderColor: 'rgba(71,85,105,0.85)', borderWidth: 1, borderRadius: 7, order: 30,
+                datalabels: { anchor: 'end', align: 'top', offset: 3, color: '#334155', font: { family: 'Poppins', weight: '800', size: 10 }, formatter: val => val > 0 ? new Intl.NumberFormat('pt-BR').format(val) : '' }
+            });
 
             varieties.forEach(v => {
                 let trans = blocks.map(b => filteredData.filter(d => d.local === b && d.variedade === v).reduce((s, r) => s + r.transplantado, 0));
