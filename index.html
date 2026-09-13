@@ -886,7 +886,7 @@
                         </div>
                         Total de Perdas por Causa e % de Perda
                     </h3>
-                    <div class="relative w-full" style="height: 450px;">
+                    <div class="relative w-full" style="height: 500px;">
                         <canvas id="psChartCausasBarra"></canvas>
                     </div>
                 </section>
@@ -1635,7 +1635,15 @@
                     scales: {
                         x: {
                             grid: { display: false },
-                            ticks: { font: { family: 'Poppins', weight: '600' } }
+                            offset: true,
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 0,
+                                minRotation: 0,
+                                padding: 14,
+                                font: { family: 'Poppins', weight: '600', size: 10 },
+                                color: '#475569'
+                            }
                         },
                         yPerdas: {
                             type: 'linear',
