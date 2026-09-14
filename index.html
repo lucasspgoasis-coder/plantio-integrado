@@ -1285,21 +1285,77 @@
         }
 
         // --- Filters Applications ---
+        // Consolida registros de plantio que pertencem ao MESMO Bloco + Ciclo + Variedade.
+        // Assim, se a mesma variedade foi plantada em 2, 3 ou mais dias dentro do mesmo ciclo,
+        // todos os registros da planilha entram no mesmo cálculo, sem misturar ciclos/variedades.
+        function aggregatePlantioData(rows) {
+            const groups = new Map();
+
+            rows.forEach(d => {
+                const key = [String(d.local || '').trim(), String(d.ciclo || '').trim(), String(d.variedade || '').trim()].join('||');
+                if (!groups.has(key)) {
+                    groups.set(key, {
+                        ...d,
+                        bandejas: 0,
+                        mudas: 0,
+                        transplantado: 0,
+                        perdas: 0,
+                        horasTrabalhadas: 0,
+                        colaboradores: 0,
+                        _dates: [],
+                        _dateObjs: [],
+                        _months: []
+                    });
+                }
+
+                const g = groups.get(key);
+                g.bandejas += Number(d.bandejas) || 0;
+                g.mudas += Number(d.mudas) || 0;
+                g.transplantado += Number(d.transplantado) || 0;
+                g.perdas += Number(d.perdas) || 0;
+                g.horasTrabalhadas += Number(d.horasTrabalhadas) || 0;
+                g.colaboradores += Number(d.colaboradores) || 0;
+
+                if (d.dataStr && !g._dates.includes(d.dataStr)) g._dates.push(d.dataStr);
+                if (d.dateObj && !isNaN(d.dateObj)) {
+                    g._dateObjs.push(new Date(d.dateObj));
+                    const month = monthsNames[d.dateObj.getMonth()];
+                    const monthYear = `${month} de ${d.dateObj.getFullYear()}`;
+                    if (!g._months.includes(monthYear)) g._months.push(monthYear);
+                }
+            });
+
+            return [...groups.values()].map(g => ({
+                ...g,
+                // Mostra todas as datas quando houve plantio da mesma variedade em mais de um dia.
+                dataStr: g._dates.join(' / '),
+                // Usa a primeira data para comparações/compatibilidade; os meses ficam preservados abaixo.
+                dateObj: g._dateObjs && g._dateObjs.length ? new Date(Math.min(...g._dateObjs.map(x => x.getTime()))) : g.dateObj,
+                mesAno: g._months.length ? g._months.join(' / ') : g.mesAno,
+                qtdDiasPlantio: g._dates.length,
+                datasPlantio: [...g._dates],
+                mesesPlantio: [...g._months]
+            }));
+        }
+
         function applyFilters() {
             const di = document.getElementById('filterDataInicio').value ? new Date(document.getElementById('filterDataInicio').value) : null;
             const df = document.getElementById('filterDataFim').value ? new Date(document.getElementById('filterDataFim').value) : null;
             if(df) df.setHours(23,59,59,999);
-            filteredData = allData.filter(d => selectedFilters.local.has(d.local) && selectedFilters.ciclo.has(String(d.ciclo)) && selectedFilters.variedade.has(d.variedade) && (!di || d.dateObj >= di) && (!df || d.dateObj <= df));
+            const base = allData.filter(d => selectedFilters.local.has(d.local) && selectedFilters.ciclo.has(String(d.ciclo)) && selectedFilters.variedade.has(d.variedade) && (!di || d.dateObj >= di) && (!df || d.dateObj <= df));
+            filteredData = aggregatePlantioData(base);
             updateUI();
         }
 
         function applyRendFilters() {
-            filteredRendData = allData.filter(d => selectedRendFilters.variedade.has(d.variedade) && selectedRendFilters.ciclo.has(String(d.ciclo)) && selectedRendFilters.mes.has(d.mesAno));
+            const base = allData.filter(d => selectedRendFilters.variedade.has(d.variedade) && selectedRendFilters.ciclo.has(String(d.ciclo)) && selectedRendFilters.mes.has(d.mesAno));
+            filteredRendData = aggregatePlantioData(base);
             updateRendimentoUI();
         }
 
         function applyProdFilters() {
-            filteredProdData = allData.filter(d => selectedProdFilters.local.has(d.local) && selectedProdFilters.ciclo.has(String(d.ciclo)) && selectedProdFilters.variedade.has(d.variedade));
+            const base = allData.filter(d => selectedProdFilters.local.has(d.local) && selectedProdFilters.ciclo.has(String(d.ciclo)) && selectedProdFilters.variedade.has(d.variedade));
+            filteredProdData = aggregatePlantioData(base);
             updateProductivityUI();
         }
 
@@ -1436,7 +1492,7 @@
                 if (!rows.length) return [b];
 
                 const months = [...new Set(
-                    rows.map(d => monthsNames[d.dateObj.getMonth()])
+                    rows.flatMap(d => Array.isArray(d.mesesPlantio) && d.mesesPlantio.length ? d.mesesPlantio : (d.dateObj && !isNaN(d.dateObj) ? [monthsNames[d.dateObj.getMonth()]] : []))
                 )];
 
                 return months.length ? [b, `(${months.join(', ')})`] : [b];
