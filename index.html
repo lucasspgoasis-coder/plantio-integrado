@@ -953,6 +953,9 @@
         let allData = [];
         let prodData = [];
         let filteredData = [];
+        // Dados originais filtrados: usados na tabela de REGISTROS.
+        // Os KPIs/gráficos usam filteredData (consolidado por Bloco + Ciclo + Variedade).
+        let filteredRawData = [];
         let filteredRendData = [];
         let filteredProdData = [];
         let filteredProdSheetData = [];
@@ -1073,8 +1076,35 @@
 
         function parseNum(val) {
             if (typeof val === 'number') return val;
-            if (!val) return 0;
-            return parseFloat(val.toString().replace(/[^\d,-]/g, '').replace(',', '.')) || 0;
+            if (val === null || val === undefined || val === '') return 0;
+
+            let s = String(val).trim().replace(/[^\d.,-]/g, '');
+            if (!s) return 0;
+
+            // Planilha em padrão brasileiro:
+            // 26.000 = 26000 | 23.252 = 23252 | 1.145 = 1145
+            // 469,5 = 469.5 | 1.234,56 = 1234.56
+            const hasDot = s.includes('.');
+            const hasComma = s.includes(',');
+
+            if (hasDot && hasComma) {
+                // O último separador é o decimal.
+                if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
+                    s = s.replace(/\./g, '').replace(',', '.');
+                } else {
+                    s = s.replace(/,/g, '');
+                }
+            } else if (hasComma) {
+                s = s.replace(',', '.');
+            } else if (hasDot) {
+                // Um ou mais grupos de 3 após o ponto = separador de milhar.
+                const parts = s.split('.');
+                if (parts.length > 1 && parts.slice(1).every(part => /^\d{3}$/.test(part))) {
+                    s = parts.join('');
+                }
+            }
+
+            return parseFloat(s) || 0;
         }
 
         function parseDate(dateStr) {
@@ -1355,6 +1385,10 @@
             const df = document.getElementById('filterDataFim').value ? new Date(document.getElementById('filterDataFim').value) : null;
             if(df) df.setHours(23,59,59,999);
             const base = allData.filter(d => selectedFilters.local.has(d.local) && selectedFilters.ciclo.has(String(d.ciclo)) && selectedFilters.variedade.has(d.variedade) && (!di || (d.dateObj && d.dateObj >= di)) && (!df || (d.dateObj && d.dateObj <= df)));
+
+            // IMPORTANTE: mantém cada lançamento da planilha nos REGISTROS.
+            // A consolidação acontece somente para os KPIs e gráficos.
+            filteredRawData = base.slice();
             filteredData = aggregatePlantioData(base);
             updateUI();
         }
@@ -1390,15 +1424,13 @@
             document.getElementById('kpiPctPlantado').textContent = Math.round(pctPlan)+'%'; document.getElementById('barPctPlantado').style.width = Math.min(pctPlan,100)+'%';
             document.getElementById('kpiPctPerdas').textContent = Math.round(pctPerd)+'%'; document.getElementById('barPctPerdas').style.width = Math.min(pctPerd,100)+'%';
             
-            const tbody = document.getElementById('dataTableBody'); document.getElementById('rowCount').textContent = `${filteredData.length} registros`;
-            tbody.innerHTML = filteredData.slice(0, 150).map((d, i) => `
+            // REGISTROS = exatamente os lançamentos encontrados na planilha.
+            // Assim, se o mesmo Bloco + Ciclo + Variedade tiver duas datas, as duas linhas aparecem.
+            const tbody = document.getElementById('dataTableBody');
+            document.getElementById('rowCount').textContent = `${filteredRawData.length} registros`;
+            tbody.innerHTML = filteredRawData.slice(0, 150).map((d, i) => `
                 <tr class="border-b border-slate-100 last:border-0 hover:bg-emerald-50/50 transition-colors ${i%2===0?'bg-white':'bg-slate-50/30'}">
-                    <td class="px-6 py-4 text-slate-500 font-medium">
-                        <div class="flex flex-col gap-1">
-                            <span>${d.datasPlantio && d.datasPlantio.length ? d.datasPlantio.join(' / ') : d.dataStr}</span>
-                            ${d.qtdDiasPlantio > 1 ? `<span class="inline-flex w-fit items-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 text-[10px] font-extrabold">${d.qtdDiasPlantio} datas de plantio — contabilizadas juntas</span>` : ''}
-                        </div>
-                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-slate-500 font-medium">${d.dataStr}</td>
                     <td class="px-6 py-4 font-extrabold text-slate-700">${d.local}</td>
                     <td class="px-6 py-4"><span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200">${d.ciclo}</span></td>
                     <td class="px-6 py-4 text-slate-600 font-semibold">${d.variedade}</td>
