@@ -1288,11 +1288,23 @@
         // Consolida registros de plantio que pertencem ao MESMO Bloco + Ciclo + Variedade.
         // Assim, se a mesma variedade foi plantada em 2, 3 ou mais dias dentro do mesmo ciclo,
         // todos os registros da planilha entram no mesmo cálculo, sem misturar ciclos/variedades.
+        function normalizePlantioKey(value) {
+            return String(value ?? '')
+                .trim()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, ' ')
+                .toLowerCase();
+        }
+
         function aggregatePlantioData(rows) {
             const groups = new Map();
 
             rows.forEach(d => {
-                const key = [String(d.local || '').trim(), String(d.ciclo || '').trim(), String(d.variedade || '').trim()].join('||');
+                // A chave usa BLOCO + CICLO + VARIEDADE normalizados.
+                // Portanto, a mesma variedade plantada em vários dias no mesmo ciclo
+                // sempre pertence ao mesmo grupo e TODOS os lançamentos são somados.
+                const key = [normalizePlantioKey(d.local), normalizePlantioKey(d.ciclo), normalizePlantioKey(d.variedade)].join('||');
                 if (!groups.has(key)) {
                     groups.set(key, {
                         ...d,
@@ -1342,12 +1354,14 @@
             const di = document.getElementById('filterDataInicio').value ? new Date(document.getElementById('filterDataInicio').value) : null;
             const df = document.getElementById('filterDataFim').value ? new Date(document.getElementById('filterDataFim').value) : null;
             if(df) df.setHours(23,59,59,999);
-            const base = allData.filter(d => selectedFilters.local.has(d.local) && selectedFilters.ciclo.has(String(d.ciclo)) && selectedFilters.variedade.has(d.variedade) && (!di || d.dateObj >= di) && (!df || d.dateObj <= df));
+            const base = allData.filter(d => selectedFilters.local.has(d.local) && selectedFilters.ciclo.has(String(d.ciclo)) && selectedFilters.variedade.has(d.variedade) && (!di || (d.dateObj && d.dateObj >= di)) && (!df || (d.dateObj && d.dateObj <= df)));
             filteredData = aggregatePlantioData(base);
             updateUI();
         }
 
         function applyRendFilters() {
+            // Filtra os LANÇAMENTOS originais primeiro. Depois consolida.
+            // Isso permite somar corretamente a mesma variedade em vários dias.
             const base = allData.filter(d => selectedRendFilters.variedade.has(d.variedade) && selectedRendFilters.ciclo.has(String(d.ciclo)) && selectedRendFilters.mes.has(d.mesAno));
             filteredRendData = aggregatePlantioData(base);
             updateRendimentoUI();
