@@ -571,7 +571,10 @@
                 </section>
                 <section class="elegant-card overflow-hidden">
                     <div class="p-6 border-b border-slate-100 flex items-center justify-between">
-                        <h3 class="text-lg font-extrabold text-slate-800">Registros Detalhados</h3>
+                        <div>
+                            <h3 class="text-lg font-extrabold text-slate-800">Registros Detalhados</h3>
+                            <p class="text-xs text-slate-500 font-medium mt-1">Todas as datas de plantio do mesmo bloco e ciclo são exibidas e entram na contabilização.</p>
+                        </div>
                         <span id="rowCount" class="bg-slate-100 text-slate-600 px-3 py-1 rounded-xl text-xs font-bold">0 registros</span>
                     </div>
                     <div class="overflow-x-auto max-h-[450px]">
@@ -953,9 +956,6 @@
         let allData = [];
         let prodData = [];
         let filteredData = [];
-        // Dados originais filtrados: usados na tabela de REGISTROS.
-        // Os KPIs/gráficos usam filteredData (consolidado por Bloco + Ciclo + Variedade).
-        let filteredRawData = [];
         let filteredRendData = [];
         let filteredProdData = [];
         let filteredProdSheetData = [];
@@ -1076,43 +1076,25 @@
 
         function parseNum(val) {
             if (typeof val === 'number') return val;
-            if (val === null || val === undefined || val === '') return 0;
-
-            let s = String(val).trim().replace(/[^\d.,-]/g, '');
-            if (!s) return 0;
-
-            // Planilha em padrão brasileiro:
-            // 26.000 = 26000 | 23.252 = 23252 | 1.145 = 1145
-            // 469,5 = 469.5 | 1.234,56 = 1234.56
-            const hasDot = s.includes('.');
-            const hasComma = s.includes(',');
-
-            if (hasDot && hasComma) {
-                // O último separador é o decimal.
-                if (s.lastIndexOf(',') > s.lastIndexOf('.')) {
-                    s = s.replace(/\./g, '').replace(',', '.');
-                } else {
-                    s = s.replace(/,/g, '');
-                }
-            } else if (hasComma) {
-                s = s.replace(',', '.');
-            } else if (hasDot) {
-                // Um ou mais grupos de 3 após o ponto = separador de milhar.
-                const parts = s.split('.');
-                if (parts.length > 1 && parts.slice(1).every(part => /^\d{3}$/.test(part))) {
-                    s = parts.join('');
-                }
-            }
-
-            return parseFloat(s) || 0;
+            if (!val) return 0;
+            return parseFloat(val.toString().replace(/[^\d,-]/g, '').replace(',', '.')) || 0;
         }
 
         function parseDate(dateStr) {
-            if (!dateStr) return null;
-            let parts = dateStr.split('/');
-            if (parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
-            let d = new Date(dateStr);
-            return isNaN(d) ? null : d;
+            if (dateStr === null || dateStr === undefined || String(dateStr).trim() === '') return null;
+            const raw = String(dateStr).trim();
+
+            // dd/mm/yyyy, inclusive quando vier com hora.
+            const br = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (br) return new Date(Number(br[3]), Number(br[2]) - 1, Number(br[1]));
+
+            // yyyy-mm-dd ou timestamp ISO.
+            const iso = new Date(raw);
+            if (!isNaN(iso)) return iso;
+
+            // Última tentativa para formatos reconhecidos pelo navegador.
+            const fallback = new Date(raw.replace(/-/g, '/'));
+            return isNaN(fallback) ? null : fallback;
         }
 
         function parseHours(hIni, hFin) {
@@ -1315,95 +1297,32 @@
         }
 
         // --- Filters Applications ---
-        // Consolida registros de plantio que pertencem ao MESMO Bloco + Ciclo + Variedade.
-        // Assim, se a mesma variedade foi plantada em 2, 3 ou mais dias dentro do mesmo ciclo,
-        // todos os registros da planilha entram no mesmo cálculo, sem misturar ciclos/variedades.
-        function normalizePlantioKey(value) {
-            return String(value ?? '')
-                .trim()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/\s+/g, ' ')
-                .toLowerCase();
-        }
-
-        function aggregatePlantioData(rows) {
-            const groups = new Map();
-
-            rows.forEach(d => {
-                // A chave usa BLOCO + CICLO + VARIEDADE normalizados.
-                // Portanto, a mesma variedade plantada em vários dias no mesmo ciclo
-                // sempre pertence ao mesmo grupo e TODOS os lançamentos são somados.
-                const key = [normalizePlantioKey(d.local), normalizePlantioKey(d.ciclo), normalizePlantioKey(d.variedade)].join('||');
-                if (!groups.has(key)) {
-                    groups.set(key, {
-                        ...d,
-                        bandejas: 0,
-                        mudas: 0,
-                        transplantado: 0,
-                        perdas: 0,
-                        horasTrabalhadas: 0,
-                        colaboradores: 0,
-                        _dates: [],
-                        _dateObjs: [],
-                        _months: []
-                    });
-                }
-
-                const g = groups.get(key);
-                g.bandejas += Number(d.bandejas) || 0;
-                g.mudas += Number(d.mudas) || 0;
-                g.transplantado += Number(d.transplantado) || 0;
-                g.perdas += Number(d.perdas) || 0;
-                g.horasTrabalhadas += Number(d.horasTrabalhadas) || 0;
-                g.colaboradores += Number(d.colaboradores) || 0;
-
-                if (d.dataStr && !g._dates.includes(d.dataStr)) g._dates.push(d.dataStr);
-                if (d.dateObj && !isNaN(d.dateObj)) {
-                    g._dateObjs.push(new Date(d.dateObj));
-                    const month = monthsNames[d.dateObj.getMonth()];
-                    const monthYear = `${month} de ${d.dateObj.getFullYear()}`;
-                    if (!g._months.includes(monthYear)) g._months.push(monthYear);
-                }
-            });
-
-            return [...groups.values()].map(g => ({
-                ...g,
-                // Mostra todas as datas quando houve plantio da mesma variedade em mais de um dia.
-                dataStr: g._dates.join(' / '),
-                // Usa a primeira data para comparações/compatibilidade; os meses ficam preservados abaixo.
-                dateObj: g._dateObjs && g._dateObjs.length ? new Date(Math.min(...g._dateObjs.map(x => x.getTime()))) : g.dateObj,
-                mesAno: g._months.length ? g._months.join(' / ') : g.mesAno,
-                qtdDiasPlantio: g._dates.length,
-                datasPlantio: [...g._dates],
-                mesesPlantio: [...g._months]
-            }));
-        }
-
         function applyFilters() {
-            const di = document.getElementById('filterDataInicio').value ? new Date(document.getElementById('filterDataInicio').value) : null;
-            const df = document.getElementById('filterDataFim').value ? new Date(document.getElementById('filterDataFim').value) : null;
-            if(df) df.setHours(23,59,59,999);
-            const base = allData.filter(d => selectedFilters.local.has(d.local) && selectedFilters.ciclo.has(String(d.ciclo)) && selectedFilters.variedade.has(d.variedade) && (!di || (d.dateObj && d.dateObj >= di)) && (!df || (d.dateObj && d.dateObj <= df)));
+            const di = document.getElementById('filterDataInicio').value ? new Date(document.getElementById('filterDataInicio').value + 'T00:00:00') : null;
+            const df = document.getElementById('filterDataFim').value ? new Date(document.getElementById('filterDataFim').value + 'T23:59:59.999') : null;
 
-            // IMPORTANTE: mantém cada lançamento da planilha nos REGISTROS.
-            // A consolidação acontece somente para os KPIs e gráficos.
-            filteredRawData = base.slice();
-            filteredData = aggregatePlantioData(base);
+            // IMPORTANTE:
+            // Cada lançamento é uma ocorrência independente. Assim, se o mesmo
+            // bloco/ciclo tiver 2 ou mais datas de plantio, TODAS as ocorrências
+            // permanecem no conjunto filtrado e entram na soma dos KPIs/gráficos.
+            filteredData = allData.filter(d =>
+                selectedFilters.local.has(d.local) &&
+                selectedFilters.ciclo.has(String(d.ciclo)) &&
+                selectedFilters.variedade.has(d.variedade) &&
+                (!di || (d.dateObj && d.dateObj >= di)) &&
+                (!df || (d.dateObj && d.dateObj <= df))
+            );
+
             updateUI();
         }
 
         function applyRendFilters() {
-            // Filtra os LANÇAMENTOS originais primeiro. Depois consolida.
-            // Isso permite somar corretamente a mesma variedade em vários dias.
-            const base = allData.filter(d => selectedRendFilters.variedade.has(d.variedade) && selectedRendFilters.ciclo.has(String(d.ciclo)) && selectedRendFilters.mes.has(d.mesAno));
-            filteredRendData = aggregatePlantioData(base);
+            filteredRendData = allData.filter(d => selectedRendFilters.variedade.has(d.variedade) && selectedRendFilters.ciclo.has(String(d.ciclo)) && selectedRendFilters.mes.has(d.mesAno));
             updateRendimentoUI();
         }
 
         function applyProdFilters() {
-            const base = allData.filter(d => selectedProdFilters.local.has(d.local) && selectedProdFilters.ciclo.has(String(d.ciclo)) && selectedProdFilters.variedade.has(d.variedade));
-            filteredProdData = aggregatePlantioData(base);
+            filteredProdData = allData.filter(d => selectedProdFilters.local.has(d.local) && selectedProdFilters.ciclo.has(String(d.ciclo)) && selectedProdFilters.variedade.has(d.variedade));
             updateProductivityUI();
         }
 
@@ -1424,20 +1343,45 @@
             document.getElementById('kpiPctPlantado').textContent = Math.round(pctPlan)+'%'; document.getElementById('barPctPlantado').style.width = Math.min(pctPlan,100)+'%';
             document.getElementById('kpiPctPerdas').textContent = Math.round(pctPerd)+'%'; document.getElementById('barPctPerdas').style.width = Math.min(pctPerd,100)+'%';
             
-            // REGISTROS = exatamente os lançamentos encontrados na planilha.
-            // Assim, se o mesmo Bloco + Ciclo + Variedade tiver duas datas, as duas linhas aparecem.
             const tbody = document.getElementById('dataTableBody');
-            document.getElementById('rowCount').textContent = `${filteredRawData.length} registros`;
-            tbody.innerHTML = filteredRawData.slice(0, 150).map((d, i) => `
+            document.getElementById('rowCount').textContent = `${filteredData.length} registros`;
+
+            // Conta quantas datas diferentes existem no mesmo Bloco + Ciclo.
+            const datesByBlockCycle = new Map();
+            filteredData.forEach(d => {
+                const key = `${d.local}|||${d.ciclo}`;
+                if (!datesByBlockCycle.has(key)) datesByBlockCycle.set(key, new Set());
+                if (d.dataStr) datesByBlockCycle.get(key).add(d.dataStr);
+            });
+
+            tbody.innerHTML = filteredData
+                .slice()
+                .sort((a,b) => {
+                    const la = String(a.local).localeCompare(String(b.local));
+                    if (la !== 0) return la;
+                    const ca = parseInt(a.ciclo), cb = parseInt(b.ciclo);
+                    if (!isNaN(ca) && !isNaN(cb) && ca !== cb) return ca - cb;
+                    return (a.dateObj || 0) - (b.dateObj || 0);
+                })
+                .slice(0, 150)
+                .map((d, i) => {
+                    const key = `${d.local}|||${d.ciclo}`;
+                    const qtdDatas = datesByBlockCycle.get(key)?.size || 1;
+                    const multiBadge = qtdDatas > 1
+                        ? `<span class="ml-2 bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase">+${qtdDatas} datas</span>`
+                        : '';
+
+                    return `
                 <tr class="border-b border-slate-100 last:border-0 hover:bg-emerald-50/50 transition-colors ${i%2===0?'bg-white':'bg-slate-50/30'}">
-                    <td class="px-6 py-4 whitespace-nowrap text-slate-500 font-medium">${d.dataStr}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-slate-500 font-medium">${d.dataStr}${multiBadge}</td>
                     <td class="px-6 py-4 font-extrabold text-slate-700">${d.local}</td>
                     <td class="px-6 py-4"><span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200">${d.ciclo}</span></td>
                     <td class="px-6 py-4 text-slate-600 font-semibold">${d.variedade}</td>
                     <td class="px-6 py-4 text-right font-extrabold text-emerald-600">${f(d.transplantado)}</td>
                     <td class="px-6 py-4 text-right font-extrabold ${d.perdas>0?'text-rose-500':'text-slate-400'}">${f(d.perdas)}</td>
                     <td class="px-6 py-4 text-right font-bold text-slate-500 bg-slate-50/50">${d.germinacao} <span class="text-[10px] uppercase font-bold text-slate-400 ml-1">dias</span></td>
-                </tr>`).join('');
+                </tr>`;
+                }).join('');
             renderChart();
         }
 
@@ -1501,34 +1445,149 @@
             const ctx = document.getElementById('mainChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
 
-            let blocks = [...new Set(filteredData.map(d => d.local))].sort(), varieties = [...new Set(filteredData.map(d => d.variedade))].sort();
-            let ds = [], vColors = {}; varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
+            // O gráfico agora trabalha com a combinação BLOCO + CICLO.
+            // Todas as linhas/datas dentro dessa combinação são somadas.
+            const groupsMap = new Map();
+
+            filteredData.forEach(d => {
+                const key = `${d.local}|||${d.ciclo}`;
+                if (!groupsMap.has(key)) {
+                    groupsMap.set(key, {
+                        local: d.local,
+                        ciclo: String(d.ciclo),
+                        dates: new Set(),
+                        rows: []
+                    });
+                }
+                const g = groupsMap.get(key);
+                if (d.dataStr) g.dates.add(d.dataStr);
+                g.rows.push(d);
+            });
+
+            const groups = [...groupsMap.values()].sort((a,b) => {
+                const l = String(a.local).localeCompare(String(b.local));
+                if (l !== 0) return l;
+                const na = parseInt(a.ciclo), nb = parseInt(b.ciclo);
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return String(a.ciclo).localeCompare(String(b.ciclo));
+            });
+
+            // Label: Bloco / Ciclo / todas as datas de plantio encontradas.
+            const labels = groups.map(g => {
+                const dates = [...g.dates];
+                return dates.length
+                    ? [g.local + ' - Ciclo ' + g.ciclo, dates.join(' | ')]
+                    : [g.local + ' - Ciclo ' + g.ciclo];
+            });
+
+            const varieties = [...new Set(filteredData.map(d => d.variedade))].sort();
+            const ds = [];
+            const vColors = {};
+            varieties.forEach((v, i) => vColors[v] = colors[i % colors.length]);
 
             varieties.forEach(v => {
-                let trans = blocks.map(b => filteredData.filter(d => d.local === b && d.variedade === v).reduce((s, r) => s + r.transplantado, 0));
-                let mudas = blocks.map(b => filteredData.filter(d => d.local === b && d.variedade === v).reduce((s, r) => s + r.mudas, 0));
+                const trans = groups.map(g =>
+                    g.rows.filter(r => r.variedade === v)
+                        .reduce((sum, r) => sum + r.transplantado, 0)
+                );
+                const mudas = groups.map(g =>
+                    g.rows.filter(r => r.variedade === v)
+                        .reduce((sum, r) => sum + r.mudas, 0)
+                );
+
                 if (trans.some(val => val > 0)) {
-                    ds.push({ label: v + ' (Transplantado)', data: trans, backgroundColor: vColors[v], borderRadius: 6,
-                        datalabels: { anchor: 'end', align: 'top', color: vColors[v], font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val>0?new Intl.NumberFormat('pt-BR').format(val):'' }
+                    ds.push({
+                        label: v + ' (Transplantado)',
+                        data: trans,
+                        backgroundColor: vColors[v],
+                        borderRadius: 6,
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: vColors[v],
+                            font: { family: 'Poppins', weight: '700', size: 10 },
+                            formatter: (val) => val > 0
+                                ? new Intl.NumberFormat('pt-BR').format(val)
+                                : ''
+                        }
                     });
-                    ds.push({ label: v + ' (% Plantado)', data: blocks.map((b,i) => mudas[i]>0?(trans[i]/mudas[i]*100):null), type: 'line', yAxisID: 'y1',
-                        borderColor: vColors[v], backgroundColor: vColors[v], borderWidth: 3, borderDash: [], tension: 0.42, cubicInterpolationMode: 'monotone', pointRadius: 4, pointHoverRadius: 6, datalabels: { display: true, align: 'top', anchor: 'end', font: { family: 'Poppins', weight: '700', size: 10 }, formatter: (val) => val != null ? Math.round(val) + '%' : '' }
+
+                    ds.push({
+                        label: v + ' (% Plantado)',
+                        data: groups.map((g, i) =>
+                            mudas[i] > 0 ? (trans[i] / mudas[i] * 100) : null
+                        ),
+                        type: 'line',
+                        yAxisID: 'y1',
+                        borderColor: vColors[v],
+                        backgroundColor: vColors[v],
+                        borderWidth: 3,
+                        tension: 0.42,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        datalabels: {
+                            display: true,
+                            align: 'top',
+                            anchor: 'end',
+                            font: { family: 'Poppins', weight: '700', size: 10 },
+                            formatter: (val) => val != null ? Math.round(val) + '%' : ''
+                        }
                     });
                 }
             });
 
             chartInstance = new Chart(ctx, {
-                type: 'bar', data: { labels: blocks, datasets: ds },
-                options: { responsive: true, maintainAspectRatio: false, scales: {
-                    x: { grid: { display: false }, ticks: { font: { family: 'Poppins', weight: '700' } } },
-                    y: { title: { display: true, text: 'Qtd. Transplantada' }, ticks: { font: { family: 'Poppins' } } },
-                    y1: { type: 'linear', position: 'right', title: { display: true, text: '% Plantado' }, max: 120 }
-                }, plugins: { legend: { display: false } } }
+                type: 'bar',
+                data: { labels: labels, datasets: ds },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 0,
+                                minRotation: 0,
+                                font: { family: 'Poppins', weight: '700' }
+                            }
+                        },
+                        y: {
+                            title: { display: true, text: 'Qtd. Transplantada' },
+                            ticks: { font: { family: 'Poppins' } }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: '% Plantado' },
+                            max: 120
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterTitle: function(items) {
+                                    const idx = items?.[0]?.dataIndex;
+                                    if (idx == null || !groups[idx]) return '';
+                                    return 'Datas de plantio: ' + ([...groups[idx].dates].join(', ') || 'não informada');
+                                }
+                            }
+                        }
+                    }
+                }
             });
 
-            document.getElementById('customLegend').innerHTML = varieties.filter(v=>filteredData.some(d=>d.variedade===v)).map(v => 
-                `<div class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm"><div class="w-3 h-3 rounded-full" style="background-color:${vColors[v]}"></div><span class="text-xs font-bold">${v}</span></div>`).join('');
+            document.getElementById('customLegend').innerHTML = varieties
+                .filter(v => filteredData.some(d => d.variedade === v))
+                .map(v =>
+                    `<div class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100 shadow-sm">
+                        <div class="w-3 h-3 rounded-full" style="background-color:${vColors[v]}"></div>
+                        <span class="text-xs font-bold">${v}</span>
+                    </div>`
+                ).join('');
         }
+
         function renderRendimentoCharts() {
             const blocks = [...new Set(filteredRendData.map(d => d.local))].sort();
             const varieties = [...new Set(filteredRendData.map(d => d.variedade))].sort();
@@ -1543,7 +1602,7 @@
                 if (!rows.length) return [b];
 
                 const months = [...new Set(
-                    rows.flatMap(d => Array.isArray(d.mesesPlantio) && d.mesesPlantio.length ? d.mesesPlantio : (d.dateObj && !isNaN(d.dateObj) ? [monthsNames[d.dateObj.getMonth()]] : []))
+                    rows.map(d => monthsNames[d.dateObj.getMonth()])
                 )];
 
                 return months.length ? [b, `(${months.join(', ')})`] : [b];
