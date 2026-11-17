@@ -372,7 +372,7 @@
         }
 
     </style>
-<link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="stylesheet" href="layout.css?v=20261117-seedlings-17"></head>
+<link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="stylesheet" href="layout.css?v=20261117-png-18"><script src="daily-seed-report.js?v=20261117-png-18"></script></head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-emerald-200 selection:text-emerald-900">
 
     <div id="dashboardScreen" class=" flex flex-col w-full">
@@ -415,6 +415,7 @@
               <section class="elegant-card p-6 daily-seed-header"><h2 class="text-xl font-extrabold">Mudas por bloco e dia</h2><p>Totais de bandejas por variedade e total de mudas registrados na planilha de transplantio.</p>
                 <div class="daily-seed-filters"><label>Dia do transplantio<input type="date" id="dailySeedDate" onchange="renderDailySeedlings()"></label><label>Bloco<select id="dailySeedBlock" onchange="renderDailySeedlings()"><option value="">Todos os blocos</option></select></label><label>Variedade<select id="dailySeedVariety" onchange="renderDailySeedlings()"><option value="">Todas as variedades</option></select></label></div>
               </section>
+              <div class="daily-seed-export"><button id="dailySeedPng" type="button" onclick="exportDailySeedPng()" class="daily-seed-download"><svg class="tab-icon" viewBox="0 0 24 24" data-motion-icon="records" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg>Baixar relatório PNG</button><p id="dailySeedExportStatus" role="status">Imagem com margens de página e todos os detalhes dos filtros selecionados.</p></div>
               <div id="dailySeedMetrics" class="daily-seed-metrics" aria-live="polite"></div>
               <p id="dailySeedEmpty" class="module-notice" hidden>Nenhum registro encontrado para o dia e os filtros selecionados.</p>
               <div id="dailySeedBlocks" class="daily-seed-blocks"></div>
@@ -1095,6 +1096,7 @@
 
 
         function seedDayKey(date){if(!date||isNaN(date))return '';return date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');}
+        async function exportDailySeedPng(){const button=document.getElementById('dailySeedPng'),status=document.getElementById('dailySeedExportStatus');button.disabled=true;status.textContent='Preparando imagem com todos os blocos e variedades selecionados…';try{const filters={day:document.getElementById('dailySeedDate').value,block:document.getElementById('dailySeedBlock').value,variety:document.getElementById('dailySeedVariety').value},groups=dailySeedGroups(allData,filters);const report=await DailySeedReport.png(groups,filters);const url=URL.createObjectURL(report.blob),link=document.createElement('a');link.href=url;link.download='Mudas_por_dia_'+filters.day+'.png';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);status.textContent='PNG gerado com '+report.pages+' página(s), reunidas em uma imagem. Confira os downloads do aparelho.';}catch(error){status.textContent=error.message;}finally{button.disabled=false;}}
         function dailySeedGroups(data,{day,block='',variety=''}={}){
             const groups=new Map();for(const row of data){if(!day||seedDayKey(row.dateObj)!==day||(block&&row.local!==block)||(variety&&row.variedade!==variety))continue;
                 const key=JSON.stringify([row.local,row.variedade]);if(!groups.has(key))groups.set(key,{block:row.local,variety:row.variedade,trays:0,seedlings:0});const group=groups.get(key);group.trays+=row.bandejas;group.seedlings+=row.mudas;}
@@ -1107,7 +1109,7 @@
         function renderDailySeedlings(){
             const day=document.getElementById('dailySeedDate').value,groups=dailySeedGroups(allData,{day,block:document.getElementById('dailySeedBlock').value,variety:document.getElementById('dailySeedVariety').value}),format=n=>new Intl.NumberFormat('pt-BR').format(n),node=(tag,text,cls)=>{const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;},metrics=document.getElementById('dailySeedMetrics'),board=document.getElementById('dailySeedBlocks');metrics.replaceChildren();board.replaceChildren();
             for(const [label,value] of [['Total de bandejas',groups.reduce((n,g)=>n+g.trays,0)],['Total de mudas',groups.reduce((n,g)=>n+g.seedlings,0)],['Blocos',new Set(groups.map(g=>g.block)).size],['Variedades',new Set(groups.map(g=>g.variety)).size]]){const card=node('div',undefined,'kpi');card.innerHTML='<svg class="tab-icon" viewBox="0 0 24 24" data-motion-icon="leaf" aria-hidden="true"><path d="M12 22V11"/><path class="motion-leaf-left" d="M12 15C5 16 2 12 2 6c6-1 10 2 10 9Z"/><path class="motion-leaf-right" d="M12 11C12 5 16 3 22 4c0 6-4 9-10 7Z"/></svg>';card.append(node('span',label),node('strong',format(value)));metrics.append(card);}
-            document.getElementById('dailySeedEmpty').hidden=groups.length>0;
+            document.getElementById('dailySeedEmpty').hidden=groups.length>0;document.getElementById('dailySeedPng').disabled=!groups.length;
             for(const block of [...new Set(groups.map(g=>g.block))]){const rows=groups.filter(g=>g.block===block),card=node('section',undefined,'elegant-card p-6 daily-seed-card');card.append(node('h3',block),node('p',day.split('-').reverse().join('/'),'daily-seed-date'));
                 const total=node('div',undefined,'daily-seed-total');for(const [label,value] of [['Bandejas',rows.reduce((n,g)=>n+g.trays,0)],['Mudas',rows.reduce((n,g)=>n+g.seedlings,0)]]){const item=node('div');item.append(node('span',label),node('strong',format(value)));total.append(item);}card.append(total);
                 const table=node('table'),head=node('thead'),header=node('tr');for(const title of ['Variedade','Bandejas','Mudas'])header.append(node('th',title));head.append(header);table.append(head);const body=node('tbody');for(const group of rows){const tr=node('tr');for(const [label,value] of [['Variedade',group.variety],['Bandejas',format(group.trays)],['Mudas',format(group.seedlings)]]){const td=node('td',value);td.dataset.column=label;tr.append(td);}body.append(tr);}table.append(body);card.append(table);board.append(card);}
@@ -2028,5 +2030,5 @@
     </script>
 
 
-<script src="layout.js?v=20261117-seedlings-17"></script><script>const transplantSwitch=switchTab;switchTab=function(name){transplantSwitch(name);document.querySelectorAll('#dashboardScreen>nav .tab-btn').forEach(button=>{const active=button.id==='tabBtn-'+name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});};document.getElementById('tabBtn-transplantio').classList.add('active');</script><script>document.querySelectorAll('#dashboardScreen main canvas').forEach(canvas=>{canvas.setAttribute('role','img');const card=canvas.closest('.elegant-card');if(card)card.classList.add('chart-panel');});</script></body>
+<script src="layout.js?v=20261117-png-18"></script><script>const transplantSwitch=switchTab;switchTab=function(name){transplantSwitch(name);document.querySelectorAll('#dashboardScreen>nav .tab-btn').forEach(button=>{const active=button.id==='tabBtn-'+name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});};document.getElementById('tabBtn-transplantio').classList.add('active');</script><script>document.querySelectorAll('#dashboardScreen main canvas').forEach(canvas=>{canvas.setAttribute('role','img');const card=canvas.closest('.elegant-card');if(card)card.classList.add('chart-panel');});</script></body>
 </html>

@@ -1,0 +1,26 @@
+var DailySeedReport=(()=>{
+ const W=1240,H=1754,M=76,ink='#173c4b',teal='#087f83';
+ const number=value=>new Intl.NumberFormat('pt-BR').format(value);
+ function wrap(ctx,value,width){const result=[];let line='';for(const word of String(value||'').split(/\s+/)){if(ctx.measureText(line+' '+word).width>width&&line){result.push(line);line='';}for(const char of word){if(ctx.measureText(line+char).width>width&&line){result.push(line);line='';}line+=char;}line+=' ';}if(line.trim())result.push(line.trim());return result;}
+ function leaf(ctx,x,y){ctx.save();ctx.translate(x,y);ctx.strokeStyle='#7bdfbb';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,28);ctx.lineTo(0,-6);ctx.bezierCurveTo(-30,-4,-31,-26,-28,-29);ctx.bezierCurveTo(-8,-32,0,-17,0,-6);ctx.moveTo(0,9);ctx.bezierCurveTo(30,10,32,-14,28,-20);ctx.bezierCurveTo(8,-22,0,-6,0,9);ctx.stroke();ctx.restore();}
+ function tray(ctx,x,y){ctx.save();ctx.translate(x,y);ctx.strokeStyle=teal;ctx.lineWidth=3;ctx.strokeRect(0,0,38,26);for(let r=0;r<2;r++)for(let c=0;c<3;c++)ctx.strokeRect(4+c*11,4+r*10,7,6);ctx.restore();}
+ function build(groups,{day,block='',variety=''}={}){
+  if(!groups.length)throw Error('Não há dados para gerar o PNG.');
+  const pages=[];let canvas,ctx,y;
+  function text(value,x,top,size=24,bold=false,color=ink,width=W-2*M){ctx.font=(bold?'700 ':'400 ')+size+'px Arial';ctx.fillStyle=color;const rows=wrap(ctx,value,width);rows.forEach((line,i)=>ctx.fillText(line,x,top+i*(size+9)));return rows.length*(size+9);}
+  function page(){canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;ctx=canvas.getContext('2d');ctx.fillStyle='#f3f7f5';ctx.fillRect(0,0,W,H);ctx.fillStyle=ink;ctx.fillRect(0,0,W,260);ctx.fillStyle='#dcae51';ctx.fillRect(M,52,72,5);leaf(ctx,W-M-32,115);text('FAZENDA OÁSIS',M,92,23,true,'#a3dccc');text('Mudas por dia',M,149,46,true,'#fff',W-2*M-110);text('TRANSPLANTIO · '+day.split('-').reverse().join('/'),M,206,24,true,'#e4eee9');y=305;
+   y+=text('Bloco: '+(block||'Todos')+'  •  Variedade: '+(variety||'Todas'),M,y,23,false,ink)+22;pages.push(canvas);}
+  function ensure(height){if(y+height>H-115)page();}
+  page();
+  const totals=[['BANDEJAS',groups.reduce((n,g)=>n+g.trays,0)],['MUDAS',groups.reduce((n,g)=>n+g.seedlings,0)],['BLOCOS',new Set(groups.map(g=>g.block)).size]];
+  const boxW=(W-2*M-32)/3;
+  totals.forEach(([label,value],i)=>{const x=M+i*(boxW+16);ctx.fillStyle='#fff';ctx.fillRect(x,y,boxW,140);ctx.fillStyle=teal;ctx.fillRect(x,y,boxW,5);tray(ctx,x+18,y+22);text(label,x+70,y+43,18,true,'#5b787e',boxW-90);text(number(value),x+18,y+109,38,true,teal,boxW-36);});y+=180;
+  function blockHeader(name,continued=false){ensure(120);ctx.fillStyle=teal;ctx.fillRect(M,y,W-2*M,60);text(name+(continued?' · continuação':''),M+18,y+40,27,true,'white',W-2*M-36);y+=60;ctx.fillStyle='#dfeee9';ctx.fillRect(M,y,W-2*M,50);text('VARIEDADE',M+18,y+32,18,true,ink,560);text('BANDEJAS',M+650,y+32,18,true,ink,180);text('MUDAS',M+865,y+32,18,true,ink,200);y+=50;}
+  for(const name of [...new Set(groups.map(g=>g.block))]){const rows=groups.filter(g=>g.block===name);blockHeader(name);for(let index=0;index<rows.length;index++){const row=rows[index];ctx.font='400 25px Arial';const height=Math.max(65,wrap(ctx,row.variety,580).length*34+28);if(y+height>H-115){page();blockHeader(name,true);}ctx.fillStyle=index%2?'#edf5f1':'#fff';ctx.fillRect(M,y,W-2*M,height);text(row.variety,M+18,y+36,25,false,ink,580);text(number(row.trays),M+650,y+36,25,true,teal,180);text(number(row.seedlings),M+865,y+36,25,true,ink,200);y+=height;}
+   if(y+70>H-115){page();blockHeader(name,true);}ctx.fillStyle='#dcece5';ctx.fillRect(M,y,W-2*M,62);text('TOTAL DO BLOCO',M+18,y+39,21,true,ink,580);text(number(rows.reduce((n,g)=>n+g.trays,0)),M+650,y+39,25,true,teal,180);text(number(rows.reduce((n,g)=>n+g.seedlings,0)),M+865,y+39,25,true,ink,200);y+=92;}
+  pages.forEach((c,i)=>{const p=c.getContext('2d');p.strokeStyle='#b4cbc2';p.beginPath();p.moveTo(M,H-85);p.lineTo(W-M,H-85);p.stroke();p.fillStyle='#59736b';p.font='19px Arial';p.fillText('Fonte: planilha de transplantio · Bandejas e Mudas cadastradas',M,H-49);p.textAlign='right';p.fillText((i+1)+' / '+pages.length,W-M,H-49);p.textAlign='left';});
+  return {pages,width:W,height:H};
+ }
+ async function png(groups,filters){const report=build(groups,filters),image=document.createElement('canvas'),scale=Math.min(1,24000/(report.pages.length*H));image.width=Math.round(W*scale);image.height=Math.round(H*report.pages.length*scale);const ctx=image.getContext('2d');report.pages.forEach((page,index)=>ctx.drawImage(page,0,Math.round(index*H*scale),image.width,Math.round(H*scale)));const blob=await new Promise((resolve,reject)=>image.toBlob(value=>value?resolve(value):reject(Error('Não foi possível gerar o PNG.')),'image/png'));return {blob,pages:report.pages.length,width:image.width,height:image.height};}
+ return {build,png};
+})();
