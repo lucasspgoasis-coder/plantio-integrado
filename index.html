@@ -372,7 +372,7 @@
         }
 
     </style>
-<link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="stylesheet" href="layout.css?v=20261117-five-7"></head>
+<link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="stylesheet" href="layout.css?v=20261117-summary-14"></head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-emerald-200 selection:text-emerald-900">
 
     <div id="dashboardScreen" class=" flex flex-col w-full">
@@ -851,11 +851,11 @@
                         </div>
                     </section>
 
-                    <section class="elegant-card p-6 flex flex-col justify-between">
+                    <section id="analyticalSummary" class="elegant-card p-6 flex flex-col">
                         <div>
                             <h3 class="text-lg font-extrabold text-slate-800 mb-2">Resumo Analítico</h3>
                         </div>
-                        <div class="overflow-x-auto max-h-[300px]">
+                        <div class="analytical-summary-content">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead class="bg-slate-50 sticky top-0 text-slate-400 uppercase text-[10px] font-extrabold tracking-wider">
                                     <tr>
@@ -1996,5 +1996,5 @@
     </script>
 
 
-<script src="layout.js?v=20261117-five-7"></script><script>const transplantSwitch=switchTab;switchTab=function(name){transplantSwitch(name);document.querySelectorAll('#dashboardScreen>nav .tab-btn').forEach(button=>{const active=button.id==='tabBtn-'+name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});};document.getElementById('tabBtn-transplantio').classList.add('active');</script><script>document.querySelectorAll('#dashboardScreen main canvas').forEach(canvas=>{canvas.setAttribute('role','img');const card=canvas.closest('.elegant-card');if(card)card.classList.add('chart-panel');});</script></body>
+<script src="layout.js?v=20261117-summary-14"></script><script>const transplantSwitch=switchTab;switchTab=function(name){transplantSwitch(name);document.querySelectorAll('#dashboardScreen>nav .tab-btn').forEach(button=>{const active=button.id==='tabBtn-'+name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});};document.getElementById('tabBtn-transplantio').classList.add('active');</script><script>document.querySelectorAll('#dashboardScreen main canvas').forEach(canvas=>{canvas.setAttribute('role','img');const card=canvas.closest('.elegant-card');if(card)card.classList.add('chart-panel');});</script></body>
 </html>
