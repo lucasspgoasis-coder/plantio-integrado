@@ -4,12 +4,12 @@ var DailySeedReport=(()=>{
  function wrap(ctx,value,width){const result=[];let line='';for(const word of String(value||'').split(/\s+/)){if(ctx.measureText(line+' '+word).width>width&&line){result.push(line);line='';}for(const char of word){if(ctx.measureText(line+char).width>width&&line){result.push(line);line='';}line+=char;}line+=' ';}if(line.trim())result.push(line.trim());return result;}
  function leaf(ctx,x,y){ctx.save();ctx.translate(x,y);ctx.strokeStyle='#7bdfbb';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,28);ctx.lineTo(0,-6);ctx.bezierCurveTo(-30,-4,-31,-26,-28,-29);ctx.bezierCurveTo(-8,-32,0,-17,0,-6);ctx.moveTo(0,9);ctx.bezierCurveTo(30,10,32,-14,28,-20);ctx.bezierCurveTo(8,-22,0,-6,0,9);ctx.stroke();ctx.restore();}
  function tray(ctx,x,y){ctx.save();ctx.translate(x,y);ctx.strokeStyle=teal;ctx.lineWidth=3;ctx.strokeRect(0,0,38,26);for(let r=0;r<2;r++)for(let c=0;c<3;c++)ctx.strokeRect(4+c*11,4+r*10,7,6);ctx.restore();}
- function build(groups,{cycle=''}={}){
+ function build(groups,{cycle='',block=''}={}){
   if(!groups.length)throw Error('Não há dados para gerar o PNG.');
   const pages=[];let canvas,ctx,y;
   function text(value,x,top,size=24,bold=false,color=ink,width=W-2*M){ctx.font=(bold?'700 ':'400 ')+size+'px Arial';ctx.fillStyle=color;const rows=wrap(ctx,value,width);rows.forEach((line,i)=>ctx.fillText(line,x,top+i*(size+9)));return rows.length*(size+9);}
   function page(){canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;ctx=canvas.getContext('2d');ctx.fillStyle='#f3f7f5';ctx.fillRect(0,0,W,H);ctx.fillStyle=ink;ctx.fillRect(0,0,W,260);ctx.fillStyle='#dcae51';ctx.fillRect(M,52,72,5);leaf(ctx,W-M-32,115);text('FAZENDA OÁSIS',M,92,23,true,'#a3dccc');text('Mudas por ciclo',M,149,46,true,'#fff',W-2*M-110);text('TRANSPLANTIO · CICLO '+cycle,M,206,24,true,'#e4eee9');y=305;
-   y+=text('Todos os blocos, dias de plantio e variedades do ciclo',M,y,23,false,ink)+22;pages.push(canvas);}
+   y+=text((block?'Bloco: '+block+' · Todos os dias e variedades':'Todos os blocos, dias de plantio e variedades do ciclo'),M,y,23,false,ink)+22;pages.push(canvas);}
   function ensure(height){if(y+height>H-115)page();}
   page();
   const totals=[['BANDEJAS',groups.reduce((n,g)=>n+g.trays,0)],['MUDAS',groups.reduce((n,g)=>n+g.seedlings,0)],['BLOCOS',new Set(groups.map(g=>g.block)).size]];
