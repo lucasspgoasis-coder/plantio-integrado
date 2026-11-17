@@ -9,13 +9,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Chart.js for charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <!-- Chart.js DataLabels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <!-- PapaParse for CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="fontawesome/css/all.min.css">
     <!-- Modern Font: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -372,57 +372,14 @@
         }
 
     </style>
-</head>
+<link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="stylesheet" href="layout.css?v=20261117-five-7"></head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-emerald-200 selection:text-emerald-900">
 
-    <div id="loginScreen" class="fixed inset-0 z-50 login-bg flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl p-8 sm:p-10 w-full max-w-md relative overflow-hidden">
-            <div class="absolute -top-16 -right-16 w-32 h-32 bg-emerald-50 rounded-full opacity-50"></div>
-            <div class="flex flex-col items-center mb-8 relative z-10">
-                <img class="login-logo" src="https://i.imgur.com/oFfFlsV.png" alt="Logo institucional">
-                <div class="login-badge"><i class="fa-solid fa-shield-halved"></i> Acesso seguro</div>
-                <h2 class="text-2xl font-extrabold text-slate-800 text-center">Acesso ao Sistema</h2>
-                <p class="text-sm text-slate-500 mt-2 text-center font-medium">Digite suas credenciais para entrar no sistema.</p>
-            </div>
-            <form id="loginForm" class="space-y-4 relative z-10">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Login</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-user text-slate-400 text-sm"></i>
-                        </div>
-                        <input type="text" id="username" class="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-2.5 pl-10 pr-4 text-sm text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/10 transition-all shadow-sm" placeholder="Seu usuário" required>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Senha</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-lock text-slate-400 text-sm"></i>
-                        </div>
-                        <input type="password" id="password" class="w-full bg-slate-50 border border-slate-200/80 rounded-xl py-2.5 pl-10 pr-12 text-sm text-slate-700 font-semibold focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/10 transition-all shadow-sm" placeholder="Sua senha" required>
-                        <button type="button" onclick="togglePassword()" aria-label="Mostrar ou ocultar senha" class="absolute inset-y-0 right-0 px-3.5 text-slate-400 hover:text-emerald-600" style="transform:none!important;">
-                            <i id="passwordToggleIcon" class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="loginError" class="hidden bg-rose-50 text-rose-600 text-sm font-semibold p-3 rounded-xl flex items-center gap-2">
-                    <i class="fa-solid fa-circle-exclamation"></i> Credenciais incorretas. Tente novamente.
-                </div>
-
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/30 transition-all transform hover:-translate-y-0.5 mt-2">
-                    Entrar no Sistema
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <div id="dashboardScreen" class="hidden h-full flex flex-col w-full">
+    <div id="dashboardScreen" class=" flex flex-col w-full">
         <header class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 shadow-md z-10 sticky top-0 relative overflow-hidden">
             <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between relative z-10">
                 <div class="flex items-center gap-4 min-w-0">
-                    <img class="system-logo" src="https://i.imgur.com/oFfFlsV.png" alt="Logo institucional">
+                    <img class="system-logo" src="logo.svg" alt="Logo institucional">
                     <div class="min-w-0">
                         <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-tight">
                             Sistema Integrado
@@ -445,21 +402,13 @@
 
         <!-- Navigation Tabs Bar -->
         <nav class="bg-white border-b border-slate-200 shadow-sm px-4 sm:px-6 lg:px-8 flex items-center gap-2 overflow-x-auto z-10">
-            <button onclick="switchTab('transplantio')" id="tabBtn-transplantio" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 flex items-center gap-2 transition-colors whitespace-nowrap">
-                <i class="fa-solid fa-seedling"></i> Transplantio
-            </button>
-            <button onclick="switchTab('germinacao')" id="tabBtn-germinacao" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors whitespace-nowrap">
-                <i class="fa-solid fa-chart-line"></i> Germinação
-            </button>
-            <button onclick="switchTab('rendimento')" id="tabBtn-rendimento" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors whitespace-nowrap">
-                <i class="fa-solid fa-clock"></i> Rendimento
-            </button>
-            <button onclick="switchTab('producao')" id="tabBtn-producao" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors whitespace-nowrap">
-                <i class="fa-solid fa-clipboard-check"></i> Produção & Perdas
-            </button>
+            <button onclick="switchTab('transplantio')" id="tabBtn-transplantio" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 flex items-center gap-2 transition-colors whitespace-nowrap"><svg class="tab-icon" viewBox="0 0 24 24" data-motion-icon="leaf" aria-hidden="true"><path d="M12 22V11"/><path class="motion-leaf-left" d="M12 15C5 16 2 12 2 6c6-1 10 2 10 9Z"/><path class="motion-leaf-right" d="M12 11C12 5 16 3 22 4c0 6-4 9-10 7Z"/></svg>Transplantio</button>
+            <button onclick="switchTab('germinacao')" id="tabBtn-germinacao" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors whitespace-nowrap"><svg class="tab-icon" viewBox="0 0 24 24" data-motion-icon="trend" aria-hidden="true"><path d="M3 3v18h18"/><path class="motion-trace" d="m5 16 5-5 4 3 7-9"/><path class="motion-arrow-tip" d="M16 5h5v5"/><circle class="motion-trend-point" cx="10" cy="11" r="1"/></svg>Germinação</button>
+            <button onclick="switchTab('rendimento')" id="tabBtn-rendimento" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors whitespace-nowrap"><svg class="tab-icon" viewBox="0 0 24 24" data-motion-icon="gauge" aria-hidden="true"><path d="M3 20a10 10 0 1 1 18 0H3ZM5 11l2 1M12 4v3M19 11l-2 1"/><path class="motion-needle" d="M12 16V8"/><circle cx="12" cy="16" r="2"/></svg>Rendimento</button>
+            <button onclick="switchTab('producao')" id="tabBtn-producao" class="tab-btn py-4 px-5 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors whitespace-nowrap"><svg class="tab-icon" viewBox="0 0 24 24" data-motion-icon="records" aria-hidden="true"><rect x="4" y="3" width="16" height="19" rx="2"/><path class="motion-record-line line-a" d="M8 8h8"/><path class="motion-record-line line-b" d="M8 13h8"/><path class="motion-record-line line-c" d="M8 18h5"/></svg>Produção & Perdas</button>
         </nav>
 
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50 relative">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50/50 relative"><p id="sheetNotice" class="module-notice" role="status" hidden></p>
             <!-- TAB 1: Transplantio -->
             <div id="tabContent-transplantio" class="tab-content space-y-6">
                 <!-- Filtros T1 -->
@@ -467,12 +416,12 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                         <div class="flex items-center gap-3">
                             <div class="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl">
-                                <i class="fa-solid fa-sliders text-lg"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </div>
                             <h2 class="text-lg font-bold text-slate-800">Filtros de Análise</h2>
                         </div>
                         <button id="btnLimparFiltros" class="text-sm font-bold text-slate-500 hover:text-emerald-700 bg-slate-100 hover:bg-emerald-100 px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2">
-                            <i class="fa-solid fa-eraser"></i> Limpar Filtros
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg> Limpar Filtros
                         </button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -480,7 +429,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Local (Bloco)</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownLocal')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedLocalText">Todos os Blocos</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsLocal"></div>
                         </div>
@@ -488,7 +437,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ciclo</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownCiclo')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedCicloText">Todos os Ciclos</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsCiclo"></div>
                         </div>
@@ -496,7 +445,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variedade</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownVariedade')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedVariedadeText">Todas as Variedades</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsVariedade"></div>
                         </div>
@@ -513,22 +462,22 @@
                 <!-- KPIs T1 -->
                 <section class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     <div class="kpi-card bg-emerald-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-layer-group text-xl text-emerald-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="network" aria-hidden="true" focusable="false"><path class="motion-network-flow" d="M12 8v4M5.5 16v-4h13v4"/><rect x="8" y="2" width="8" height="6" rx="2"/><rect x="2" y="16" width="7" height="6" rx="2"/><rect x="15" y="16" width="7" height="6" rx="2"/><circle class="motion-node node-a" cx="5.5" cy="19" r="1"/><circle class="motion-node node-b" cx="18.5" cy="19" r="1"/></svg>
                         <span class="text-[10px] font-extrabold text-emerald-900 uppercase tracking-wider mb-0.5">Bandejas</span>
                         <span id="kpiBandejas" class="text-2xl font-extrabold text-emerald-950">0</span>
                     </div>
                     <div class="kpi-card bg-teal-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-seedling text-xl text-teal-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="leaf" aria-hidden="true" focusable="false"><path d="M12 22V11"/><path class="motion-leaf-left" d="M12 15C5 16 2 12 2 6c6-1 10 2 10 9Z"/><path class="motion-leaf-right" d="M12 11C12 5 16 3 22 4c0 6-4 9-10 7Z"/></svg>
                         <span class="text-[10px] font-extrabold text-teal-900 uppercase tracking-wider mb-0.5">Total Mudas</span>
                         <span id="kpiMudas" class="text-2xl font-extrabold text-teal-950">0</span>
                     </div>
                     <div class="kpi-card bg-sky-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-check-to-slot text-xl text-sky-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         <span class="text-[10px] font-extrabold text-sky-900 uppercase tracking-wider mb-0.5">Total Transplantado</span>
                         <span id="kpiTransplantado" class="text-2xl font-extrabold text-sky-950">0</span>
                     </div>
                     <div class="kpi-card bg-rose-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-triangle-exclamation text-xl text-rose-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         <span class="text-[10px] font-extrabold text-rose-900 uppercase tracking-wider mb-0.5">Total Perdas</span>
                         <span id="kpiPerdas" class="text-2xl font-extrabold text-rose-950">0</span>
                     </div>
@@ -602,12 +551,12 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                         <div class="flex items-center gap-3">
                             <div class="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl">
-                                <i class="fa-solid fa-sliders text-lg"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </div>
                             <h2 class="text-lg font-bold text-slate-800">Filtros de Germinação e Rendimento</h2>
                         </div>
                         <button id="btnLimparFiltrosRendimento" class="text-sm font-bold text-slate-500 hover:text-emerald-700 bg-slate-100 hover:bg-emerald-100 px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2">
-                            <i class="fa-solid fa-eraser"></i> Limpar Filtros
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg> Limpar Filtros
                         </button>
                     </div>
                     
@@ -616,7 +565,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variedade</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownRendVariedade')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedRendVariedadeText">Todas as Variedades</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsRendVariedade"></div>
                         </div>
@@ -625,7 +574,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ciclo</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownRendCiclo')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedRendCicloText">Todos os Ciclos</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsRendCiclo"></div>
                         </div>
@@ -634,7 +583,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Mês</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownRendMes')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedRendMesText">Todos os Meses</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsRendMes"></div>
                         </div>
@@ -643,20 +592,20 @@
 
                 <section class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     <div class="kpi-card bg-emerald-100 p-4 flex flex-col justify-center relative overflow-hidden shadow-sm">
-                        <i class="fa-solid fa-leaf text-xl text-emerald-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="leaf" aria-hidden="true" focusable="false"><path d="M12 22V11"/><path class="motion-leaf-left" d="M12 15C5 16 2 12 2 6c6-1 10 2 10 9Z"/><path class="motion-leaf-right" d="M12 11C12 5 16 3 22 4c0 6-4 9-10 7Z"/></svg>
                         <span class="text-[10px] font-extrabold text-emerald-900 uppercase tracking-wider mb-0.5">Total Transplantado</span>
                         <span id="kpiRendTransplantado" class="text-2xl font-extrabold text-emerald-950">0</span>
                     </div>
-                    <div class="kpi-card bg-teal-100 p-4 flex flex-col justify-center relative shadow-sm">
+                    <div class="kpi-card bg-teal-100 p-4 flex flex-col justify-center relative shadow-sm"><svg class="metric-badge" viewBox="0 0 24 24" data-motion-icon="gauge" aria-hidden="true" focusable="false"><path d="M3 20a10 10 0 1 1 18 0H3ZM5 11l2 1M12 4v3M19 11l-2 1"/><path class="motion-needle" d="M12 16V8"/><circle cx="12" cy="16" r="2"/></svg>
                         <span class="text-[10px] font-extrabold text-teal-900 uppercase tracking-wider mb-1">% Plantado</span>
                         <span id="kpiRendPctPlantado" class="text-2xl font-extrabold text-teal-950">0%</span>
                     </div>
                     <div class="kpi-card bg-rose-100 p-4 flex flex-col justify-center relative overflow-hidden shadow-sm">
-                        <i class="fa-solid fa-triangle-exclamation text-xl text-rose-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         <span class="text-[10px] font-extrabold text-rose-900 uppercase tracking-wider mb-0.5">Total Perdas</span>
                         <span id="kpiRendPerdas" class="text-2xl font-extrabold text-rose-950">0</span>
                     </div>
-                    <div class="kpi-card bg-amber-100 p-4 flex flex-col justify-center relative shadow-sm">
+                    <div class="kpi-card bg-amber-100 p-4 flex flex-col justify-center relative shadow-sm"><svg class="metric-badge" viewBox="0 0 24 24" data-motion-icon="gauge" aria-hidden="true" focusable="false"><path d="M3 20a10 10 0 1 1 18 0H3ZM5 11l2 1M12 4v3M19 11l-2 1"/><path class="motion-needle" d="M12 16V8"/><circle cx="12" cy="16" r="2"/></svg>
                         <span class="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider mb-1">% Perdas</span>
                         <span id="kpiRendPctPerdas" class="text-2xl font-extrabold text-amber-950">0%</span>
                     </div>
@@ -665,7 +614,7 @@
                 <section class="elegant-card p-6">
                     <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
                         <div class="bg-indigo-50 text-indigo-500 p-2 rounded-lg">
-                            <i class="fa-solid fa-circle-dot"></i>
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         </div>
                         Quantidade Transplantada por Bloco & Variedade
                     </h3>
@@ -677,7 +626,7 @@
                 <section class="elegant-card p-6">
                     <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
                         <div class="bg-amber-50 text-amber-600 p-2 rounded-lg">
-                            <i class="fa-solid fa-chart-bar"></i>
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         </div>
                         Comparativo de Rendimento
                     </h3>
@@ -693,12 +642,12 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                         <div class="flex items-center gap-3">
                             <div class="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl">
-                                <i class="fa-solid fa-clock text-lg"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="gauge" aria-hidden="true" focusable="false"><path d="M3 20a10 10 0 1 1 18 0H3ZM5 11l2 1M12 4v3M19 11l-2 1"/><path class="motion-needle" d="M12 16V8"/><circle cx="12" cy="16" r="2"/></svg>
                             </div>
                             <h2 class="text-lg font-bold text-slate-800">Filtros de Produtividade</h2>
                         </div>
                         <button id="btnLimparFiltrosProd" class="text-sm font-bold text-slate-500 hover:text-indigo-700 bg-slate-100 hover:bg-indigo-100 px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2">
-                            <i class="fa-solid fa-eraser"></i> Limpar Filtros
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg> Limpar Filtros
                         </button>
                     </div>
                     
@@ -707,7 +656,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Bloco (Local)</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownProdLocal')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedProdLocalText">Todos os Blocos</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsProdLocal"></div>
                         </div>
@@ -716,7 +665,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ciclo</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownProdCiclo')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedProdCicloText">Todos os Ciclos</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsProdCiclo"></div>
                         </div>
@@ -725,7 +674,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variedade</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownProdVariedade')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedProdVariedadeText">Todas as Variedades</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsProdVariedade"></div>
                         </div>
@@ -734,22 +683,22 @@
 
                 <section class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     <div class="kpi-card bg-indigo-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-clock text-xl text-indigo-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="gauge" aria-hidden="true" focusable="false"><path d="M3 20a10 10 0 1 1 18 0H3ZM5 11l2 1M12 4v3M19 11l-2 1"/><path class="motion-needle" d="M12 16V8"/><circle cx="12" cy="16" r="2"/></svg>
                         <span class="text-[10px] font-extrabold text-indigo-900 uppercase tracking-wider mb-0.5">Total de Horas</span>
                         <span id="kpiProdHoras" class="text-2xl font-extrabold text-indigo-950">0h</span>
                     </div>
                     <div class="kpi-card bg-teal-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-users text-xl text-teal-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="users" aria-hidden="true" focusable="false"><circle class="motion-person-head" cx="9" cy="7" r="3"/><path d="M2 21v-3a7 7 0 0 1 14 0v3M16 4a3 3 0 0 1 0 6M18 14a5 5 0 0 1 4 5v2"/><path class="motion-person-check" d="m5 18 2 2 5-5"/></svg>
                         <span class="text-[10px] font-extrabold text-teal-900 uppercase tracking-wider mb-0.5">Total Colaboradores</span>
                         <span id="kpiProdColab" class="text-2xl font-extrabold text-teal-950">0</span>
                     </div>
                     <div class="kpi-card bg-emerald-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-user-check text-xl text-emerald-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="users" aria-hidden="true" focusable="false"><circle class="motion-person-head" cx="9" cy="7" r="3"/><path d="M2 21v-3a7 7 0 0 1 14 0v3M16 4a3 3 0 0 1 0 6M18 14a5 5 0 0 1 4 5v2"/><path class="motion-person-check" d="m5 18 2 2 5-5"/></svg>
                         <span class="text-[10px] font-extrabold text-emerald-900 uppercase tracking-wider mb-0.5">Mudas / Colab</span>
                         <span id="kpiProdMudasColab" class="text-2xl font-extrabold text-emerald-950">0</span>
                     </div>
                     <div class="kpi-card bg-sky-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-gauge-high text-xl text-sky-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="gauge" aria-hidden="true" focusable="false"><path d="M3 20a10 10 0 1 1 18 0H3ZM5 11l2 1M12 4v3M19 11l-2 1"/><path class="motion-needle" d="M12 16V8"/><circle cx="12" cy="16" r="2"/></svg>
                         <span class="text-[10px] font-extrabold text-sky-900 uppercase tracking-wider mb-0.5">Mudas / Hora</span>
                         <span id="kpiProdMudasHora" class="text-2xl font-extrabold text-sky-950">0</span>
                     </div>
@@ -758,7 +707,7 @@
                 <section class="elegant-card p-6">
                     <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
                         <div class="bg-indigo-50 text-indigo-500 p-2 rounded-lg">
-                            <i class="fa-solid fa-chart-line"></i>
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="trend" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path class="motion-trace" d="m5 16 5-5 4 3 7-9"/><path class="motion-arrow-tip" d="M16 5h5v5"/><circle class="motion-trend-point" cx="10" cy="11" r="1"/></svg>
                         </div>
                         Horas Trabalhadas e Transplantado
                     </h3>
@@ -789,12 +738,12 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                         <div class="flex items-center gap-3">
                             <div class="bg-teal-50 text-teal-700 p-2.5 rounded-xl">
-                                <i class="fa-solid fa-clipboard-check text-lg"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="records" aria-hidden="true" focusable="false"><rect x="4" y="3" width="16" height="19" rx="2"/><path class="motion-record-line line-a" d="M8 8h8"/><path class="motion-record-line line-b" d="M8 13h8"/><path class="motion-record-line line-c" d="M8 18h5"/></svg>
                             </div>
                             <h2 class="text-lg font-bold text-slate-800">Filtros de Acompanhamento de Produção</h2>
                         </div>
                         <button id="btnLimparFiltrosProdSheet" class="text-sm font-bold text-slate-500 hover:text-teal-700 bg-slate-100 hover:bg-teal-100 px-5 py-2.5 rounded-xl transition-colors flex items-center gap-2">
-                            <i class="fa-solid fa-eraser"></i> Limpar Filtros
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg> Limpar Filtros
                         </button>
                     </div>
                     
@@ -803,7 +752,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Setor (Bloco)</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownPSSetor')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedPSSetorText">Todos os Setores</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsPSSetor"></div>
                         </div>
@@ -812,7 +761,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Ciclo</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownPSCiclo')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedPSCicloText">Todos os Ciclos</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsPSCiclo"></div>
                         </div>
@@ -821,7 +770,7 @@
                             <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Variedade</label>
                             <button type="button" class="w-full filter-input rounded-xl p-3 text-sm text-left flex justify-between items-center outline-none" onclick="toggleDropdown('dropdownPSVariedade')">
                                 <span class="truncate text-slate-700 font-bold" id="selectedPSVariedadeText">Todas as Variedades</span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                                <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                             </button>
                             <div class="dropdown-content p-2" id="optionsPSVariedade"></div>
                         </div>
@@ -830,28 +779,28 @@
 
                 <section class="grid grid-cols-2 md:grid-cols-5 gap-4 sm:gap-6">
                     <div class="kpi-card bg-emerald-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-seedling text-xl text-emerald-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="leaf" aria-hidden="true" focusable="false"><path d="M12 22V11"/><path class="motion-leaf-left" d="M12 15C5 16 2 12 2 6c6-1 10 2 10 9Z"/><path class="motion-leaf-right" d="M12 11C12 5 16 3 22 4c0 6-4 9-10 7Z"/></svg>
                         <span class="text-[10px] font-extrabold text-emerald-900 uppercase tracking-wider mb-0.5">Total Transplantado</span>
                         <span id="kpiPSTrans" class="text-xl font-extrabold text-emerald-950">0</span>
                     </div>
                     <div class="kpi-card bg-rose-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-triangle-exclamation text-xl text-rose-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         <span class="text-[10px] font-extrabold text-rose-900 uppercase tracking-wider mb-0.5">Total Perdas (Causa)</span>
                         <span id="kpiPSPerdasCausa" class="text-xl font-extrabold text-rose-950">0</span>
                     </div>
                     <div class="kpi-card bg-amber-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-percent text-xl text-amber-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="trend" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path class="motion-trace" d="m5 16 5-5 4 3 7-9"/><path class="motion-arrow-tip" d="M16 5h5v5"/><circle class="motion-trend-point" cx="10" cy="11" r="1"/></svg>
                         <span class="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider mb-0.5">% Perdas por Causa</span>
                         <span id="kpiPSPctPerdasCausa" class="text-xl font-extrabold text-amber-950">0%</span>
                     </div>
                     <div class="kpi-card bg-teal-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-circle-check text-xl text-teal-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         <span class="text-[10px] font-extrabold text-teal-900 uppercase tracking-wider mb-0.5">Total Colhido</span>
                         <span id="kpiPSTotalColhido" class="text-xl font-extrabold text-teal-950">0</span>
                         <span id="kpiPSPctColhido" class="text-[11px] font-bold text-teal-700 mt-1">0% do plantado</span>
                     </div>
                     <div class="kpi-card bg-indigo-100 p-4 flex flex-col justify-center relative shadow-sm">
-                        <i class="fa-solid fa-circle-xmark text-xl text-indigo-700 mb-1.5"></i>
+                        <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         <span class="text-[10px] font-extrabold text-indigo-900 uppercase tracking-wider mb-0.5">Total Não Colhido</span>
                         <span id="kpiPSTotalNaoColhido" class="text-xl font-extrabold text-indigo-950">0</span>
                         <span id="kpiPSPctNaoColhido" class="text-[11px] font-bold text-indigo-700 mt-1">0% do plantado</span>
@@ -861,7 +810,7 @@
                 <div class="elegant-card p-5 bg-teal-50/50 border border-teal-100 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="bg-teal-600 text-white p-3 rounded-xl shadow-sm">
-                            <i class="fa-solid fa-medal text-lg"></i>
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         </div>
                         <div>
                             <h4 class="text-xs font-extrabold text-teal-800 uppercase tracking-wider">Causa Principal de Perdas</h4>
@@ -873,7 +822,7 @@
                 <section class="elegant-card p-6">
                     <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
                         <div class="bg-teal-50 text-teal-600 p-2 rounded-lg">
-                            <i class="fa-solid fa-chart-bar"></i>
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="bars" aria-hidden="true" focusable="false"><path d="M3 21h19"/><rect class="motion-bar bar-a" x="4" y="11" width="4" height="8" rx="1"/><rect class="motion-bar bar-b" x="10" y="4" width="4" height="15" rx="1"/><rect class="motion-bar bar-c" x="16" y="8" width="4" height="11" rx="1"/></svg>
                         </div>
                         Total Não Colhido e Percentual por Bloco
                     </h3>
@@ -885,7 +834,7 @@
                 <section class="elegant-card p-6">
                     <h3 class="text-lg font-extrabold text-slate-800 mb-2 flex items-center gap-3">
                         <div class="bg-rose-50 text-rose-600 p-2 rounded-lg">
-                            <i class="fa-solid fa-chart-line"></i>
+                            <svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="trend" aria-hidden="true" focusable="false"><path d="M3 3v18h18"/><path class="motion-trace" d="m5 16 5-5 4 3 7-9"/><path class="motion-arrow-tip" d="M16 5h5v5"/><circle class="motion-trend-point" cx="10" cy="11" r="1"/></svg>
                         </div>
                         Total de Perdas por Causa e % de Perda
                     </h3>
@@ -978,22 +927,7 @@
         const monthsNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         const colors = ['#0ea5e9', '#f59e0b', '#8b5cf6', '#10b981', '#f43f5e', '#6366f1', '#84cc16', '#06b6d4', '#ec4899', '#a855f7'];
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            
-            if (user === 'adm123' && pass === 'lucas@2026') {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('dashboardScreen').classList.remove('hidden');
-                init();
-            } else {
-                const errorEl = document.getElementById('loginError');
-                errorEl.classList.remove('hidden');
-                errorEl.classList.add('animate-bounce');
-                setTimeout(() => errorEl.classList.remove('animate-bounce'), 1000);
-            }
-        });
+        document.addEventListener('DOMContentLoaded', init, {once:true});
 
         window.addEventListener('click', function(e) {
             if (!e.target.closest('.dropdown')) {
@@ -1130,14 +1064,16 @@
             return '';
         }
 
-        function init() {
+        function showTransplantUnavailable(){allData=[];populateFilters();populateRendFilters();populateProdFilters();applyFilters();applyRendFilters();applyProdFilters();const n=document.getElementById('sheetNotice');n.hidden=false;n.textContent='Planilha de transplantio indisponível ou sem registros válidos. Não há dados estimados sendo exibidos.';}
+        function showProductionUnavailable(){prodData=[];populateProdSheetFilters();applyProdSheetFilters();const n=document.getElementById('sheetNotice');n.hidden=false;n.textContent+=' Planilha de produção indisponível ou sem registros válidos.';}
+        function init() {document.getElementById('sheetNotice').hidden=true;document.getElementById('sheetNotice').textContent='';
             document.getElementById('btnAtualizarDados').disabled = true;
             document.getElementById('loadingIndicator').classList.remove('hidden');
             document.getElementById('loadingIndicator').classList.add('flex');
 
             Promise.all([
-                new Promise((res) => { Papa.parse(SHEET_CSV_URL, { download: true, header: true, complete: function(r) { processRawData(r.data); res(); }, error: function() { loadMockData(); res(); } }); }),
-                new Promise((res) => { Papa.parse(PROD_SHEET_CSV_URL, { download: true, header: true, complete: function(r) { processProdData(r.data); res(); }, error: function() { loadMockProdData(); res(); } }); })
+                new Promise((res) => { Papa.parse(SHEET_CSV_URL, { download: true, header: true, complete: function(r) { processRawData(r.data); res(); }, error: function() { showTransplantUnavailable(); res(); } }); }),
+                new Promise((res) => { Papa.parse(PROD_SHEET_CSV_URL, { download: true, header: true, complete: function(r) { processProdData(r.data); res(); }, error: function() { showProductionUnavailable(); res(); } }); })
             ]).then(() => {
                 document.getElementById('btnAtualizarDados').disabled = false;
                 document.getElementById('loadingIndicator').classList.add('hidden');
@@ -1146,7 +1082,7 @@
         }
 
         function processRawData(data) {
-            if (!data || data.length === 0) { loadMockData(); return; }
+            if (!data || data.length === 0) { showTransplantUnavailable(); return; }
             allData = data.map(row => {
                 const dateObj = parseDate(row['Data - Transplantio'] || row['Data']);
                 let mesAno = dateObj && !isNaN(dateObj) ? `${monthsNames[dateObj.getMonth()]} de ${dateObj.getFullYear()}` : 'Indefinido';
@@ -1170,7 +1106,7 @@
         }
 
         function processProdData(data) {
-            if (!data || data.length === 0) { loadMockProdData(); return; }
+            if (!data || data.length === 0) { showProductionUnavailable(); return; }
             
             prodData = data.map(row => {
                 let c = getCSVField(row, ['ciclo', 'Ciclo', 'CICLO']);
@@ -1193,7 +1129,7 @@
                 };
             }).filter(d => d.setor !== 'Não definido' && (d.totalTransplantado > 0 || d.qtdColhida > 0 || d.totalNaoColhido > 0 || d.perdaPorCausas > 0));
             
-            if (prodData.length === 0) { loadMockProdData(); return; }
+            if (prodData.length === 0) { showProductionUnavailable(); return; }
             populateProdSheetFilters(); applyProdSheetFilters();
         }
 
@@ -2059,15 +1995,6 @@
         }
     </script>
 
-    <script>
-        function togglePassword() {
-            const input = document.getElementById('password');
-            const icon = document.getElementById('passwordToggleIcon');
-            if (!input || !icon) return;
-            const visible = input.type === 'text';
-            input.type = visible ? 'password' : 'text';
-            icon.className = visible ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
-        }
-    </script>
-</body>
+
+<script src="layout.js?v=20261117-five-7"></script><script>const transplantSwitch=switchTab;switchTab=function(name){transplantSwitch(name);document.querySelectorAll('#dashboardScreen>nav .tab-btn').forEach(button=>{const active=button.id==='tabBtn-'+name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});};document.getElementById('tabBtn-transplantio').classList.add('active');</script><script>document.querySelectorAll('#dashboardScreen main canvas').forEach(canvas=>{canvas.setAttribute('role','img');const card=canvas.closest('.elegant-card');if(card)card.classList.add('chart-panel');});</script></body>
 </html>
