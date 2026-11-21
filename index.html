@@ -372,7 +372,7 @@
         }
 
     </style>
-<link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="stylesheet" href="layout.css?v=20261118-area-29"><script src="daily-seed-report.js?v=20261118-area-29"></script></head>
+<link rel="icon" href="logo.svg" type="image/svg+xml"><link rel="stylesheet" href="layout.css?v=20261121-transplant-summary-50"><script src="daily-seed-report.js?v=20261121-transplant-summary-50"></script><script src="transplant-summary.js?v=20261121-transplant-summary-50"></script></head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-emerald-200 selection:text-emerald-900">
 
     <div id="dashboardScreen" class=" flex flex-col w-full">
@@ -470,6 +470,11 @@
                         </div>
                     </div>
                 </section>
+                <section class="elegant-card transplant-summary-tools">
+                  <div><h3><svg class="metric-icon" viewBox="0 0 24 24" data-motion-icon="records" aria-hidden="true"><rect x="4" y="3" width="16" height="19" rx="2"/><path class="motion-record-line line-a" d="M8 8h8"/><path class="motion-record-line line-b" d="M8 13h8"/><path class="motion-record-line line-c" d="M8 18h5"/></svg>Resumo do transplantio · PNG</h3><p>Selecione um ciclo e os blocos nos filtros acima. O PNG inclui todas as datas e variedades desses blocos no ciclo, inclusive quando os filtros de data ou variedade estiverem reduzindo a tabela.</p></div>
+                  <button type="button" id="transplantSummaryPng" onclick="exportTransplantSummaryPng()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg>Baixar resumo em PNG</button><p id="transplantSummaryStatus" role="status" aria-live="polite"></p>
+                </section>
+                <section class="elegant-card transplant-bed-section"><h3>Conferência por canteiros · bloco e ciclo</h3><p>Canteiros é o total do bloco; Mudas por canteiro é a quantidade de mudas que cabe em um canteiro. A multiplicação confere o total calculado com a soma do plantado de todas as datas e variedades do ciclo. Valores repetidos não são somados e campos vazios não são tratados como zero.</p><div id="transplantBedChecks" class="transplant-bed-checks"></div></section>
                 <!-- KPIs T1 -->
                 <section class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     <div class="kpi-card bg-emerald-100 p-4 flex flex-col justify-center relative shadow-sm">
@@ -545,7 +550,7 @@
                                     <th class="px-6 py-4">Local</th>
                                     <th class="px-6 py-4">Ciclo</th>
                                     <th class="px-6 py-4">Variedade</th>
-                                    <th class="px-6 py-4 text-right">Transplantado</th>
+                                    <th class="px-6 py-4 text-right">Canteiros</th><th class="px-6 py-4 text-right">Mudas / canteiro</th><th class="px-6 py-4 text-right">Transplantado</th>
                                     <th class="px-6 py-4 text-right">Perdas</th>
                                     <th class="px-6 py-4 text-right">Germinação</th>
                                 </tr>
@@ -1114,6 +1119,7 @@
                 const table=node('table'),head=node('thead'),header=node('tr');for(const title of ['Data','Variedade','Bandejas','Mudas'])header.append(node('th',title));head.append(header);table.append(head);const body=node('tbody');for(const group of rows){const tr=node('tr');for(const [label,value] of [['Data',group.day?group.day.split('-').reverse().join('/'):'Sem data informada'],['Variedade',group.variety],['Bandejas',format(group.trays)],['Mudas',format(group.seedlings)]]){const td=node('td',value);td.dataset.column=label;tr.append(td);}body.append(tr);}table.append(body);card.append(table);board.append(card);}
         }
 
+        function optionalTransplantField(row,names){const value=getCSVField(row,names);if(value===undefined||value===null||!/[0-9]/.test(String(value)))return null;const parsed=parseNum(value);return Number.isFinite(parsed)&&parsed>=0?parsed:null;}
         function processRawData(data) {
             if (!data || data.length === 0) { showTransplantUnavailable(); return; }
             allData = data.map(row => {
@@ -1127,6 +1133,9 @@
                     ciclo: (row['Ciclo'] || 'Não definido').trim(),
                     cultura: (row['Cultura'] || '').trim(),
                     variedade: (row['Variedade'] || 'Não definida').trim(),
+                    canteiros: optionalTransplantField(row,['Canteiros','Total de canteiros','Total Canteiros']),
+                    mudasPorCanteiro: optionalTransplantField(row,['Mudas por canteiro','Mudas / canteiro']),
+                    idadeMuda: optionalTransplantField(row,['germinação (dias)','Germinação (dias)']),
                     bandejas: parseNum(row['Bandejas']), mudas: parseNum(row['Mudas']),
                     transplantado: parseNum(row['Total transplantado']), perdas: parseNum(row['Perdas']),
                     horasTrabalhadas: parseHours(row['Hora Início']||row['Hora Inicio']||'', row['Hora Final']||''),
@@ -1346,12 +1355,13 @@
                     <td class="px-6 py-4 font-extrabold text-slate-700">${d.local}</td>
                     <td class="px-6 py-4"><span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200">${d.ciclo}</span></td>
                     <td class="px-6 py-4 text-slate-600 font-semibold">${d.variedade}</td>
-                    <td class="px-6 py-4 text-right font-extrabold text-emerald-600">${f(d.transplantado)}</td>
+                    <td class="px-6 py-4 text-right font-bold text-slate-600">${d.canteiros===null?'—':f(d.canteiros)}</td><td class="px-6 py-4 text-right font-bold text-slate-600">${d.mudasPorCanteiro===null?'—':f(d.mudasPorCanteiro)}</td><td class="px-6 py-4 text-right font-extrabold text-emerald-600">${f(d.transplantado)}</td>
                     <td class="px-6 py-4 text-right font-extrabold ${d.perdas>0?'text-rose-500':'text-slate-400'}">${f(d.perdas)}</td>
                     <td class="px-6 py-4 text-right font-bold text-slate-500 bg-slate-50/50">${d.germinacao} <span class="text-[10px] uppercase font-bold text-slate-400 ml-1">dias</span></td>
                 </tr>`;
                 }).join('');
             renderChart();
+            if(typeof renderTransplantChecks==='function')renderTransplantChecks();
         }
 
         function updateRendimentoUI() {
@@ -2029,5 +2039,5 @@
     </script>
 
 
-<script src="layout.js?v=20261118-area-29"></script><script>const transplantSwitch=switchTab;switchTab=function(name){transplantSwitch(name);document.querySelectorAll('#dashboardScreen>nav .tab-btn').forEach(button=>{const active=button.id==='tabBtn-'+name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});};document.getElementById('tabBtn-transplantio').classList.add('active');</script><script>document.querySelectorAll('#dashboardScreen main canvas').forEach(canvas=>{canvas.setAttribute('role','img');const card=canvas.closest('.elegant-card');if(card)card.classList.add('chart-panel');});</script></body>
+<script src="layout.js?v=20261121-transplant-summary-50"></script><script>const transplantSwitch=switchTab;switchTab=function(name){transplantSwitch(name);document.querySelectorAll('#dashboardScreen>nav .tab-btn').forEach(button=>{const active=button.id==='tabBtn-'+name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));});};document.getElementById('tabBtn-transplantio').classList.add('active');</script><script>document.querySelectorAll('#dashboardScreen main canvas').forEach(canvas=>{canvas.setAttribute('role','img');const card=canvas.closest('.elegant-card');if(card)card.classList.add('chart-panel');});</script></body>
 </html>
